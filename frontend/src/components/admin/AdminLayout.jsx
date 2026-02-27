@@ -9,6 +9,11 @@ import { authService } from '../../services/authService';
 
 const AdminLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [isPinned, setIsPinned] = useState(() => {
+        const saved = localStorage.getItem('adminSidebarPinned');
+        return saved !== null ? JSON.parse(saved) : true;
+    });
+    const [isHovered, setIsHovered] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
     const user = authService.getCurrentUser();
@@ -36,6 +41,13 @@ const AdminLayout = () => {
         return location.pathname.startsWith(path);
     };
 
+    const togglePin = () => {
+        setIsPinned(!isPinned);
+        localStorage.setItem('adminSidebarPinned', JSON.stringify(!isPinned));
+    };
+
+    const isExpanded = isPinned || isHovered;
+
     return (
         <div className="min-h-screen bg-rice-50 flex">
             {/* Mobile Sidebar Overlay */}
@@ -47,21 +59,26 @@ const AdminLayout = () => {
             )}
 
             {/* Sidebar */}
-            <aside className={`
-        fixed lg:sticky top-0 left-0 h-screen w-64 bg-gradient-to-b from-gray-900 to-gray-800 z-50
-        transform transition-transform duration-300 lg:transform-none
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}>
-                <div className="flex flex-col h-full">
+            <aside
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                className={`
+                    fixed lg:sticky top-0 left-0 h-screen bg-gradient-to-b from-gray-900 to-gray-800 z-50
+                    transform transition-all duration-300 ease-in-out lg:transform-none
+                    ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+                    ${isExpanded ? 'w-64' : 'w-20'}
+                `}
+            >
+                <div className="flex flex-col h-full overflow-hidden">
                     {/* Logo */}
-                    <div className="p-6 border-b border-gray-700 flex items-center justify-between">
-                        <Link to="/" className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-secondary-500 rounded-lg flex items-center justify-center">
-                                <Shield className="text-white w-5 h-5" />
+                    <div className="p-4 border-b border-gray-700 flex items-center justify-between h-20 shrink-0">
+                        <Link to="/" className="flex items-center gap-3">
+                            <div className="min-w-[40px] h-10 w-10 bg-secondary-500 rounded-xl flex items-center justify-center shrink-0">
+                                <Shield className="text-white w-6 h-6" />
                             </div>
-                            <div>
+                            <div className={`transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
                                 <span className="font-bold text-lg tracking-tight text-white block">QR BRAND</span>
-                                <span className="text-xs text-gray-400 uppercase tracking-wider">Admin Panel</span>
+                                <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Admin Panel</span>
                             </div>
                         </Link>
                         <button
@@ -73,20 +90,20 @@ const AdminLayout = () => {
                     </div>
 
                     {/* User Info */}
-                    <div className="p-6 border-b border-gray-700">
+                    <div className="p-4 border-b border-gray-700 shrink-0 overflow-hidden">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-secondary-500/20 rounded-full flex items-center justify-center">
+                            <div className="w-10 h-10 bg-secondary-500/20 rounded-xl flex items-center justify-center shrink-0">
                                 <Shield className="w-5 h-5 text-secondary-500" />
                             </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="font-bold text-white truncate">{user?.name || 'Admin'}</p>
-                                <p className="text-xs text-secondary-500 uppercase tracking-wider font-bold">Administrator</p>
+                            <div className={`flex-1 min-w-0 transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
+                                <p className="font-bold text-white truncate text-sm">{user?.name || 'Admin'}</p>
+                                <p className="text-[10px] text-secondary-500 uppercase tracking-wider font-bold italic">Administrator</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Navigation */}
-                    <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+                    <nav className="flex-1 p-3 space-y-1 overflow-y-auto no-scrollbar">
                         {navItems.map((item) => {
                             const Icon = item.icon;
                             const active = isActive(item.path, item.exact);
@@ -96,29 +113,52 @@ const AdminLayout = () => {
                                     key={item.path}
                                     to={item.path}
                                     onClick={() => setSidebarOpen(false)}
+                                    title={!isExpanded ? item.label : ''}
                                     className={`
-                    flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all
-                    ${active
+                                        flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-all group
+                                        ${active
                                             ? 'bg-secondary-500 text-gray-900 shadow-lg'
                                             : 'text-gray-300 hover:bg-gray-700/50 hover:text-white'
                                         }
-                  `}
+                                    `}
                                 >
-                                    <Icon className="w-5 h-5" />
-                                    <span>{item.label}</span>
+                                    <div className="min-w-[24px] flex justify-center">
+                                        <Icon className={`w-5 h-5 ${active ? 'text-gray-900' : 'text-gray-400 group-hover:text-white'}`} />
+                                    </div>
+                                    <span className={`whitespace-nowrap transition-all duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0 w-0 h-0 overflow-hidden'}`}>
+                                        {item.label}
+                                    </span>
                                 </Link>
                             );
                         })}
                     </nav>
 
-                    {/* Logout */}
-                    <div className="p-4 border-t border-gray-700">
+                    {/* Footer Actions */}
+                    <div className="p-3 border-t border-gray-700 space-y-1">
                         <button
                             onClick={handleLogout}
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-red-400 hover:bg-red-500/10 transition-all"
+                            title={!isExpanded ? 'Logout' : ''}
+                            className="w-full flex items-center gap-3 px-3 py-3 rounded-xl font-medium text-red-400 hover:bg-red-500/10 transition-all group"
                         >
-                            <LogOut className="w-5 h-5" />
-                            <span>Logout</span>
+                            <div className="min-w-[24px] flex justify-center">
+                                <LogOut className="w-5 h-5" />
+                            </div>
+                            <span className={`transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0 w-0 h-0 overflow-hidden'}`}>
+                                Logout
+                            </span>
+                        </button>
+
+                        {/* Collapsible Toggle */}
+                        <button
+                            onClick={togglePin}
+                            className="hidden lg:flex w-full items-center gap-3 px-3 py-3 rounded-xl font-medium text-gray-500 hover:bg-gray-700/50 hover:text-white transition-all group"
+                        >
+                            <div className="min-w-[24px] flex justify-center">
+                                <Menu className={`w-5 h-5 transition-transform duration-300 ${isPinned ? 'rotate-90' : ''}`} />
+                            </div>
+                            <span className={`transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0 w-0 h-0 overflow-hidden'}`}>
+                                {isPinned ? 'Collapse Sidebar' : 'Expand Sidebar'}
+                            </span>
                         </button>
                     </div>
                 </div>

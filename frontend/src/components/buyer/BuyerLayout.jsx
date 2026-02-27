@@ -10,6 +10,11 @@ import Logo from '../common/Logo';
 
 const BuyerLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [isPinned, setIsPinned] = useState(() => {
+        const saved = localStorage.getItem('buyerSidebarPinned');
+        return saved !== null ? JSON.parse(saved) : true;
+    });
+    const [isHovered, setIsHovered] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
     const user = authService.getCurrentUser();
@@ -26,24 +31,47 @@ const BuyerLayout = () => {
         { path: '/buyer/settings', icon: Settings, label: 'Settings' },
     ];
 
+    const togglePin = () => {
+        setIsPinned(!isPinned);
+        localStorage.setItem('buyerSidebarPinned', JSON.stringify(!isPinned));
+    };
+
+    const isExpanded = isPinned || isHovered;
+
     return (
         <div className="min-h-screen bg-rice-50 flex">
             {/* Sidebar for Desktop */}
-            <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-auto flex flex-col ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <aside
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                className={`
+                    fixed inset-y-0 left-0 z-50 bg-slate-900 text-white 
+                    transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:sticky flex flex-col
+                    ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+                    ${isExpanded ? 'w-64' : 'w-20'}
+                `}
+            >
                 {/* Logo Area */}
-                <div className="h-20 flex items-center px-4 border-b border-slate-800">
-                    <Logo variant="dark" size="sm" />
+                <div className="h-20 flex items-center px-4 border-b border-slate-800 shrink-0 overflow-hidden">
+                    <Link to="/buyer" className="flex items-center gap-3">
+                        <div className="min-w-[40px] flex justify-center">
+                            <Logo variant="dark" size="sm" />
+                        </div>
+                        <span className={`font-black text-xl text-white transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
+                            QR HUB
+                        </span>
+                    </Link>
                 </div>
 
                 {/* User Info */}
-                <div className="p-6 border-b border-slate-800">
+                <div className="p-4 border-b border-slate-800 shrink-0 overflow-hidden">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center border-2 border-slate-700">
+                        <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center border-2 border-slate-700 shrink-0">
                             <span className="text-lg font-bold text-primary-400">
                                 {user?.name?.charAt(0).toUpperCase() || 'U'}
                             </span>
                         </div>
-                        <div className="overflow-hidden">
+                        <div className={`transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
                             <p className="font-bold text-sm truncate">{user?.name || 'Buyer'}</p>
                             <p className="text-xs text-slate-500 uppercase tracking-wider font-bold">Customer</p>
                         </div>
@@ -51,7 +79,7 @@ const BuyerLayout = () => {
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+                <nav className="flex-1 px-3 py-6 space-y-2 overflow-y-auto no-scrollbar">
                     {navItems.map((item) => {
                         const Icon = item.icon;
                         const active = item.exact
@@ -63,30 +91,61 @@ const BuyerLayout = () => {
                                 key={item.path}
                                 to={item.path}
                                 onClick={() => setSidebarOpen(false)}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${active
+                                title={!isExpanded ? item.label : ''}
+                                className={`flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-all group ${active
                                     ? 'bg-primary-600 text-white shadow-lg shadow-primary-900/20'
                                     : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                                     }`}
                             >
-                                <Icon className={`w-5 h-5 ${active ? 'text-white' : 'text-slate-500 group-hover:text-white'}`} />
-                                {item.label}
+                                <div className="min-w-[24px] flex justify-center">
+                                    <Icon className={`w-5 h-5 ${active ? 'text-white' : 'text-slate-500 group-hover:text-white'}`} />
+                                </div>
+                                <span className={`whitespace-nowrap transition-all duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0 w-0 h-0 overflow-hidden'}`}>
+                                    {item.label}
+                                </span>
                             </Link>
                         );
                     })}
                 </nav>
 
                 {/* Footer Actions */}
-                <div className="p-4 border-t border-slate-800 space-y-2">
-                    <Link to="/search" className="flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-primary-400 hover:bg-slate-800 transition-all">
-                        <Search className="w-5 h-5" />
-                        Browse Market
+                <div className="p-3 border-t border-slate-800 space-y-1">
+                    <Link
+                        to="/search"
+                        title={!isExpanded ? 'Browse Market' : ''}
+                        className="flex items-center gap-3 px-3 py-3 rounded-xl font-bold text-primary-400 hover:bg-slate-800 transition-all group"
+                    >
+                        <div className="min-w-[24px] flex justify-center">
+                            <Search className="w-5 h-5" />
+                        </div>
+                        <span className={`transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0 w-0 h-0 overflow-hidden'}`}>
+                            Browse Market
+                        </span>
                     </Link>
                     <button
                         onClick={handleLogout}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-red-400 hover:bg-red-400/10 transition-all w-full"
+                        title={!isExpanded ? 'Logout' : ''}
+                        className="flex items-center gap-3 px-3 py-3 rounded-xl font-medium text-red-400 hover:bg-red-400/10 transition-all w-full group"
                     >
-                        <LogOut className="w-5 h-5" />
-                        Logout
+                        <div className="min-w-[24px] flex justify-center">
+                            <LogOut className="w-5 h-5" />
+                        </div>
+                        <span className={`transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0 w-0 h-0 overflow-hidden'}`}>
+                            Logout
+                        </span>
+                    </button>
+
+                    {/* Collapsible Toggle */}
+                    <button
+                        onClick={togglePin}
+                        className="hidden lg:flex w-full items-center gap-3 px-3 py-3 rounded-xl font-medium text-slate-500 hover:bg-slate-800 hover:text-white transition-all group"
+                    >
+                        <div className="min-w-[24px] flex justify-center">
+                            <Menu className={`w-5 h-5 transition-transform duration-300 ${isPinned ? 'rotate-90' : ''}`} />
+                        </div>
+                        <span className={`transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0 w-0 h-0 overflow-hidden'}`}>
+                            {isPinned ? 'Collapse Sidebar' : 'Expand Sidebar'}
+                        </span>
                     </button>
                 </div>
             </aside>

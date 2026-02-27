@@ -11,6 +11,11 @@ import Logo from '../common/Logo';
 
 const SupplierLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [isPinned, setIsPinned] = useState(() => {
+        const saved = localStorage.getItem('supplierSidebarPinned');
+        return saved !== null ? JSON.parse(saved) : true;
+    });
+    const [isHovered, setIsHovered] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
     const user = authService.getCurrentUser();
@@ -35,7 +40,6 @@ const SupplierLayout = () => {
     }, []);
 
     const refreshStats = () => {
-        // Optimistic update or just refetch
         fetchStats();
     };
 
@@ -58,6 +62,13 @@ const SupplierLayout = () => {
         return location.pathname.startsWith(path);
     };
 
+    const togglePin = () => {
+        setIsPinned(!isPinned);
+        localStorage.setItem('supplierSidebarPinned', JSON.stringify(!isPinned));
+    };
+
+    const isExpanded = isPinned || isHovered;
+
     return (
         <div className="min-h-screen bg-rice-50 flex">
             {/* Mobile Sidebar Overlay */}
@@ -69,16 +80,26 @@ const SupplierLayout = () => {
             )}
 
             {/* Sidebar */}
-            <aside className={`
-        fixed lg:sticky top-0 left-0 h-screen w-64 bg-white border-r border-gray-100 z-50
-        transform transition-transform duration-300 lg:transform-none
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}>
-                <div className="flex flex-col h-full">
+            <aside
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                className={`
+                    fixed lg:sticky top-0 left-0 h-screen bg-white border-r border-gray-100 z-50
+                    transform transition-all duration-300 ease-in-out lg:transform-none
+                    ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+                    ${isExpanded ? 'w-64' : 'w-20'}
+                `}
+            >
+                <div className="flex flex-col h-full overflow-hidden">
                     {/* Logo */}
-                    <div className="p-4 border-b border-gray-100 flex items-center justify-between h-20">
-                        <Link to="/supplier" className="flex items-center gap-2">
-                            <Logo variant="light" size="sm" />
+                    <div className="p-4 border-b border-gray-100 flex items-center justify-between h-20 shrink-0">
+                        <Link to="/supplier" className="flex items-center gap-3 overflow-hidden">
+                            <div className="min-w-[40px] flex justify-center">
+                                <Logo variant="light" size="sm" />
+                            </div>
+                            <span className={`font-black text-xl text-primary-900 transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
+                                QR HUB
+                            </span>
                         </Link>
                         <button
                             onClick={() => setSidebarOpen(false)}
@@ -89,20 +110,20 @@ const SupplierLayout = () => {
                     </div>
 
                     {/* User Info */}
-                    <div className="p-6 border-b border-gray-100">
+                    <div className="p-4 border-b border-gray-100 shrink-0 overflow-hidden">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+                            <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center shrink-0">
                                 <User className="w-5 h-5 text-primary-600" />
                             </div>
-                            <div className="flex-1 min-w-0">
+                            <div className={`flex-1 min-w-0 transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
                                 <p className="font-black text-primary-900 truncate text-sm leading-none">{user?.name || 'Supplier'}</p>
-                                <p className="text-[10px] text-primary-500/70 font-bold uppercase tracking-widest mt-1">Authorized Supplier</p>
+                                <p className="text-[10px] text-primary-500/70 font-bold uppercase tracking-widest mt-1">Supplier</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Navigation */}
-                    <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+                    <nav className="flex-1 p-3 space-y-1 overflow-y-auto no-scrollbar">
                         {navItems.map((item) => {
                             const Icon = item.icon;
                             const active = isActive(item.path, item.exact);
@@ -112,29 +133,55 @@ const SupplierLayout = () => {
                                     key={item.path}
                                     to={item.path}
                                     onClick={() => setSidebarOpen(false)}
+                                    title={!isExpanded ? item.label : ''}
                                     className={`
-                    flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all
-                    ${active
+                                        flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-all group
+                                        ${active
                                             ? 'bg-primary-600 text-white shadow-md'
                                             : 'text-gray-600 hover:bg-gray-50 hover:text-primary-600'
                                         }
-                  `}
+                                    `}
                                 >
-                                    <Icon className="w-5 h-5" />
-                                    <span>{item.label}</span>
+                                    <div className="min-w-[24px] flex justify-center">
+                                        <Icon className={`w-5 h-5 ${active ? 'text-white' : 'text-gray-400 group-hover:text-primary-600'}`} />
+                                    </div>
+                                    <span className={`whitespace-nowrap transition-all duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0 w-0 h-0 overflow-hidden'}`}>
+                                        {item.label}
+                                    </span>
                                 </Link>
                             );
                         })}
                     </nav>
 
-                    {/* Logout */}
-                    <div className="p-4 border-t border-gray-100">
+                    {/* Footer Actions */}
+                    <div className="p-3 border-t border-gray-100 space-y-1">
                         <button
                             onClick={handleLogout}
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-red-600 hover:bg-red-50 transition-all"
+                            className="w-full flex items-center gap-3 px-3 py-3 rounded-xl font-medium text-red-600 hover:bg-red-50 transition-all group"
                         >
-                            <LogOut className="w-5 h-5" />
-                            <span>Logout</span>
+                            <div className="min-w-[24px] flex justify-center text-red-400 group-hover:text-red-600">
+                                <LogOut className="w-5 h-5" />
+                            </div>
+                            <span className={`transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0 w-0 h-0 overflow-hidden'}`}>
+                                Logout
+                            </span>
+                        </button>
+
+                        {/* Collapsible Toggle */}
+                        <button
+                            onClick={togglePin}
+                            className="hidden lg:flex w-full items-center gap-3 px-3 py-3 rounded-xl font-medium text-gray-400 hover:bg-gray-50 hover:text-primary-600 transition-all group"
+                        >
+                            <div className="min-w-[24px] flex justify-center">
+                                {isPinned ? (
+                                    <Menu className="w-5 h-5 rotate-90" /> // Using Menu as a placeholder for toggle icon
+                                ) : (
+                                    <Menu className="w-5 h-5" />
+                                )}
+                            </div>
+                            <span className={`transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0 w-0 h-0 overflow-hidden'}`}>
+                                {isPinned ? 'Collapse Sidebar' : 'Expand Sidebar'}
+                            </span>
                         </button>
                     </div>
                 </div>
