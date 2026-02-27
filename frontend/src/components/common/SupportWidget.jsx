@@ -170,6 +170,21 @@ const SupportWidget = () => {
                                     </div>
                                 </button>
 
+                                <a
+                                    href="https://wa.me/919614346666"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full p-5 bg-green-50 rounded-2xl border border-green-100 shadow-sm hover:shadow-md hover:border-green-300 transition-all text-left flex items-center gap-4 group"
+                                >
+                                    <div className="w-12 h-12 rounded-xl bg-green-500 flex items-center justify-center text-white group-hover:bg-green-600 transition-all transform group-hover:scale-110">
+                                        <MessageCircle className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <p className="font-black text-green-900 leading-tight">WhatsApp Support</p>
+                                        <p className="text-xs text-green-700 mt-1">Chat directly with our team</p>
+                                    </div>
+                                </a>
+
                                 <div className="p-4 bg-orange-50 rounded-2xl border border-orange-100 flex gap-3 mt-4">
                                     <AlertCircle className="w-5 h-5 text-orange-600 shrink-0" />
                                     <p className="text-[11px] text-orange-800 font-bold leading-relaxed">

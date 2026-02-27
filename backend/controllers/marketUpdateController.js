@@ -11,11 +11,11 @@ exports.createUpdate = async (req, res) => {
             description: Joi.string().required(),
             category: Joi.string()
                 .valid(
-                    'Trend Update',
-                    'Price Movement',
-                    'Supply Alert',
-                    'Quality Awareness',
-                    'Usage Guidance'
+                    'Education',
+                    'Quality',
+                    'Market Trends',
+                    'Price Alerts',
+                    'Supply Updates'
                 )
                 .required(),
             district: Joi.string().allow('', null),
@@ -28,10 +28,16 @@ exports.createUpdate = async (req, res) => {
             return res.status(400).json({ success: false, message: error.details[0].message });
         }
 
-        const update = await MarketUpdate.create({
+        const updateData = {
             ...req.body,
             createdBy: req.user._id,
-        });
+        };
+
+        if (req.file) {
+            updateData.imageUrl = req.file.path;
+        }
+
+        const update = await MarketUpdate.create(updateData);
 
         res.status(201).json({ success: true, data: update });
     } catch (err) {
@@ -55,7 +61,12 @@ exports.updateMarketUpdate = async (req, res) => {
             return res.status(403).json({ success: false, message: 'Not authorized to update this feed' });
         }
 
-        update = await MarketUpdate.findByIdAndUpdate(req.params.id, req.body, {
+        const updateData = { ...req.body };
+        if (req.file) {
+            updateData.imageUrl = req.file.path;
+        }
+
+        update = await MarketUpdate.findByIdAndUpdate(req.params.id, updateData, {
             new: true,
             runValidators: true,
         });

@@ -5,11 +5,14 @@ const { protect, authorize } = require('../middleware/authMiddleware');
 const {
     getAllListings,
     approveListing,
+    approveListingsBulk,
     rejectListing,
     deactivateListing,
+    deleteListing,
     getDashboardStats,
     getAllSuppliers,
     deactivateSupplier,
+    verifySupplierGST,
     getTopSuppliers,
     getAllUsers,
     updateUserStatus,
@@ -24,9 +27,12 @@ const {
     deleteReview
 } = require('../controllers/reviewController');
 
+const { getDemandHeatmap } = require('../controllers/insightsController');
+
 // Dashboard Stats
 router.get('/dashboard/stats', protect, authorize('admin'), getDashboardStats);
 router.get('/dashboard/top-suppliers', protect, authorize('admin'), getTopSuppliers);
+router.get('/insights/heatmap', protect, authorize('admin'), getDemandHeatmap);
 
 // User Management
 router.get('/users', protect, authorize('admin'), getAllUsers);
@@ -35,12 +41,15 @@ router.patch('/users/:id/status', protect, authorize('admin'), updateUserStatus)
 // Supplier Management
 router.get('/suppliers', protect, authorize('admin'), getAllSuppliers);
 router.patch('/suppliers/:id/deactivate', protect, authorize('admin'), deactivateSupplier);
+router.post('/suppliers/:id/verify-gst', protect, authorize('admin'), verifySupplierGST);
 
 // Listing Management
 router.get('/listings', protect, authorize('admin'), getAllListings);
+router.patch('/listings/bulk-approve', protect, authorize('admin'), approveListingsBulk);
 router.patch('/listings/:id/approve', protect, authorize('admin'), approveListing);
 router.patch('/listings/:id/reject', protect, authorize('admin'), rejectListing);
 router.patch('/listings/:id/deactivate', protect, authorize('admin'), deactivateListing);
+router.delete('/listings/:id', protect, authorize('admin'), deleteListing);
 
 // Support Management
 router.get('/support', protect, authorize('admin'), getAllSupportTickets);

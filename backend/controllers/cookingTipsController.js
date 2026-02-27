@@ -120,7 +120,7 @@ exports.getListingCookingTips = async (req, res) => {
         );
 
         if (!tips) {
-            return res.status(404).json({ success: false, message: 'No cooking tips found for this listing' });
+            return res.status(200).json({ success: true, data: null });
         }
 
         res.json({

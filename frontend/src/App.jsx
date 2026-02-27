@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Search, Home, TrendingUp, BarChart2, ShoppingBag, LogOut, User, Wheat, Scale, BookOpen, Shield, Menu, X, LogIn, LayoutDashboard } from 'lucide-react';
+import { Search, Home, TrendingUp, BarChart2, ShoppingBag, LogOut, User, Wheat, Scale, BookOpen, Shield, Menu, X, LogIn, LayoutDashboard, Box, ArrowRight } from 'lucide-react';
 import ProtectedRoute from './components/ProtectedRoute';
 import SupplierLayout from './components/supplier/SupplierLayout';
 import AdminLayout from './components/admin/AdminLayout';
@@ -60,7 +60,7 @@ const Layout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const user = authService.getCurrentUser();
-  const { compareIds } = useAppStore();
+  const { compareIds, clearCompare } = useAppStore();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleLogout = () => {
@@ -196,12 +196,32 @@ const Layout = ({ children }) => {
 
       {/* Compare Float Bar */}
       {compareIds.length > 0 && location.pathname !== '/compare' && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-field-800/90 backdrop-blur-md text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-4 animate-in slide-in-from-bottom-10 fade-in duration-500 border border-field-600">
-          <Scale className="w-5 h-5 text-rice-300" />
-          <span className="text-sm font-medium whitespace-nowrap">{compareIds.length} rice selected</span>
-          <Link to="/compare" className="bg-rice-500 hover:bg-rice-400 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors shadow-lg uppercase tracking-wide">
-            Compare
-          </Link>
+        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] bg-white border border-primary-100 shadow-[0_20px_50px_rgba(0,0,0,0.1)] p-2 pr-4 rounded-full flex items-center gap-4 animate-in slide-in-from-bottom-12 duration-700">
+          <div className="flex -space-x-2 ml-2">
+            {[...Array(compareIds.length)].map((_, i) => (
+              <div key={i} className="w-8 h-8 rounded-full bg-primary-600 border-2 border-white flex items-center justify-center text-[10px] font-black text-white shadow-sm ring-1 ring-primary-100">
+                <Box className="w-3.5 h-3.5" />
+              </div>
+            ))}
+          </div>
+          <div className="h-6 w-px bg-gray-100" />
+          <p className="text-xs font-black uppercase tracking-widest text-gray-900 whitespace-nowrap">
+            {compareIds.length} <span className="text-primary-600">Selected</span>
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={clearCompare}
+              className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-red-500 px-2 transition-colors"
+            >
+              Clear
+            </button>
+            <Link
+              to={`/compare?ids=${compareIds.join(',')}`}
+              className="bg-primary-600 hover:bg-primary-700 text-white text-[10px] font-black uppercase tracking-[0.15em] px-6 py-2.5 rounded-full transition-all shadow-lg shadow-primary-200 flex items-center gap-2 group"
+            >
+              Analysis <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
         </div>
       )}
 

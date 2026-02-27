@@ -6,12 +6,13 @@ import {
     Shield, LifeBuoy, UserCheck
 } from 'lucide-react';
 import { authService } from '../../services/authService';
+import Logo from '../common/Logo';
 
 const AdminLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isPinned, setIsPinned] = useState(() => {
         const saved = localStorage.getItem('adminSidebarPinned');
-        return saved !== null ? JSON.parse(saved) : true;
+        return saved !== null ? JSON.parse(saved) : false;
     });
     const [isHovered, setIsHovered] = useState(false);
     const location = useLocation();
@@ -73,13 +74,7 @@ const AdminLayout = () => {
                     {/* Logo */}
                     <div className="p-4 border-b border-gray-700 flex items-center justify-between h-20 shrink-0">
                         <Link to="/" className="flex items-center gap-3">
-                            <div className="min-w-[40px] h-10 w-10 bg-secondary-500 rounded-xl flex items-center justify-center shrink-0">
-                                <Shield className="text-white w-6 h-6" />
-                            </div>
-                            <div className={`transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
-                                <span className="font-bold text-lg tracking-tight text-white block">QR BRAND</span>
-                                <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Admin Panel</span>
-                            </div>
+                            <Logo variant="dark" size="sm" iconOnly={!isExpanded} />
                         </Link>
                         <button
                             onClick={() => setSidebarOpen(false)}
@@ -152,13 +147,11 @@ const AdminLayout = () => {
                         <button
                             onClick={togglePin}
                             className="hidden lg:flex w-full items-center gap-3 px-3 py-3 rounded-xl font-medium text-gray-500 hover:bg-gray-700/50 hover:text-white transition-all group"
+                            title={isPinned ? 'Collapse Sidebar' : 'Expand Sidebar'}
                         >
                             <div className="min-w-[24px] flex justify-center">
                                 <Menu className={`w-5 h-5 transition-transform duration-300 ${isPinned ? 'rotate-90' : ''}`} />
                             </div>
-                            <span className={`transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0 w-0 h-0 overflow-hidden'}`}>
-                                {isPinned ? 'Collapse Sidebar' : 'Expand Sidebar'}
-                            </span>
                         </button>
                     </div>
                 </div>

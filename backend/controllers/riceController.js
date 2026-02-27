@@ -8,6 +8,15 @@ const { APPROVAL_STATUS, USAGE_CATEGORIES } = require('../utils/constants');
 // @route   POST /api/rice
 // @access  Private (Supplier)
 exports.createListing = asyncHandler(async (req, res) => {
+    // Parse specifications if it's a string (from FormData)
+    if (req.body.specifications && typeof req.body.specifications === 'string') {
+        try {
+            req.body.specifications = JSON.parse(req.body.specifications);
+        } catch (e) {
+            console.error("Failed to parse specifications:", e);
+        }
+    }
+
     const schema = Joi.object({
         brandName: Joi.string().required(),
         riceVariety: Joi.string().required(),
@@ -16,6 +25,14 @@ exports.createListing = asyncHandler(async (req, res) => {
         bagWeightKg: Joi.number().min(0).required(),
         dispatchTimeline: Joi.string().required(),
         usageCategory: Joi.string().valid(...USAGE_CATEGORIES).required(),
+        specifications: Joi.object({
+            grainLength: Joi.string(),
+            riceAge: Joi.string(),
+            purityPercentage: Joi.number().min(0).max(100),
+            brokenGrainPercentage: Joi.number().min(0).max(100),
+            moistureContent: Joi.number().min(0).max(100),
+            cookingTime: Joi.string()
+        }).optional()
     });
 
     const { error } = schema.validate(req.body);
@@ -29,6 +46,8 @@ exports.createListing = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('Please create a supplier profile first');
     }
+
+
 
     const listingData = {
         ...req.body,
@@ -48,6 +67,15 @@ exports.createListing = asyncHandler(async (req, res) => {
 // @route   PUT /api/rice/:id
 // @access  Private (Supplier)
 exports.updateListing = asyncHandler(async (req, res) => {
+    // Parse specifications if it's a string (from FormData)
+    if (req.body.specifications && typeof req.body.specifications === 'string') {
+        try {
+            req.body.specifications = JSON.parse(req.body.specifications);
+        } catch (e) {
+            console.error("Failed to parse specifications:", e);
+        }
+    }
+
     let listing = await RiceListing.findById(req.params.id);
 
     if (!listing) {
@@ -160,6 +188,8 @@ exports.searchListings = asyncHandler(async (req, res) => {
     if (riceVariety) query.riceVariety = { $regex: riceVariety, $options: 'i' };
     if (usageCategory) query.usageCategory = usageCategory;
 
+
+
     if (minPrice || maxPrice) {
         query.pricePerBag = {};
         if (minPrice) query.pricePerBag.$gte = Number(minPrice);
@@ -221,9 +251,9 @@ exports.compareListings = asyncHandler(async (req, res) => {
         throw new Error('Please provide an array of listing IDs');
     }
 
-    if (listingIds.length < 2 || listingIds.length > 4) {
+    if (listingIds.length < 2 || listingIds.length > 3) {
         res.status(400);
-        throw new Error('Comparison requires minimum 2 and maximum 4 listings');
+        throw new Error('Comparison requires minimum 2 and maximum 3 listings');
     }
 
     const comparison = await RiceListing.find({
@@ -232,7 +262,7 @@ exports.compareListings = asyncHandler(async (req, res) => {
         isActive: true,
     })
         .populate('supplierId', 'millName district state')
-        .select('brandName riceVariety pricePerBag bagWeightKg usageCategory supplierId');
+        .select('brandName riceVariety pricePerBag bagWeightKg usageCategory supplierId bagImageUrl averageRating ratingDetails dispatchTimeline specifications');
 
     const formattedComparison = comparison.map((item) => ({
         id: item._id,
@@ -242,6 +272,11 @@ exports.compareListings = asyncHandler(async (req, res) => {
         bagWeightKg: item.bagWeightKg,
         usageCategory: item.usageCategory,
         supplier: item.supplierId,
+        bagImageUrl: item.bagImageUrl,
+        averageRating: item.averageRating,
+        ratingDetails: item.ratingDetails,
+        dispatchTimeline: item.dispatchTimeline,
+        specifications: item.specifications
     }));
 
     res.json({ success: true, comparison: formattedComparison });

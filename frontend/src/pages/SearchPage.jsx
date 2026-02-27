@@ -1,35 +1,76 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
-import { Search, Filter, SlidersHorizontal, MapPin, Tag, ArrowUpDown, Star } from 'lucide-react';
-import { riceService } from '../services';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
+import { Search, Filter, SlidersHorizontal, MapPin, Tag, ArrowUpDown, Star, Scale, Info, Heart, XCircle, X } from 'lucide-react';
+import { useAppStore } from '../context/AppContext';
+import { riceService, watchlistService } from '../services';
+import { authService } from '../services/authService';
 
 const SearchPage = () => {
+    const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showFilters, setShowFilters] = useState(false);
     const [pagination, setPagination] = useState({ totalResults: 0, totalPages: 0 });
+    const [watchlist, setWatchlist] = useState([]);
+    const [searchTerm, setSearchTerm] = useState(searchParams.get('riceVariety') || '');
+    const user = React.useMemo(() => authService.getCurrentUser(), []);
+    const userId = user?._id;
 
+    const { compareIds, toggleCompare } = useAppStore();
     const fetchResults = useCallback(async () => {
         setLoading(true);
         try {
             const params = Object.fromEntries([...searchParams]);
             const res = await riceService.searchListings({ limit: 10, ...params });
-            setResults(res.data.results);
+            setResults(res.data.results || []);
             setPagination({
-                totalResults: res.data.totalResults,
-                totalPages: res.data.totalPages
+                totalResults: res.data.totalResults || 0,
+                totalPages: res.data.totalPages || 0
             });
         } catch (err) {
             console.error(err);
         } finally {
             setLoading(false);
         }
-    }, [searchParams]);
+    }, [searchParams.toString()]); // Stable string dependency
+
+    const fetchWatchlist = useCallback(async () => {
+        if (!userId) return;
+        try {
+            const res = await watchlistService.getMyWatchlist();
+            setWatchlist(res.data.data.map(item => item.listingId._id));
+        } catch (err) {
+            console.error(err);
+        }
+    }, [userId]);
 
     useEffect(() => {
         fetchResults();
-    }, [fetchResults]);
+        fetchWatchlist();
+    }, [fetchResults, fetchWatchlist]);
+
+    const toggleWatchlist = async (e, listingId) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!user) return alert('Please login to use watchlist');
+
+        try {
+            if (watchlist.includes(listingId)) {
+                // Find the watchItem ID (simplified: fetch again or manage map)
+                // For now, let's just use the toggle logic
+                // Refetch is safer for now
+                const res = await watchlistService.getMyWatchlist();
+                const item = res.data.data.find(i => i.listingId._id === listingId);
+                if (item) await watchlistService.removeFromWatchlist(item._id);
+            } else {
+                await watchlistService.addToWatchlist({ listingId });
+            }
+            fetchWatchlist();
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const updateParam = (key, value) => {
         const newParams = new URLSearchParams(searchParams);
@@ -41,6 +82,15 @@ const SearchPage = () => {
         setSearchParams(newParams);
     };
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (searchTerm !== (searchParams.get('riceVariety') || '')) {
+                updateParam('riceVariety', searchTerm);
+            }
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -51,41 +101,64 @@ const SearchPage = () => {
             </div>
             {/* Search Bar & Stats */}
             <div className="flex flex-col gap-4">
-                <div className="relative">
-                    <input
-                        type="text"
-                        placeholder="Search variety, brand..."
-                        className="w-full card py-3 pl-12 pr-4 focus:ring-2 focus:ring-primary-500 transition-all outline-none"
-                        value={searchParams.get('riceVariety') || ''}
-                        onChange={(e) => updateParam('riceVariety', e.target.value)}
-                    />
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <div className="flex flex-col md:flex-row gap-4">
+                    <div className="relative flex-1">
+                        <input
+                            type="text"
+                            placeholder="Search variety, brand..."
+                            className="w-full card py-3 pl-12 pr-4 focus:ring-2 focus:ring-primary-500 transition-all outline-none"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    </div>
+
+                    {/* Comparison Mode Toggle */}
+                    <button
+                        onClick={() => {
+                            if (compareIds.length > 0 && !showFilters) {
+                                navigate(`/compare?ids=${compareIds.join(',')}`);
+                            } else {
+                                setShowFilters(!showFilters);
+                            }
+                        }}
+                        className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all shadow-lg
+                            ${compareIds.length > 0 ? 'bg-primary-600 text-white shadow-primary-200 hover:bg-primary-700' : 'bg-white text-gray-600 border border-gray-100 hover:bg-gray-50'}
+                        `}
+                    >
+                        <Scale className={`w-4 h-4 ${compareIds.length > 0 ? 'animate-bounce' : ''}`} />
+                        {compareIds.length > 0 ? `Analyze ${compareIds.length} Selected` : 'Comparison Mode'}
+                    </button>
                 </div>
 
                 <div className="flex items-center justify-between">
                     <p className="text-sm text-gray-500 font-medium tracking-tight">
-                        Showing <span className="text-primary-700 font-bold">{pagination.totalResults}</span> products
+                        Found <span className="text-primary-700 font-bold">{pagination.totalResults}</span> varieties
                     </p>
                     <div className="flex gap-2">
                         <button
                             onClick={() => setShowFilters(!showFilters)}
-                            className={`p-2 rounded-lg border shadow-sm transition-all ${showFilters ? 'bg-primary-600 text-white border-primary-600' : 'bg-white text-gray-700 border-gray-100 hover:bg-gray-50'}`}
+                            className={`p-2.5 rounded-xl border shadow-sm transition-all flex items-center gap-2 text-xs font-bold uppercase tracking-wider
+                                ${showFilters ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-100 hover:bg-gray-50'}
+                            `}
                         >
-                            <Filter className="w-5 h-5" />
+                            <Filter className="w-4 h-4" /> Filters
                         </button>
                         <select
-                            className="bg-white px-3 py-2 rounded-lg border border-gray-100 shadow-sm text-sm font-medium focus:ring-2 focus:ring-primary-500 outline-none"
+                            className="bg-white px-4 py-2.5 rounded-xl border border-gray-100 shadow-sm text-xs font-bold uppercase tracking-wider focus:ring-2 focus:ring-primary-500 outline-none"
                             onChange={(e) => updateParam('sortBy', e.target.value)}
                             value={searchParams.get('sortBy') || ''}
                         >
                             <option value="">Sort By</option>
-                            <option value="priceAsc">Price: Low to High</option>
-                            <option value="priceDesc">Price: High to Low</option>
-                            <option value="newest">Newest First</option>
+                            <option value="priceAsc">Price: Low</option>
+                            <option value="priceDesc">Price: High</option>
+                            <option value="newest">Latest</option>
                         </select>
                     </div>
                 </div>
             </div>
+
+
 
             {/* Advanced Filters Drawer/Section */}
             {showFilters && (
@@ -93,7 +166,7 @@ const SearchPage = () => {
                     <div>
                         <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">Category</label>
                         <select
-                            className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary-500"
+                            className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary-500 font-bold"
                             onChange={(e) => updateParam('usageCategory', e.target.value)}
                             value={searchParams.get('usageCategory') || ''}
                         >
@@ -109,7 +182,7 @@ const SearchPage = () => {
                         <input
                             type="text"
                             placeholder="e.g. Haryana"
-                            className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary-500"
+                            className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary-500 font-bold"
                             value={searchParams.get('state') || ''}
                             onChange={(e) => updateParam('state', e.target.value)}
                         />
@@ -120,7 +193,7 @@ const SearchPage = () => {
                             <input
                                 type="number"
                                 placeholder="₹"
-                                className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary-500"
+                                className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary-500 font-bold"
                                 value={searchParams.get('minPrice') || ''}
                                 onChange={(e) => updateParam('minPrice', e.target.value)}
                             />
@@ -130,7 +203,7 @@ const SearchPage = () => {
                             <input
                                 type="number"
                                 placeholder="₹"
-                                className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary-500"
+                                className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary-500 font-bold"
                                 value={searchParams.get('maxPrice') || ''}
                                 onChange={(e) => updateParam('maxPrice', e.target.value)}
                             />
@@ -156,12 +229,28 @@ const SearchPage = () => {
                                     alt={item.brandName}
                                     className="w-full h-full object-contain drop-shadow-xl group-hover:scale-105 transition-transform duration-500"
                                 />
-                                {item.averageRating > 0 && (
-                                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm border border-rice-100 z-10">
-                                        <Star className="w-3 h-3 text-gold-500 fill-gold-500" />
-                                        <span className="text-[10px] font-bold text-gray-700">{item.averageRating}</span>
-                                    </div>
-                                )}
+                                <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
+                                    {item.averageRating > 0 && (
+                                        <div className="bg-white/90 backdrop-blur px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm border border-rice-100 w-fit ml-auto">
+                                            <Star className="w-3 h-3 text-gold-500 fill-gold-500" />
+                                            <span className="text-[10px] font-bold text-gray-700">{item.averageRating}</span>
+                                        </div>
+                                    )}
+                                    <button
+                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleCompare(item._id); }}
+                                        className={`p-2 rounded-full shadow-lg transition-all ${compareIds.includes(item._id) ? 'bg-primary-600 text-white' : 'bg-white text-gray-400 hover:text-primary-600'}`}
+                                        title="Compare this item"
+                                    >
+                                        <Scale className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        onClick={(e) => toggleWatchlist(e, item._id)}
+                                        className={`p-2 rounded-full shadow-lg transition-all ${watchlist.includes(item._id) ? 'bg-red-500 text-white' : 'bg-white text-gray-400 hover:text-red-500'}`}
+                                        title="Watch this item for price drops"
+                                    >
+                                        <Heart className={`w-4 h-4 ${watchlist.includes(item._id) ? 'fill-current' : ''}`} />
+                                    </button>
+                                </div>
                             </div>
 
                             {/* Minimal Details */}

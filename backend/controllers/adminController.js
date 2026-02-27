@@ -1,6 +1,7 @@
 const RiceListing = require('../models/RiceListing');
 const User = require('../models/User');
 const SupplierProfile = require('../models/SupplierProfile');
+const { cloudinary } = require('../config/cloudinary');
 
 // @desc    Get all rice listings with filters (Admin)
 // @route   GET /api/admin/listings
@@ -14,17 +15,14 @@ exports.getAllListings = async (req, res) => {
         if (status) {
             if (status === 'deactivated') {
                 query.isActive = false;
-            } else {
-                query.approvalStatus = status;
-                // For other statuses, default to active unless specified otherwise?
-                // Actually, rejected are inactive by default. Approved are active.
-                // Pending are technically inactive until approved?
-                // Mongoose default is isActive: true?
-                // Let's just filter by approvalStatus.
-                // But for 'approved', we usually mean 'active & approved'.
-                if (status === 'approved') {
-                    query.isActive = true;
-                }
+                query.approvalStatus = 'approved';
+            } else if (status === 'pending') {
+                query.approvalStatus = 'pending';
+            } else if (status === 'rejected') {
+                query.approvalStatus = 'rejected';
+            } else if (status === 'approved') {
+                query.approvalStatus = 'approved';
+                query.isActive = true;
             }
         }
 
@@ -62,6 +60,34 @@ exports.approveListing = async (req, res) => {
         }
 
         res.json({ success: true, data: listing, message: 'Listing approved and published' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @desc    Approve multiple rice listings
+// @route   PATCH /api/admin/listings/bulk-approve
+// @access  Private (Admin)
+exports.approveListingsBulk = async (req, res) => {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids)) {
+            return res.status(400).json({ success: false, message: 'Please provide an array of IDs' });
+        }
+
+        const result = await RiceListing.updateMany(
+            { _id: { $in: ids } },
+            {
+                approvalStatus: 'approved',
+                isActive: true,
+            }
+        );
+
+        res.json({
+            success: true,
+            message: `${result.modifiedCount} listings approved successfully`,
+            count: result.modifiedCount
+        });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -113,6 +139,43 @@ exports.deactivateListing = async (req, res) => {
         }
 
         res.json({ success: true, data: listing, message: 'Listing deactivated' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @desc    Permanently delete a listing
+// @route   DELETE /api/admin/listings/:id
+// @access  Private (Admin)
+exports.deleteListing = async (req, res) => {
+    try {
+        const listing = await RiceListing.findById(req.params.id);
+        if (!listing) {
+            return res.status(404).json({ success: false, message: 'Listing not found' });
+        }
+
+        // Delete images from Cloudinary
+        const deleteImage = async (url) => {
+            if (!url || !url.includes('cloudinary.com')) return;
+            try {
+                const parts = url.split('/');
+                const uploadIndex = parts.indexOf('upload');
+                if (uploadIndex !== -1) {
+                    const afterUpload = parts.slice(uploadIndex + 2);
+                    const publicId = afterUpload.join('/').split('.')[0];
+                    await cloudinary.uploader.destroy(publicId);
+                }
+            } catch (error) {
+                console.error('Error deleting image from Cloudinary:', error);
+            }
+        };
+
+        await deleteImage(listing.bagImageUrl);
+        await deleteImage(listing.grainImageUrl);
+
+        await RiceListing.findByIdAndDelete(req.params.id);
+
+        res.json({ success: true, message: 'Listing permanently deleted from database and cloud storage' });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -342,6 +405,39 @@ exports.replyToTicket = async (req, res) => {
 
         await ticket.save();
         res.json({ success: true, data: ticket });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @desc    Verify Supplier GST Status (Mock API)
+// @route   POST /api/admin/suppliers/:id/verify-gst
+// @access  Private (Admin)
+exports.verifySupplierGST = async (req, res) => {
+    try {
+        const supplier = await SupplierProfile.findById(req.params.id);
+        if (!supplier) {
+            return res.status(404).json({ success: false, message: 'Supplier not found' });
+        }
+
+        if (!supplier.gstNumber) {
+            return res.status(400).json({ success: false, message: 'Supplier has no GST number provided' });
+        }
+
+        // Mock API Logic: In live, this would call Karza/Razorpay/ClearTax GST API
+        const isMockValid = supplier.gstNumber.length === 15; // Basic structure check
+
+        res.json({
+            success: true,
+            data: {
+                isValid: isMockValid,
+                gstNumber: supplier.gstNumber,
+                legalName: supplier.millName + " PVT LTD",
+                status: "ACTIVE",
+                type: "Regular",
+                lastCheck: new Date()
+            }
+        });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }

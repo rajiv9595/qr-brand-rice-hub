@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { MapPin, Scale, CheckCircle2, XCircle } from 'lucide-react';
 import StarRating from './StarRating';
 import { useAppStore } from '../context/AppContext';
+import { optimizeImage } from '../utils/imageOptimizer';
 
 function RiceCard({ rice }) {
     const { toggleCompare } = useAppStore();
@@ -19,7 +20,8 @@ function RiceCard({ rice }) {
     const millName = rice.millName || "Premium Mill";
     const location = rice.location || "Andhra Pradesh";
     const state = rice.state || "";
-    const imageUrl = rice.bagImageUrl || rice.imageUrl || "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&q=80";
+    const rawImageUrl = rice.bagImageUrl || rice.imageUrl || "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&q=80";
+    const imageUrl = optimizeImage(rawImageUrl, 400); // Optimize for card size
     const stockAvailable = rice.stockAvailable ?? true;
     const averageRating = rice.averageRating || 4.5;
 

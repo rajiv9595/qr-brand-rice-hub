@@ -12,7 +12,7 @@ export const AppProvider = ({ children }) => {
             if (prevIds.includes(id)) {
                 return prevIds.filter(i => i !== id);
             } else {
-                return prevIds.length < 4 ? [...prevIds, id] : prevIds;
+                return prevIds.length < 3 ? [...prevIds, id] : prevIds;
             }
         });
     };

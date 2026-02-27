@@ -117,7 +117,7 @@ exports.getListingExpertReview = async (req, res) => {
         );
 
         if (!review) {
-            return res.status(404).json({ success: false, message: 'No expert review found for this listing' });
+            return res.status(200).json({ success: true, data: null });
         }
 
         res.json({
@@ -132,6 +132,32 @@ exports.getListingExpertReview = async (req, res) => {
                 expertName: review.expertId.name,
             },
         });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @desc    Get all expert reviews
+// @route   GET /api/expert-review
+// @access  Private (Admin/Expert)
+exports.getAllExpertReviews = async (req, res) => {
+    try {
+        const reviews = await ExpertReview.find()
+            .populate('riceListingId', 'brandName riceVariety')
+            .populate('expertId', 'name email')
+            .sort({ createdAt: -1 });
+
+        // Map it to add expertName to the top level if needed by the frontend frontend,
+        // or the frontend can just read it from the populated expertId
+        const mappedReviews = reviews.map(r => {
+            const doc = r.toObject();
+            return {
+                ...doc,
+                expertName: doc.expertId?.name || 'Unknown Expert'
+            };
+        });
+
+        res.json({ success: true, reviews: mappedReviews });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }

@@ -78,6 +78,14 @@ const riceListingSchema = new mongoose.Schema(
             tasteAvg: { type: Number, default: 0 },
             valueForMoneyAvg: { type: Number, default: 0 },
         },
+        specifications: {
+            grainLength: { type: String, default: 'Medium' }, // Short, Medium, Long, Extra Long
+            riceAge: { type: String, default: '6+ Months' }, // New, 6+ Months, 12+ Months, 2+ Years
+            purityPercentage: { type: Number, default: 95 },
+            brokenGrainPercentage: { type: Number, default: 5 },
+            moistureContent: { type: Number, default: 12 },
+            cookingTime: { type: String, default: '15-20 Mins' }
+        }
     },
     {
         timestamps: true,

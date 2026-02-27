@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Phone, MapPin, X, Plus, Search } from 'lucide-react';
+import { User, Mail, Phone, MapPin, X, Plus, Search, ShieldCheck } from 'lucide-react';
 import { authService } from '../../services/authService';
+import ProfessionalAddressSearch from '../../components/common/ProfessionalAddressSearch';
 
 const BuyerProfile = () => {
     const [user, setUser] = useState(authService.getCurrentUser());
@@ -9,9 +10,6 @@ const BuyerProfile = () => {
     const [isEditingProfile, setIsEditingProfile] = useState(false);
     const [isEditingAddress, setIsEditingAddress] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [isSearching, setIsSearching] = useState(false);
-    const [suggestions, setSuggestions] = useState([]);
-    const [showSuggestions, setShowSuggestions] = useState(false);
 
     // Fetch fresh user data on mount
     useEffect(() => {
@@ -114,8 +112,8 @@ const BuyerProfile = () => {
             if (res.success) {
                 // res.data contains the updated user object from the backend
                 setUser(res.data);
-                // Also update localStorage just to be safe (authService should have handled it)
-                localStorage.setItem('user', JSON.stringify(res.data));
+                // Also update sessionStorage just to be safe
+                sessionStorage.setItem('user', JSON.stringify(res.data));
 
                 setAddressForm(prev => ({ ...prev, ...emptyAddress }));
                 alert("Address removed successfully");
@@ -250,183 +248,82 @@ const BuyerProfile = () => {
                             <button onClick={() => setIsEditingAddress(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><X className="w-5 h-5 text-gray-400" /></button>
                         </div>
 
-                        <form onSubmit={submitAddress} className="space-y-5">
-                            {/* Dynamic Search Integration */}
-                            <div className="space-y-2 relative">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">Search Village / Pincode</label>
-                                <div className="relative">
-                                    <Search className="absolute left-3.5 top-3.5 w-4 h-4 text-primary-500" />
-                                    <input
-                                        type="text"
-                                        placeholder="Type Pincode or Village name..."
-                                        className="w-full pl-11 pr-10 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 outline-none font-bold text-gray-700 transition-all shadow-inner placeholder:text-gray-400 placeholder:font-medium"
-                                        autoComplete="off"
-                                        onChange={(e) => {
-                                            const val = e.target.value;
-                                            if (window.searchTimeout) clearTimeout(window.searchTimeout);
+                        <form onSubmit={submitAddress} className="space-y-6">
+                            {/* Professional Search Component */}
+                            <ProfessionalAddressSearch
+                                onSelect={(s) => {
+                                    setAddressForm(prev => ({
+                                        ...prev,
+                                        village: s.village || '',
+                                        city: s.city || prev.city,
+                                        state: s.state || prev.state,
+                                        zipCode: s.pincode || prev.zipCode || ''
+                                    }));
+                                }}
+                                initialValue={addressForm.village}
+                            />
 
-                                            const pincodeMatch = val.match(/^[1-9][0-9]{5}$/);
-                                            if (pincodeMatch) {
-                                                setIsSearching(true);
-                                                window.searchTimeout = setTimeout(() => {
-                                                    fetch(`https://api.postalpincode.in/pincode/${val}`)
-                                                        .then(res => res.json())
-                                                        .then(data => {
-                                                            setIsSearching(false);
-                                                            if (data && data[0].Status === "Success") {
-                                                                const formatted = data[0].PostOffice.slice(0, 8).map(po => ({
-                                                                    name: po.Name,
-                                                                    district: po.District,
-                                                                    state: po.State,
-                                                                    pincode: po.Pincode
-                                                                }));
-                                                                setSuggestions(formatted);
-                                                                setShowSuggestions(true);
-                                                            } else {
-                                                                setSuggestions([]);
-                                                                setShowSuggestions(false);
-                                                            }
-                                                        }).catch(() => { setIsSearching(false); setShowSuggestions(false); });
-                                                }, 300);
-                                                return;
-                                            }
-
-                                            if (val.length === 0) {
-                                                setSuggestions([]);
-                                                setShowSuggestions(false);
-                                                setIsSearching(false);
-                                                return;
-                                            }
-
-                                            if (val.length > 2) {
-                                                setIsSearching(true);
-                                                window.searchTimeout = setTimeout(() => {
-                                                    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(val)}&addressdetails=1&countrycodes=in&limit=6&accept-language=en`;
-                                                    fetch(url)
-                                                        .then(res => res.json())
-                                                        .then(data => {
-                                                            setIsSearching(false);
-                                                            if (data && data.length > 0) {
-                                                                const formatted = data.map(place => {
-                                                                    const addr = place.address;
-                                                                    return {
-                                                                        name: addr.village || addr.suburb || addr.town || addr.city || addr.hamlet || place.display_name.split(',')[0],
-                                                                        district: addr.state_district || addr.district || addr.county || '',
-                                                                        state: addr.state || '',
-                                                                        pincode: addr.postcode || place.display_name.match(/\b\d{6}\b/)?.[0] || ''
-                                                                    };
-                                                                });
-                                                                setSuggestions(formatted);
-                                                                setShowSuggestions(true);
-                                                            } else {
-                                                                setSuggestions([]);
-                                                                setShowSuggestions(false);
-                                                            }
-                                                        }).catch(() => { setIsSearching(false); setShowSuggestions(false); });
-                                                }, 300);
-                                            } else {
-                                                setShowSuggestions(false);
-                                            }
-                                        }}
-                                    />
-                                    {isSearching && (
-                                        <div className="absolute right-4 top-4">
-                                            <div className="w-4 h-4 border-2 border-primary-500/30 border-t-primary-500 rounded-full animate-spin" />
-                                        </div>
-                                    )}
-
-                                    {/* Dropdown Suggestions */}
-                                    {showSuggestions && suggestions.length > 0 && (
-                                        <div className="absolute top-full left-0 right-0 bg-white shadow-2xl rounded-2xl border border-gray-100 mt-2 max-h-56 overflow-y-auto z-[110] divide-y divide-gray-50">
-                                            {suggestions.map((s, idx) => (
-                                                <button
-                                                    key={idx}
-                                                    type="button"
-                                                    className="w-full text-left p-4 hover:bg-primary-50/50 transition-colors flex flex-col items-start gap-1"
-                                                    onClick={() => {
-                                                        setAddressForm(prev => ({
-                                                            ...prev,
-                                                            village: s.name || '',
-                                                            city: s.district || prev.city,
-                                                            state: s.state || prev.state,
-                                                            zipCode: s.pincode || prev.zipCode || ''
-                                                        }));
-                                                        setShowSuggestions(false);
-                                                    }}
-                                                >
-                                                    <span className="font-bold text-gray-900 border-b-2 border-primary-100">{s.name}</span>
-                                                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">
-                                                        {s.district ? s.district + ', ' : ''}{s.state} {s.pincode ? '• ' + s.pincode : ''}
-                                                    </span>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="pt-2">
-                                <label className="label text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">Street Address</label>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Street / House Details</label>
                                 <textarea
                                     name="street"
                                     value={addressForm.street}
                                     onChange={handleAddressChange}
-                                    className="w-full px-4 py-3 rounded-2xl bg-gray-50 border border-gray-100 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 outline-none font-medium text-sm min-h-[80px]"
-                                    placeholder="House No, Building Name, Street, Landmark"
+                                    className="w-full px-5 py-4 rounded-2xl bg-gray-50 border-2 border-gray-100 focus:bg-white focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 outline-none font-bold text-gray-700 min-h-[100px] text-sm transition-all"
+                                    placeholder="Ex: H.No 4-55, Near Temple, Main Street"
                                     required
                                 />
                             </div>
 
-                            <div className="space-y-1">
-                                <label className="text-[9px] font-black text-primary-400 uppercase tracking-widest ml-1">Village / Area</label>
-                                <input
-                                    type="text"
-                                    name="village"
-                                    value={addressForm.village}
-                                    className="w-full bg-primary-50/30 border border-primary-100/50 rounded-xl px-4 py-2.5 text-xs font-bold text-gray-700 outline-none"
-                                    readOnly
-                                    placeholder="Select from search above"
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-[9px] font-black text-primary-400 uppercase tracking-widest ml-1">City / District</label>
-                                    <input
-                                        type="text"
-                                        name="city"
-                                        value={addressForm.city}
-                                        onChange={handleAddressChange}
-                                        className="w-full bg-primary-50/30 border border-primary-100/50 rounded-xl px-4 py-2.5 text-xs font-bold text-gray-700 outline-none"
-                                        readOnly
-                                    />
+                            {/* Auto-filled Preview Section */}
+                            <div className="bg-primary-50/30 rounded-[2rem] p-5 border border-primary-100/50 space-y-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <ShieldCheck className="w-4 h-4 text-primary-500" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-primary-600">Verified Location Details</span>
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-[9px] font-black text-primary-400 uppercase tracking-widest ml-1">Pincode</label>
-                                    <input
-                                        type="text"
-                                        name="zipCode"
-                                        value={addressForm.zipCode}
-                                        onChange={handleAddressChange}
-                                        className="w-full bg-primary-50/30 border border-primary-100/50 rounded-xl px-4 py-2.5 text-xs font-bold text-gray-700 outline-none"
-                                        readOnly
-                                    />
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">State</label>
+                                        <input
+                                            type="text"
+                                            value={addressForm.state}
+                                            className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3 text-xs font-bold text-gray-700 outline-none"
+                                            readOnly
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">District / City</label>
+                                        <input
+                                            type="text"
+                                            value={addressForm.city}
+                                            className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3 text-xs font-bold text-gray-700 outline-none"
+                                            readOnly
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Pincode</label>
+                                        <input
+                                            type="text"
+                                            value={addressForm.zipCode}
+                                            className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3 text-xs font-bold text-gray-700 outline-none"
+                                            readOnly
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Village/Town</label>
+                                        <input
+                                            type="text"
+                                            value={addressForm.village}
+                                            className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3 text-xs font-bold text-gray-700 outline-none"
+                                            readOnly
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="space-y-1">
-                                <label className="text-[9px] font-black text-primary-400 uppercase tracking-widest ml-1">State</label>
-                                <input
-                                    type="text"
-                                    name="state"
-                                    value={addressForm.state}
-                                    className="w-full bg-primary-50/30 border border-primary-100/50 rounded-xl px-4 py-2.5 text-xs font-bold text-gray-700 outline-none"
-                                    readOnly
-                                />
-                            </div>
-
-                            <button type="submit" disabled={loading} className="w-full bg-primary-700 hover:bg-primary-800 text-white py-4 rounded-2xl shadow-xl shadow-primary-200 transition-all text-sm font-black uppercase tracking-widest mt-4">
-                                {loading ? 'Saving to Cloud...' : 'Save Shipping Address'}
+                            <button type="submit" disabled={loading} className="w-full bg-primary-700 hover:bg-primary-800 text-white py-5 rounded-2xl shadow-xl shadow-primary-200 transition-all text-[11px] font-black uppercase tracking-[0.2em] mt-2">
+                                {loading ? 'Saving to Profile...' : 'Update Primary Address'}
                             </button>
                         </form>
                     </div>

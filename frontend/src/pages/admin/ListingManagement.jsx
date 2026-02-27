@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, CheckCircle, XCircle, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Search, CheckCircle, XCircle, Eye, EyeOff, AlertCircle, Trash2, AlertTriangle } from 'lucide-react';
 import { adminService } from '../../services/adminService';
 
 const ListingManagement = () => {
@@ -8,6 +8,7 @@ const ListingManagement = () => {
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [rejectModal, setRejectModal] = useState({ open: false, listingId: null, feedback: '' });
+    const [deleteModal, setDeleteModal] = useState({ open: false, listingId: null, brandName: '' });
     const [detailModal, setDetailModal] = useState({ open: false, listing: null });
 
     useEffect(() => {
@@ -70,6 +71,19 @@ const ListingManagement = () => {
             fetchListings();
         } catch (err) {
             alert('Failed to activate listing');
+        }
+    };
+
+    const handleDelete = async () => {
+        setLoading(true);
+        try {
+            await adminService.deleteListing(deleteModal.listingId);
+            setDeleteModal({ open: false, listingId: null, brandName: '' });
+            fetchListings();
+        } catch (err) {
+            alert(err.response?.data?.message || 'Failed to permanently delete listing');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -246,11 +260,53 @@ const ListingManagement = () => {
                                                 Activate
                                             </button>
                                         )}
+
+                                        {(activeTab === 'approved' || activeTab === 'rejected' || activeTab === 'deactivated') && (
+                                            <button
+                                                onClick={() => setDeleteModal({ open: true, listingId: listing._id, brandName: listing.brandName })}
+                                                className="btn text-sm py-2 px-4 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
+                                                title="Delete Permanently"
+                                            >
+                                                <Trash2 className="w-4 h-4 mr-1" />
+                                                Delete
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {deleteModal.open && (
+                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 transition-all animate-in fade-in">
+                    <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl transform animate-in zoom-in duration-300">
+                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <AlertTriangle className="w-8 h-8 text-red-600" />
+                        </div>
+                        <h3 className="text-2xl font-black text-center text-gray-900 mb-2">Permanent Delete</h3>
+                        <p className="text-gray-500 text-center mb-6 px-4">
+                            Are you absolutely sure you want to permanently delete <span className="font-black text-gray-900">"{deleteModal.brandName}"</span>?
+                            This action will remove the listing and its images from our cloud servers and cannot be undone.
+                        </p>
+                        <div className="flex gap-4">
+                            <button
+                                onClick={() => setDeleteModal({ open: false, listingId: null, brandName: '' })}
+                                className="flex-1 px-6 py-3 rounded-xl font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
+                            >
+                                No, Cancel
+                            </button>
+                            <button
+                                onClick={handleDelete}
+                                disabled={loading}
+                                className="flex-1 px-6 py-3 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 transition-colors shadow-lg shadow-red-200"
+                            >
+                                {loading ? 'Deleting...' : 'Yes, Delete'}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
 

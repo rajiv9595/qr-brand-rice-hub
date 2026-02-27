@@ -5,8 +5,8 @@ export const authService = {
         const res = await api.post('/auth/login', { email, password });
         if (res.data.success && res.data.data) {
             const { token, ...user } = res.data.data;
-            localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(user));
+            sessionStorage.setItem('token', token);
+            sessionStorage.setItem('user', JSON.stringify(user));
         }
         return res.data;
     },
@@ -15,8 +15,8 @@ export const authService = {
         const res = await api.post('/auth/verify-mfa', { userId, code });
         if (res.data.success) {
             const { token, ...user } = res.data.data;
-            localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(user));
+            sessionStorage.setItem('token', token);
+            sessionStorage.setItem('user', JSON.stringify(user));
         }
         return res.data;
     },
@@ -25,28 +25,28 @@ export const authService = {
         const res = await api.post('/auth/register', userData);
         if (res.data.success) {
             const { token, ...user } = res.data.data;
-            localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(user));
+            sessionStorage.setItem('token', token);
+            sessionStorage.setItem('user', JSON.stringify(user));
         }
         return res.data;
     },
 
     logout: () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
     },
 
     getCurrentUser: () => {
-        const userStr = localStorage.getItem('user');
+        const userStr = sessionStorage.getItem('user');
         return userStr ? JSON.parse(userStr) : null;
     },
 
     getToken: () => {
-        return localStorage.getItem('token');
+        return sessionStorage.getItem('token');
     },
 
     isAuthenticated: () => {
-        return !!localStorage.getItem('token');
+        return !!sessionStorage.getItem('token');
     },
 
     hasRole: (role) => {
@@ -58,10 +58,9 @@ export const authService = {
         const res = await api.get('/auth/profile');
         if (res.data.success) {
             const user = res.data.data;
-            // Update local storage with fresh data, keeping the token
-            const token = localStorage.getItem('token');
-            // Ensure we don't lose the token if it's not in the profile response (which it isn't)
-            localStorage.setItem('user', JSON.stringify(user));
+            // Update session storage with fresh data, keeping the token
+            const token = sessionStorage.getItem('token');
+            sessionStorage.setItem('user', JSON.stringify(user));
         }
         return res.data;
     },
@@ -70,8 +69,8 @@ export const authService = {
         const res = await api.put('/auth/profile', userData);
         if (res.data.success) {
             const { token, ...user } = res.data.data;
-            if (token) localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(user));
+            if (token) sessionStorage.setItem('token', token);
+            sessionStorage.setItem('user', JSON.stringify(user));
         }
         return res.data;
     }

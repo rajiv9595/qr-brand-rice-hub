@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { encrypt, decrypt } = require('../utils/encryption');
 
 const supplierProfileSchema = new mongoose.Schema(
     {
@@ -35,7 +36,12 @@ const supplierProfileSchema = new mongoose.Schema(
         },
         bankDetails: {
             accountHolderName: { type: String, trim: true },
-            accountNumber: { type: String, trim: true },
+            accountNumber: {
+                type: String,
+                trim: true,
+                set: encrypt,
+                get: decrypt
+            },
             bankName: { type: String, trim: true },
             ifscCode: { type: String, trim: true },
             branchName: { type: String, trim: true },
@@ -43,10 +49,21 @@ const supplierProfileSchema = new mongoose.Schema(
         upiId: {
             type: String,
             trim: true,
+            set: encrypt,
+            get: decrypt
         },
+        badges: [{
+            title: String,
+            icon: String, // e.g. "Zap", "Award"
+            color: String,
+            description: String,
+            awardedAt: { type: Date, default: Date.now }
+        }]
     },
     {
         timestamps: true,
+        toJSON: { getters: true },
+        toObject: { getters: true }
     }
 );
 

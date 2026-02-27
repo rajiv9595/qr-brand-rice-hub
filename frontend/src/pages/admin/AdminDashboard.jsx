@@ -11,6 +11,7 @@ import {
 import { adminService } from '../../services/adminService';
 import { authService } from '../../services/authService';
 import { orderService } from '../../services/orderService';
+import DemandHeatmap from '../../components/admin/DemandHeatmap';
 
 const AdminDashboard = () => {
     const user = authService.getCurrentUser();
@@ -198,6 +199,9 @@ const AdminDashboard = () => {
                     <button className="btn-secondary w-full text-center text-sm py-2" disabled>Coming Soon</button>
                 </div>
             </div>
+
+            {/* Demand Intelligence */}
+            <DemandHeatmap />
 
             {/* Charts Grid */}
             {chartData.byDistrict && chartData.byDistrict.length > 0 ? (

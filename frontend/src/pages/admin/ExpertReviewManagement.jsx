@@ -54,7 +54,7 @@ const ExpertReviewManagement = () => {
             open: true,
             mode: 'create',
             data: {
-                listingId: '',
+                riceListingId: '',
                 expertName: '',
                 grainQualityGrade: '',
                 suitabilityScore: 5,
@@ -91,7 +91,7 @@ const ExpertReviewManagement = () => {
                             <div className="flex items-start justify-between gap-4 mb-4">
                                 <div className="flex-1">
                                     <h3 className="text-xl font-black text-gray-900 mb-1">
-                                        {review.listingId?.brandName}
+                                        {review.riceListingId?.brandName || review.riceListingId}
                                     </h3>
                                     <p className="text-sm text-gray-500 mb-3">
                                         Expert: <span className="font-bold">{review.expertName}</span>

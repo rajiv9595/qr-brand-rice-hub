@@ -4,13 +4,16 @@ import {
     Star, MapPin, Tag, Box, Info,
     ChefHat, Award, ShoppingBag, ShieldCheck, Sparkles,
     ArrowLeft, MessageSquare, ChevronRight,
-    TrendingDown, TrendingUp, Search, X, Phone
+    TrendingDown, TrendingUp, Search, X, Phone,
+    Pencil, Mail
 } from 'lucide-react';
 import { riceService, reviewService, expertService, cookingService } from '../services';
 import { orderService } from '../services/orderService';
 import { authService } from '../services/authService';
 import { useNavigate } from 'react-router-dom';
 import RiceCard from '../components/RiceCard';
+import ProfessionalAddressSearch from '../components/common/ProfessionalAddressSearch';
+import { optimizeImage } from '../utils/imageOptimizer';
 
 const RiceDetailPage = () => {
     const { id } = useParams();
@@ -36,12 +39,10 @@ const RiceDetailPage = () => {
         city: user?.address?.city || '',
         state: user?.address?.state || '',
         zipCode: user?.address?.zipCode || '',
-        phone: user?.phone || ''
+        phone: user?.phone || '',
+        email: user?.email || ''
     });
     const [orderLoading, setOrderLoading] = useState(false);
-    const [isSearching, setIsSearching] = useState(false);
-    const [suggestions, setSuggestions] = useState([]);
-    const [showSuggestions, setShowSuggestions] = useState(false);
     const [calculatorPeople, setCalculatorPeople] = useState(2);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const [relatedRice, setRelatedRice] = useState([]);
@@ -122,6 +123,11 @@ const RiceDetailPage = () => {
                 setOrderLoading(false);
                 return;
             }
+            if (!address.phone || address.phone.length < 10) {
+                alert('Please provide a valid 10-digit phone number for delivery');
+                setOrderLoading(false);
+                return;
+            }
             await orderService.createOrder({
                 listingId: rice._id,
                 quantity: parseInt(orderQuantity),
@@ -160,7 +166,7 @@ const RiceDetailPage = () => {
                         <div className="bg-rice-50 p-8 lg:p-12 flex items-center justify-center relative min-h-[350px] lg:min-h-[450px]">
                             <div className="aspect-[4/5] w-full max-w-[280px] flex items-center justify-center relative">
                                 <img
-                                    src={rice.bagImageUrl || 'https://via.placeholder.com/600x600?text=Rice+Brand'}
+                                    src={optimizeImage(rice.bagImageUrl, 800) || 'https://via.placeholder.com/600x600?text=Rice+Brand'}
                                     className="w-full h-full object-contain drop-shadow-2xl hover:scale-105 hover:rotate-1 transition-all duration-700"
                                     alt={rice.brandName}
                                 />
@@ -547,7 +553,7 @@ const RiceDetailPage = () => {
                                                 setIsUsingSavedAddress(!isUsingSavedAddress);
                                                 if (isUsingSavedAddress) {
                                                     // If switching TO new address, clear fields
-                                                    setAddress({ street: '', village: '', city: '', state: '', zipCode: '', phone: user?.phone || '' });
+                                                    setAddress({ street: '', village: '', city: '', state: '', zipCode: '', phone: user?.phone || '', email: user?.email || '' });
                                                 } else {
                                                     // If switching BACK to saved
                                                     setAddress({
@@ -556,7 +562,8 @@ const RiceDetailPage = () => {
                                                         city: user.address.city,
                                                         state: user.address.state,
                                                         zipCode: user.address.zipCode,
-                                                        phone: user.phone
+                                                        phone: user.phone,
+                                                        email: user.email
                                                     });
                                                 }
                                             }}
@@ -569,7 +576,15 @@ const RiceDetailPage = () => {
 
                                 {isUsingSavedAddress ? (
                                     <div className="bg-primary-50/30 p-5 rounded-3xl border border-primary-100/50 space-y-1 relative group">
-                                        <div className="absolute top-4 right-5 opacity-20 group-hover:opacity-100 transition-opacity">
+                                        <div className="absolute top-4 right-5 flex items-center gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsUsingSavedAddress(false)}
+                                                className="p-1.5 bg-white text-gray-400 hover:text-primary-600 rounded-full border border-gray-100 shadow-sm transition-all opacity-0 group-hover:opacity-100"
+                                                title="Edit this address"
+                                            >
+                                                <Pencil className="w-3 h-3" />
+                                            </button>
                                             <div className="bg-primary-500 text-white p-1 rounded-full"><ShieldCheck className="w-3 h-3" /></div>
                                         </div>
                                         <p className="text-[10px] font-black text-primary-400 uppercase tracking-widest mb-2">Delivery to saved address</p>
@@ -578,142 +593,52 @@ const RiceDetailPage = () => {
                                             {user.address.village && user.address.village + ', '}
                                             {user.address.city}, {user.address.state} - {user.address.zipCode}
                                         </p>
-                                        <p className="text-[10px] font-bold text-gray-400 mt-3 pt-3 border-t border-primary-100/50 flex items-center gap-2">
-                                            <Phone className="w-3 h-3" /> +91 {user.phone}
-                                        </p>
+                                        <div className="flex flex-wrap gap-4 mt-3 pt-3 border-t border-primary-100/50">
+                                            <div className="space-y-1 flex-1 min-w-[120px]">
+                                                <label className="text-[9px] font-black text-primary-400 uppercase tracking-widest ml-1">Confirm Phone</label>
+                                                <div className="relative">
+                                                    <Phone className="absolute left-3 top-2.5 w-3 h-3 text-gray-400" />
+                                                    <input
+                                                        type="tel"
+                                                        value={address.phone}
+                                                        onChange={(e) => setAddress({ ...address, phone: e.target.value })}
+                                                        className="w-full pl-8 pr-3 py-1.5 bg-white border border-primary-100 rounded-lg text-[10px] font-bold text-gray-700 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                                                        placeholder="Confirm phone..."
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="space-y-1 flex-1 min-w-[150px]">
+                                                <label className="text-[9px] font-black text-primary-400 uppercase tracking-widest ml-1">Confirm Email</label>
+                                                <div className="relative">
+                                                    <Mail className="absolute left-3 top-2.5 w-3 h-3 text-gray-400" />
+                                                    <input
+                                                        type="email"
+                                                        value={address.email}
+                                                        onChange={(e) => setAddress({ ...address, email: e.target.value })}
+                                                        className="w-full pl-8 pr-3 py-1.5 bg-white border border-primary-100 rounded-lg text-[10px] font-bold text-gray-700 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                                                        placeholder="Confirm email..."
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 ) : (
                                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                                         {/* Dynamic Location Search */}
-                                        <div className="space-y-1 relative">
-                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Search Village / Pincode</label>
-                                            <div className="relative">
-                                                <Search className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
-                                                <input
-                                                    type="text"
-                                                    placeholder="Type Pincode (6-digit) or Village/City name..."
-                                                    className="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 outline-none font-bold text-gray-700 transition-all placeholder:text-gray-400"
-                                                    autoComplete="off"
-                                                    onChange={(e) => {
-                                                        const val = e.target.value;
-                                                        const dropdown = document.getElementById('location-suggestions');
-                                                        if (window.searchTimeout) clearTimeout(window.searchTimeout);
-
-                                                        // Expert logic: Detect 6-digit Pincode first
-                                                        const pincodeMatch = val.match(/^[1-9][0-9]{5}$/);
-
-                                                        if (pincodeMatch) {
-                                                            setIsSearching(true);
-                                                            window.searchTimeout = setTimeout(() => {
-                                                                fetch(`https://api.postalpincode.in/pincode/${val}`)
-                                                                    .then(res => res.json())
-                                                                    .then(data => {
-                                                                        setIsSearching(false);
-                                                                        if (data && data[0].Status === "Success") {
-                                                                            const postOffices = data[0].PostOffice;
-                                                                            const formatted = postOffices.slice(0, 10).map(po => ({
-                                                                                name: po.Name,
-                                                                                district: po.District,
-                                                                                state: po.State,
-                                                                                pincode: po.Pincode,
-                                                                                isIndiaPost: true
-                                                                            }));
-                                                                            setSuggestions(formatted);
-                                                                            setShowSuggestions(true);
-                                                                        } else {
-                                                                            setSuggestions([]);
-                                                                            setShowSuggestions(false);
-                                                                        }
-                                                                    }).catch(() => {
-                                                                        setIsSearching(false);
-                                                                        setShowSuggestions(false);
-                                                                    });
-                                                            }, 300);
-                                                            return;
-                                                        }
-
-                                                        if (val.length === 0) {
-                                                            setAddress(prev => ({
-                                                                ...prev, city: '', state: '', zipCode: ''
-                                                            }));
-                                                            setSuggestions([]);
-                                                            setShowSuggestions(false);
-                                                            setIsSearching(false);
-                                                            return;
-                                                        }
-
-                                                        if (val.length > 2) {
-                                                            setIsSearching(true);
-                                                            window.searchTimeout = setTimeout(() => {
-                                                                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(val)}&addressdetails=1&countrycodes=in&limit=8&accept-language=en&dedupe=1`;
-
-                                                                fetch(url)
-                                                                    .then(res => res.json())
-                                                                    .then(data => {
-                                                                        setIsSearching(false);
-                                                                        if (data && data.length > 0) {
-                                                                            const formatted = data.map(place => {
-                                                                                const addr = place.address;
-                                                                                return {
-                                                                                    name: addr.village || addr.suburb || addr.town || addr.city || addr.hamlet || addr.neighbourhood || place.display_name.split(',')[0],
-                                                                                    district: addr.state_district || addr.district || addr.county || addr.city_district || '',
-                                                                                    state: addr.state || '',
-                                                                                    pincode: addr.postcode || place.display_name.match(/\b\d{6}\b/)?.[0] || ''
-                                                                                };
-                                                                            });
-                                                                            setSuggestions(formatted);
-                                                                            setShowSuggestions(true);
-                                                                        } else {
-                                                                            setSuggestions([]);
-                                                                            setShowSuggestions(false);
-                                                                        }
-                                                                    }).catch(() => {
-                                                                        setIsSearching(false);
-                                                                        setShowSuggestions(false);
-                                                                    });
-                                                            }, 300);
-                                                        } else {
-                                                            setShowSuggestions(false);
-                                                        }
-                                                    }}
-                                                />
-                                                {isSearching && (
-                                                    <div className="absolute right-3 top-3.5">
-                                                        <div className="w-4 h-4 border-2 border-primary-500/30 border-t-primary-500 rounded-full animate-spin" />
-                                                    </div>
-                                                )}
-
-                                                {/* Suggestions Dropdown - React Rendered */}
-                                                {showSuggestions && suggestions.length > 0 && (
-                                                    <div className="absolute top-full left-0 right-0 bg-white shadow-2xl rounded-2xl border border-gray-200 mt-2 max-h-64 overflow-y-auto z-[110] divide-y divide-gray-50 flex flex-col">
-                                                        {suggestions.map((s, idx) => (
-                                                            <button
-                                                                key={idx}
-                                                                type="button"
-                                                                className="text-left p-3 hover:bg-primary-50/50 cursor-pointer transition-colors flex flex-col gap-0.5"
-                                                                onClick={(e) => {
-                                                                    setAddress((prev) => ({
-                                                                        ...prev,
-                                                                        village: s.name || '',
-                                                                        city: s.district || prev.city,
-                                                                        state: s.state || prev.state,
-                                                                        zipCode: s.pincode || prev.zipCode || ''
-                                                                    }));
-                                                                    const input = e.target.closest('.relative').querySelector('input');
-                                                                    if (input) input.value = s.name;
-                                                                    setShowSuggestions(false);
-                                                                }}
-                                                            >
-                                                                <span className="font-bold text-gray-900">{s.name}</span>
-                                                                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">
-                                                                    {s.district ? s.district + ', ' : ''}{s.state}{s.pincode ? ' • ' + s.pincode : ''}
-                                                                </span>
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <p className="text-[10px] text-gray-400 pl-1 font-medium">Expert Search: Enter 6-digit Pincode for exact village details (India Post API).</p>
+                                        <div className="space-y-4">
+                                            {/* Professional Search Component */}
+                                            <ProfessionalAddressSearch
+                                                onSelect={(s) => {
+                                                    setAddress(prev => ({
+                                                        ...prev,
+                                                        village: s.village || '',
+                                                        city: s.city || prev.city,
+                                                        state: s.state || prev.state,
+                                                        zipCode: s.pincode || prev.zipCode || ''
+                                                    }));
+                                                }}
+                                                initialValue={address.village}
+                                            />
                                         </div>
 
                                         {/* Auto-filled Preview */}
@@ -773,19 +698,35 @@ const RiceDetailPage = () => {
                                             <p className="text-[10px] text-gray-500 italic mt-1 pl-1">Ex: D.No 4-55, Main Road, Near Ramalayam Temple</p>
                                         </div>
 
-                                        <div className="space-y-1">
-                                            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Phone Number</label>
-                                            <div className="relative">
-                                                <span className="absolute left-4 top-3 text-gray-400 font-bold text-xs">+91</span>
-                                                <input
-                                                    type="tel"
-                                                    pattern="[0-9]{10}"
-                                                    placeholder="9876543210"
-                                                    value={address.phone.replace('+91', '')}
-                                                    onChange={(e) => setAddress({ ...address, phone: e.target.value })}
-                                                    className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-gray-200 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 outline-none font-bold text-gray-900 tracking-wider text-sm"
-                                                    required
-                                                />
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <div className="space-y-1">
+                                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Phone Number</label>
+                                                <div className="relative">
+                                                    <span className="absolute left-4 top-3 text-gray-400 font-bold text-xs">+91</span>
+                                                    <input
+                                                        type="tel"
+                                                        pattern="[0-9]{10}"
+                                                        placeholder="9876543210"
+                                                        value={address.phone.replace('+91', '')}
+                                                        onChange={(e) => setAddress({ ...address, phone: e.target.value })}
+                                                        className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-gray-200 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 outline-none font-bold text-gray-900 tracking-wider text-sm"
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Email for Updates</label>
+                                                <div className="relative">
+                                                    <Mail className="absolute left-4 top-3 w-4 h-4 text-gray-400" />
+                                                    <input
+                                                        type="email"
+                                                        placeholder="email@example.com"
+                                                        value={address.email}
+                                                        onChange={(e) => setAddress({ ...address, email: e.target.value })}
+                                                        className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-gray-200 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 outline-none font-bold text-gray-900 text-sm"
+                                                        required
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

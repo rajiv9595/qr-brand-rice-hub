@@ -12,7 +12,7 @@ const BuyerLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isPinned, setIsPinned] = useState(() => {
         const saved = localStorage.getItem('buyerSidebarPinned');
-        return saved !== null ? JSON.parse(saved) : true;
+        return saved !== null ? JSON.parse(saved) : false;
     });
     const [isHovered, setIsHovered] = useState(false);
     const location = useLocation();
@@ -54,12 +54,7 @@ const BuyerLayout = () => {
                 {/* Logo Area */}
                 <div className="h-20 flex items-center px-4 border-b border-slate-800 shrink-0 overflow-hidden">
                     <Link to="/buyer" className="flex items-center gap-3">
-                        <div className="min-w-[40px] flex justify-center">
-                            <Logo variant="dark" size="sm" />
-                        </div>
-                        <span className={`font-black text-xl text-white transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
-                            QR HUB
-                        </span>
+                        <Logo variant="dark" size="sm" iconOnly={!isExpanded} />
                     </Link>
                 </div>
 
@@ -139,13 +134,11 @@ const BuyerLayout = () => {
                     <button
                         onClick={togglePin}
                         className="hidden lg:flex w-full items-center gap-3 px-3 py-3 rounded-xl font-medium text-slate-500 hover:bg-slate-800 hover:text-white transition-all group"
+                        title={isPinned ? 'Collapse Sidebar' : 'Expand Sidebar'}
                     >
                         <div className="min-w-[24px] flex justify-center">
                             <Menu className={`w-5 h-5 transition-transform duration-300 ${isPinned ? 'rotate-90' : ''}`} />
                         </div>
-                        <span className={`transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0 w-0 h-0 overflow-hidden'}`}>
-                            {isPinned ? 'Collapse Sidebar' : 'Expand Sidebar'}
-                        </span>
                     </button>
                 </div>
             </aside>

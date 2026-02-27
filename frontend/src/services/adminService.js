@@ -9,12 +9,14 @@ export const adminService = {
     approveListing: (id) => api.patch(`/admin/listings/${id}/approve`),
     rejectListing: (id, feedback) => api.patch(`/admin/listings/${id}/reject`, { reason: feedback }),
     deactivateListing: (id) => api.patch(`/admin/listings/${id}/deactivate`),
+    deleteListing: (id) => api.delete(`/admin/listings/${id}`),
     activateListing: (id) => api.patch(`/admin/listings/${id}/approve`), // Re-use approve for activation since it sets isActive: true
 
     // Supplier Management
     getAllSuppliers: (params) => api.get('/admin/suppliers', { params }),
     getSupplierById: (id) => api.get(`/admin/suppliers/${id}`),
     deactivateSupplier: (id) => api.patch(`/admin/suppliers/${id}/deactivate`),
+    verifySupplierGST: (id) => api.post(`/admin/suppliers/${id}/verify-gst`),
 
     // Review Moderation
     getAllReviews: (params) => api.get('/admin/reviews', { params }),
@@ -22,10 +24,10 @@ export const adminService = {
     flagReview: (id) => api.patch(`/admin/reviews/${id}/flag`),
 
     // Expert Review Management
-    getAllExpertReviews: (params) => api.get('/admin/expert-reviews', { params }),
-    createExpertReview: (data) => api.post('/admin/expert-reviews', data),
-    updateExpertReview: (id, data) => api.put(`/admin/expert-reviews/${id}`, data),
-    deleteExpertReview: (id) => api.delete(`/admin/expert-reviews/${id}`),
+    getAllExpertReviews: (params) => api.get('/expert-review', { params }),
+    createExpertReview: (data) => api.post('/expert-review', data),
+    updateExpertReview: (id, data) => api.put(`/expert-review/${id}`, data),
+    deleteExpertReview: (id) => api.delete(`/expert-review/${id}`),
 
     // Cooking Tips Management
     // Cooking Tips Management
@@ -35,10 +37,10 @@ export const adminService = {
     deleteCookingTip: (id) => api.delete(`/cooking-tips/${id}`),
 
     // Market Updates Management
-    getAllMarketUpdates: (params) => api.get('/admin/market-updates', { params }),
-    createMarketUpdate: (data) => api.post('/admin/market-updates', data),
-    updateMarketUpdate: (id, data) => api.put(`/admin/market-updates/${id}`, data),
-    deleteMarketUpdate: (id) => api.delete(`/admin/market-updates/${id}`),
+    getAllMarketUpdates: (params) => api.get('/market-updates', { params }),
+    createMarketUpdate: (data) => api.post('/market-updates', data, { headers: { 'Content-Type': 'multipart/form-data' } }),
+    updateMarketUpdate: (id, data) => api.put(`/market-updates/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } }),
+    deleteMarketUpdate: (id) => api.delete(`/market-updates/${id}`),
     // User Management
     getAllUsers: (params) => api.get('/admin/users', { params }),
     updateUserStatus: (id, status) => api.patch(`/admin/users/${id}/status`, { status }),

@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 
 // Load env vars
@@ -12,11 +13,19 @@ connectDB();
 
 const app = express();
 
-// Body parser
-app.use(express.json());
-
 // Enable CORS
 app.use(cors());
+
+// Rate limiting
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 1000, // limit each IP to 1000 requests per windowMs
+    message: 'Too many requests from this IP, please try again after 15 minutes'
+});
+// app.use('/api/', limiter); // Temporarily disabled for dev stability
+
+// Body parser
+app.use(express.json());
 
 // Dev logging middleware
 if (process.env.NODE_ENV === 'development') {
@@ -37,6 +46,7 @@ app.use('/api/market-updates', require('./routes/marketUpdateRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/support', require('./routes/supportRoutes'));
 app.use('/api/payments', require('./routes/paymentRoutes'));
+app.use('/api/watchlist', require('./routes/watchlistRoutes'));
 
 // Basic route
 app.get('/', (req, res) => {

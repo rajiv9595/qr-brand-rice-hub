@@ -18,7 +18,25 @@ const CreateListing = () => {
         bagWeightKg: '',
         dispatchTimeline: '',
         usageCategory: '',
+        specifications: {
+            grainLength: 'Medium',
+            riceAge: '6+ Months',
+            purityPercentage: 95,
+            brokenGrainPercentage: 5,
+            moistureContent: 12,
+            cookingTime: '15-20 Mins'
+        }
     });
+
+    const handleSpecChange = (e) => {
+        setFormData({
+            ...formData,
+            specifications: {
+                ...formData.specifications,
+                [e.target.name]: e.target.value
+            }
+        });
+    };
 
     const [bagImage, setBagImage] = useState(null);
     const [grainImage, setGrainImage] = useState(null);
@@ -71,7 +89,11 @@ const CreateListing = () => {
         try {
             const data = new FormData();
             Object.keys(formData).forEach(key => {
-                data.append(key, formData[key]);
+                if (key === 'specifications') {
+                    data.append(key, JSON.stringify(formData[key]));
+                } else {
+                    data.append(key, formData[key]);
+                }
             });
             data.append('bagImage', bagImage);
             data.append('grainImage', grainImage);
@@ -241,6 +263,88 @@ const CreateListing = () => {
                     </div>
                 </div>
 
+                {/* Technical Specifications */}
+                <div className="card p-8 space-y-6">
+                    <h3 className="text-xl font-black text-gray-900 border-b border-gray-100 pb-4">Technical Specifications (Optional)</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Grain Length</label>
+                            <select
+                                name="grainLength"
+                                value={formData.specifications.grainLength}
+                                onChange={handleSpecChange}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all bg-white"
+                            >
+                                <option value="Short">Short</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Long">Long</option>
+                                <option value="Extra Long">Extra Long</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Rice Age</label>
+                            <select
+                                name="riceAge"
+                                value={formData.specifications.riceAge}
+                                onChange={handleSpecChange}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all bg-white"
+                            >
+                                <option value="New">New</option>
+                                <option value="6+ Months">6+ Months</option>
+                                <option value="12+ Months">12+ Months</option>
+                                <option value="2+ Years">2+ Years</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Purity %</label>
+                            <input
+                                type="number"
+                                name="purityPercentage"
+                                value={formData.specifications.purityPercentage}
+                                onChange={handleSpecChange}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all"
+                                placeholder="e.g. 95"
+                                min="0" max="100"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Broken Grain %</label>
+                            <input
+                                type="number"
+                                name="brokenGrainPercentage"
+                                value={formData.specifications.brokenGrainPercentage}
+                                onChange={handleSpecChange}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all"
+                                placeholder="e.g. 5"
+                                min="0" max="100"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Moisture %</label>
+                            <input
+                                type="number"
+                                name="moistureContent"
+                                value={formData.specifications.moistureContent}
+                                onChange={handleSpecChange}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all"
+                                placeholder="e.g. 12"
+                                min="0" max="100"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Cooking Time</label>
+                            <input
+                                type="text"
+                                name="cookingTime"
+                                value={formData.specifications.cookingTime}
+                                onChange={handleSpecChange}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all"
+                                placeholder="e.g. 15-20 mins"
+                            />
+                        </div>
+                    </div>
+                </div>
+
                 {/* Image Uploads */}
                 <div className="card p-8 space-y-6">
                     <h3 className="text-xl font-black text-gray-900 border-b border-gray-100 pb-4">Product Images</h3>
@@ -254,7 +358,7 @@ const CreateListing = () => {
                             <div className="relative">
                                 <input
                                     type="file"
-                                    accept="image/*"
+                                    accept="image/*, .heic, .heif, .avif"
                                     onChange={(e) => handleImageChange(e, 'bag')}
                                     className="hidden"
                                     id="bagImage"
@@ -283,7 +387,7 @@ const CreateListing = () => {
                             <div className="relative">
                                 <input
                                     type="file"
-                                    accept="image/*"
+                                    accept="image/*, .heic, .heif, .avif"
                                     onChange={(e) => handleImageChange(e, 'grain')}
                                     className="hidden"
                                     id="grainImage"

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { orderService } from '../../services/orderService';
 import { reviewService } from '../../services';
-import { Package, Truck, CheckCircle, XCircle, Search, Filter, ShoppingBag, Star, X } from 'lucide-react';
+import { Package, Truck, CheckCircle, XCircle, Search, Filter, ShoppingBag, Star, X, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const MyOrders = () => {
@@ -162,6 +162,58 @@ const MyOrders = () => {
                                         <div className="text-xs text-gray-400 font-medium">
                                             Sold by <span className="text-gray-600 font-bold">{order.supplierId?.millName || 'Unknown Mill'}</span>
                                         </div>
+                                    </div>
+
+                                    {/* Tracking Progress Bar */}
+                                    {order.status !== 'Cancelled' && (
+                                        <div className="mt-6">
+                                            <div className="flex justify-between mb-2">
+                                                {['Pending', 'Confirmed', 'Shipped', 'Delivered'].map((step, idx) => {
+                                                    const statuses = ['Pending', 'Confirmed', 'Shipped', 'Delivered'];
+                                                    const currentIdx = statuses.indexOf(order.status);
+                                                    const isCompleted = idx <= currentIdx;
+                                                    const isActive = idx === currentIdx;
+
+                                                    return (
+                                                        <div key={step} className="flex flex-col items-center flex-1 relative">
+                                                            {/* Line Connector */}
+                                                            {idx > 0 && (
+                                                                <div className={`absolute top-2.5 -left-1/2 w-full h-0.5 -z-10 ${idx <= currentIdx ? 'bg-primary-500' : 'bg-gray-200'}`} />
+                                                            )}
+                                                            <div className={`w-5 h-5 rounded-full border-4 flex items-center justify-center transition-all duration-500 ${isCompleted ? 'bg-primary-500 border-primary-200' : 'bg-white border-gray-100'
+                                                                } ${isActive ? 'scale-125 shadow-lg shadow-primary-200 animate-pulse' : ''}`}>
+                                                                {isCompleted && idx < currentIdx && <CheckCircle className="w-3 h-3 text-white" />}
+                                                            </div>
+                                                            <span className={`text-[9px] mt-1.5 font-black uppercase tracking-widest ${isActive ? 'text-primary-600' : isCompleted ? 'text-gray-600' : 'text-gray-300'
+                                                                }`}>
+                                                                {step}
+                                                            </span>
+                                                        </div>
+                                                    )
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Supplier Contact for Queries */}
+                                    <div className="mt-4 p-3 bg-gray-50 border border-gray-100 rounded-xl flex items-center justify-between gap-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-primary-600 border border-primary-50">
+                                                <Phone className="w-4 h-4" />
+                                            </div>
+                                            <div>
+                                                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Supplier Contact</p>
+                                                <p className="text-xs font-bold text-gray-700">{order.supplierId?.userId?.phone || 'Contact not listed'}</p>
+                                            </div>
+                                        </div>
+                                        {order.supplierId?.userId?.phone && (
+                                            <a
+                                                href={`tel:+91${order.supplierId.userId.phone}`}
+                                                className="px-3 py-1.5 bg-primary-600 text-white text-[10px] font-black uppercase rounded-lg shadow-sm hover:bg-primary-700 transition-colors"
+                                            >
+                                                Call Now
+                                            </a>
+                                        )}
                                     </div>
                                 </div>
 

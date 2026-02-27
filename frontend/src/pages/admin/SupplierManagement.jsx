@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Eye, EyeOff, Package, CheckCircle } from 'lucide-react';
+import { Search, Eye, EyeOff, Package, CheckCircle, ShieldCheck, ExternalLink, Loader2 } from 'lucide-react';
 import { adminService } from '../../services/adminService';
 
 const SupplierManagement = () => {
@@ -7,6 +7,8 @@ const SupplierManagement = () => {
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [detailModal, setDetailModal] = useState({ open: false, supplier: null });
+    const [gstData, setGstData] = useState(null);
+    const [verifying, setVerifying] = useState(false);
 
     useEffect(() => {
         fetchSuppliers();
@@ -33,6 +35,18 @@ const SupplierManagement = () => {
         } catch (err) {
             console.error(err);
             alert(err.response?.data?.message || err.message || 'Failed to update supplier status');
+        }
+    };
+
+    const handleVerifyGST = async (id) => {
+        setVerifying(true);
+        try {
+            const res = await adminService.verifySupplierGST(id);
+            setGstData(res.data.data);
+        } catch (err) {
+            alert(err.response?.data?.message || 'Verification failed');
+        } finally {
+            setVerifying(false);
         }
     };
 
@@ -147,8 +161,20 @@ const SupplierManagement = () => {
                                 <p className="text-lg font-bold text-gray-900">{detailModal.supplier.millName}</p>
                             </div>
                             <div>
-                                <p className="text-sm font-bold text-gray-500 uppercase">GST Number</p>
-                                <p className="text-lg font-bold text-gray-900">{detailModal.supplier.gstNumber || 'N/A'}</p>
+                                <p className="text-sm font-bold text-gray-500 uppercase flex items-center gap-2">
+                                    GST Number
+                                    <button
+                                        onClick={() => handleVerifyGST(detailModal.supplier._id)}
+                                        disabled={verifying}
+                                        className="text-[10px] bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full hover:bg-primary-200 transition-colors disabled:opacity-50"
+                                    >
+                                        {verifying ? 'Verifying...' : 'Check Status'}
+                                    </button>
+                                </p>
+                                <p className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                    {detailModal.supplier.gstNumber || 'N/A'}
+                                    {gstData?.isValid && <ShieldCheck className="w-5 h-5 text-green-500" />}
+                                </p>
                             </div>
                             <div>
                                 <p className="text-sm font-bold text-gray-500 uppercase">Contact Phone</p>
@@ -159,11 +185,41 @@ const SupplierManagement = () => {
                                 <p className="text-lg font-bold text-gray-900">{detailModal.supplier.district}, {detailModal.supplier.state}</p>
                             </div>
                         </div>
+
+                        {gstData && (
+                            <div className="mt-6 p-4 bg-green-50 rounded-2xl border border-green-100 animate-in fade-in slide-in-from-top-2 duration-500">
+                                <h4 className="text-xs font-black text-green-700 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                    <ShieldCheck className="w-4 h-4" /> Official GST Health Data
+                                </h4>
+                                <div className="grid grid-cols-2 gap-y-3 text-sm">
+                                    <div>
+                                        <p className="text-gray-500 font-bold text-[10px] uppercase">Legal Name</p>
+                                        <p className="font-bold text-gray-900">{gstData.legalName}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-gray-500 font-bold text-[10px] uppercase">GST Status</p>
+                                        <p className="font-extrabold text-green-600">{gstData.status}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-gray-500 font-bold text-[10px] uppercase">Constitution</p>
+                                        <p className="font-bold text-gray-900">{gstData.type}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-gray-500 font-bold text-[10px] uppercase">Last Checked</p>
+                                        <p className="font-bold text-gray-900">{new Date(gstData.lastCheck).toLocaleTimeString()}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         <button
-                            onClick={() => setDetailModal({ open: false, supplier: null })}
-                            className="btn-primary w-full mt-6"
+                            onClick={() => {
+                                setDetailModal({ open: false, supplier: null });
+                                setGstData(null);
+                            }}
+                            className="btn-primary w-full mt-6 shadow-xl shadow-primary-500/20"
                         >
-                            Close
+                            Close Details
                         </button>
                     </div>
                 </div>

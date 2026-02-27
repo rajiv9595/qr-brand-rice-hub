@@ -92,6 +92,11 @@ const notificationService = {
         await sendSMS(phone, msg);
     },
 
+    sendStockAlert: async (phone, brandName, currentStock) => {
+        const msg = `QR BRAND ALERT: Low Stock! Your listing '${brandName}' has only ${currentStock} bags left. Update stock now to avoid losing orders.`;
+        await sendSMS(phone, msg);
+    },
+
     sendSMS: async (phone, message) => {
         await sendSMS(phone, message);
     }

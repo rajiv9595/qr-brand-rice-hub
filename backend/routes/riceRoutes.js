@@ -15,12 +15,13 @@ const {
 const { getListingRatings, getListingReviews } = require('../controllers/reviewController');
 const { getListingExpertReview } = require('../controllers/expertReviewController');
 const { getListingCookingTips } = require('../controllers/cookingTipsController');
+const { trackSearch } = require('../controllers/insightsController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 const { upload } = require('../config/cloudinary');
 
 // Public routes
-router.get('/', getPublicListings);
-router.get('/search', searchListings);
+router.get('/', trackSearch, getPublicListings);
+router.get('/search', trackSearch, searchListings);
 router.post('/compare', compareListings);
 router.get('/:id/ratings', getListingRatings);
 router.get('/:id/reviews', getListingReviews);

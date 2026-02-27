@@ -11,14 +11,18 @@ const marketUpdateSchema = new mongoose.Schema(
             type: String,
             required: [true, 'Please add a description'],
         },
+        imageUrl: {
+            type: String,
+            default: null,
+        },
         category: {
             type: String,
             enum: [
-                'Trend Update',
-                'Price Movement',
-                'Supply Alert',
-                'Quality Awareness',
-                'Usage Guidance',
+                'Education',
+                'Quality',
+                'Market Trends',
+                'Price Alerts',
+                'Supply Updates',
             ],
             required: [true, 'Please add a category'],
             index: true,

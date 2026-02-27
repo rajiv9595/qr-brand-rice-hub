@@ -27,15 +27,26 @@ exports.createOrder = async (req, res) => {
         const totalPrice = listing.pricePerBag * quantity;
 
         // 3a. Generate Running Order ID
-        const lastOrder = await Order.findOne({}, { orderId: 1 }).sort({ createdAt: -1 });
         let nextId = 1001;
-        if (lastOrder && lastOrder.orderId) {
-            const lastIdNum = parseInt(lastOrder.orderId.split('-')[1]);
-            if (!isNaN(lastIdNum)) {
-                nextId = lastIdNum + 1;
+        try {
+            const lastOrder = await Order.findOne({}, { orderId: 1 }).sort({ createdAt: -1 });
+            if (lastOrder && lastOrder.orderId && lastOrder.orderId.includes('-')) {
+                const lastIdNum = parseInt(lastOrder.orderId.split('-')[1]);
+                if (!isNaN(lastIdNum)) {
+                    nextId = lastIdNum + 1;
+                }
             }
+        } catch (idErr) {
+            console.error('Order ID Gen Error:', idErr);
+            // Fallback to timestamp if counter fails
+            nextId = Date.now().toString().slice(-6);
         }
         const orderId = `ORD-${nextId}`;
+
+        // 3b. Validate Required Fields (Early check to avoid DB error)
+        if (!shippingAddress || !shippingAddress.phone) {
+            return res.status(400).json({ success: false, message: 'Shipping phone number is required' });
+        }
 
         // 4. Create Order
         const order = new Order({
@@ -69,7 +80,7 @@ exports.createOrder = async (req, res) => {
         }
 
         // Email (Non-blocking)
-        const buyerEmail = buyer ? buyer.email : null;
+        const buyerEmail = shippingAddress?.email || (buyer ? buyer.email : null);
         console.log('[OrderController] Checking email for buyer:', buyerEmail || 'No Email Found');
 
         if (buyerEmail) {
@@ -81,10 +92,26 @@ exports.createOrder = async (req, res) => {
             console.warn('[OrderController] Skipping email: No email address found for buyer.');
         }
 
+        // 7c. Inventory Alert for Supplier
+        if (listing.stockAvailable < 10) {
+            // Find supplier's phone (need to populate supplierId user)
+            const supplierWithUser = await SupplierProfile.findById(listing.supplierId).populate('userId', 'phone');
+            if (supplierWithUser && supplierWithUser.userId?.phone) {
+                console.log(`[OrderController] Sending Stock Alert to Supplier... Current Stock: ${listing.stockAvailable}`);
+                notificationService.sendStockAlert(supplierWithUser.userId.phone, listing.brandName, listing.stockAvailable)
+                    .catch(err => console.error("Failed to send Stock Alert SMS:", err.message));
+            }
+        }
+
         res.status(201).json({ success: true, data: order });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Server error processing order' });
+        console.error('Order Creation Error:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Server error processing order',
+            error: err.message,
+            stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+        });
     }
 };
 
@@ -94,7 +121,14 @@ exports.getMyOrders = async (req, res) => {
     try {
         const orders = await Order.find({ buyerId: req.user._id })
             .populate('listingId', 'brandName riceVariety bagImageUrl')
-            .populate('supplierId', 'millName') // Need to populate from SupplierProfile
+            .populate({
+                path: 'supplierId',
+                select: 'millName userId',
+                populate: {
+                    path: 'userId',
+                    select: 'phone email'
+                }
+            })
             .sort({ createdAt: -1 });
 
         res.json({ success: true, data: orders });

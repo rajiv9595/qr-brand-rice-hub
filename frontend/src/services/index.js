@@ -28,3 +28,4 @@ export const marketService = {
 export { authService } from './authService';
 export { supplierService } from './supplierService';
 export { adminService } from './adminService';
+export { watchlistService } from './watchlistService';

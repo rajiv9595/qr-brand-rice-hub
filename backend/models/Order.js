@@ -62,7 +62,8 @@ const orderSchema = new mongoose.Schema({
         city: { type: String, required: true },
         state: { type: String, required: true },
         zipCode: { type: String, required: true },
-        phone: { type: String, required: true }
+        phone: { type: String, required: true },
+        email: { type: String }
     },
     orderDate: {
         type: Date,

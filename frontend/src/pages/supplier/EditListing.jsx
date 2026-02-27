@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Package, Upload, IndianRupee, Weight, Truck, Tag, Save, ArrowLeft, AlertCircle, CheckCircle } from 'lucide-react';
+import { Package, Upload, IndianRupee, Weight, Truck, Tag, Save, ArrowLeft, AlertCircle, CheckCircle, Scale } from 'lucide-react';
 import { supplierService } from '../../services/supplierService';
 import { riceService } from '../../services'; // For fetching initial data
 
@@ -19,8 +19,26 @@ const EditListing = () => {
         stockAvailable: '',
         bagWeightKg: '',
         dispatchTimeline: '',
-        usageCategory: ''
+        usageCategory: '',
+        specifications: {
+            grainLength: 'Medium',
+            riceAge: '6+ Months',
+            purityPercentage: 95,
+            brokenGrainPercentage: 5,
+            moistureContent: 12,
+            cookingTime: '15-20 Mins'
+        }
     });
+
+    const handleSpecChange = (e) => {
+        setFormData({
+            ...formData,
+            specifications: {
+                ...formData.specifications,
+                [e.target.name]: e.target.value
+            }
+        });
+    };
 
     const [bagImage, setBagImage] = useState(null);
     const [grainImage, setGrainImage] = useState(null);
@@ -60,7 +78,15 @@ const EditListing = () => {
                     stockAvailable: listing.stockAvailable,
                     bagWeightKg: listing.bagWeightKg,
                     dispatchTimeline: listing.dispatchTimeline,
-                    usageCategory: listing.usageCategory
+                    usageCategory: listing.usageCategory,
+                    specifications: listing.specifications || {
+                        grainLength: 'Medium',
+                        riceAge: '6+ Months',
+                        purityPercentage: 95,
+                        brokenGrainPercentage: 5,
+                        moistureContent: 12,
+                        cookingTime: '15-20 Mins'
+                    }
                 });
 
                 if (listing.bagImageUrl) setBagImagePreview(listing.bagImageUrl);
@@ -104,7 +130,11 @@ const EditListing = () => {
         try {
             const data = new FormData();
             Object.keys(formData).forEach(key => {
-                data.append(key, formData[key]);
+                if (key === 'specifications') {
+                    data.append(key, JSON.stringify(formData[key]));
+                } else {
+                    data.append(key, formData[key]);
+                }
             });
 
             // Only append images if new ones were selected
@@ -284,6 +314,91 @@ const EditListing = () => {
                     </div>
                 </div>
 
+                {/* Technical Specifications */}
+                <div className="card p-8 space-y-6">
+                    <h3 className="text-xl font-black text-gray-900 border-b border-gray-100 pb-4 h-fit flex items-center gap-2">
+                        <Scale className="w-5 h-5 text-primary-600" />
+                        Technical Specifications (Optional)
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Grain Length</label>
+                            <select
+                                name="grainLength"
+                                value={formData.specifications?.grainLength}
+                                onChange={handleSpecChange}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all bg-white"
+                            >
+                                <option value="Short">Short</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Long">Long</option>
+                                <option value="Extra Long">Extra Long</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Rice Age</label>
+                            <select
+                                name="riceAge"
+                                value={formData.specifications?.riceAge}
+                                onChange={handleSpecChange}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all bg-white"
+                            >
+                                <option value="New">New</option>
+                                <option value="6+ Months">6+ Months</option>
+                                <option value="12+ Months">12+ Months</option>
+                                <option value="2+ Years">2+ Years</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Purity %</label>
+                            <input
+                                type="number"
+                                name="purityPercentage"
+                                value={formData.specifications?.purityPercentage}
+                                onChange={handleSpecChange}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all"
+                                placeholder="e.g. 95"
+                                min="0" max="100"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Broken Grain %</label>
+                            <input
+                                type="number"
+                                name="brokenGrainPercentage"
+                                value={formData.specifications?.brokenGrainPercentage}
+                                onChange={handleSpecChange}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all"
+                                placeholder="e.g. 5"
+                                min="0" max="100"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Moisture %</label>
+                            <input
+                                type="number"
+                                name="moistureContent"
+                                value={formData.specifications?.moistureContent}
+                                onChange={handleSpecChange}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all"
+                                placeholder="e.g. 12"
+                                min="0" max="100"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Cooking Time</label>
+                            <input
+                                type="text"
+                                name="cookingTime"
+                                value={formData.specifications?.cookingTime}
+                                onChange={handleSpecChange}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all"
+                                placeholder="e.g. 15-20 mins"
+                            />
+                        </div>
+                    </div>
+                </div>
+
                 {/* Images (Optional on Edit) */}
                 <div className="card p-8 space-y-6">
                     <h3 className="text-xl font-black text-gray-900 border-b border-gray-100 pb-4 flex items-center gap-2">
@@ -298,7 +413,7 @@ const EditListing = () => {
                             <div className="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:border-primary-400 transition-colors relative bg-gray-50 h-64 flex flex-col items-center justify-center cursor-pointer group">
                                 <input
                                     type="file"
-                                    accept="image/*"
+                                    accept="image/*, .heic, .heif, .avif"
                                     onChange={(e) => handleImageChange(e, 'bag')}
                                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
                                 />
@@ -321,7 +436,7 @@ const EditListing = () => {
                             <div className="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:border-primary-400 transition-colors relative bg-gray-50 h-64 flex flex-col items-center justify-center cursor-pointer group">
                                 <input
                                     type="file"
-                                    accept="image/*"
+                                    accept="image/*, .heic, .heif, .avif"
                                     onChange={(e) => handleImageChange(e, 'grain')}
                                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
                                 />

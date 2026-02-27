@@ -4,6 +4,7 @@ const {
     createExpertReview,
     updateExpertReview,
     deleteExpertReview,
+    getAllExpertReviews,
 } = require('../controllers/expertReviewController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
@@ -11,6 +12,7 @@ const { protect, authorize } = require('../middleware/authMiddleware');
 router.use(protect);
 router.use(authorize('expert', 'admin'));
 
+router.get('/', getAllExpertReviews);
 router.post('/', createExpertReview);
 router.put('/:id', updateExpertReview);
 router.delete('/:id', deleteExpertReview);

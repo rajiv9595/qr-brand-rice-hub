@@ -13,7 +13,7 @@ const SupplierLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isPinned, setIsPinned] = useState(() => {
         const saved = localStorage.getItem('supplierSidebarPinned');
-        return saved !== null ? JSON.parse(saved) : true;
+        return saved !== null ? JSON.parse(saved) : false;
     });
     const [isHovered, setIsHovered] = useState(false);
     const location = useLocation();
@@ -94,12 +94,7 @@ const SupplierLayout = () => {
                     {/* Logo */}
                     <div className="p-4 border-b border-gray-100 flex items-center justify-between h-20 shrink-0">
                         <Link to="/supplier" className="flex items-center gap-3 overflow-hidden">
-                            <div className="min-w-[40px] flex justify-center">
-                                <Logo variant="light" size="sm" />
-                            </div>
-                            <span className={`font-black text-xl text-primary-900 transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
-                                QR HUB
-                            </span>
+                            <Logo variant="light" size="sm" iconOnly={!isExpanded} />
                         </Link>
                         <button
                             onClick={() => setSidebarOpen(false)}
@@ -171,17 +166,15 @@ const SupplierLayout = () => {
                         <button
                             onClick={togglePin}
                             className="hidden lg:flex w-full items-center gap-3 px-3 py-3 rounded-xl font-medium text-gray-400 hover:bg-gray-50 hover:text-primary-600 transition-all group"
+                            title={isPinned ? 'Collapse Sidebar' : 'Expand Sidebar'}
                         >
                             <div className="min-w-[24px] flex justify-center">
                                 {isPinned ? (
-                                    <Menu className="w-5 h-5 rotate-90" /> // Using Menu as a placeholder for toggle icon
+                                    <Menu className="w-5 h-5 rotate-90" />
                                 ) : (
                                     <Menu className="w-5 h-5" />
                                 )}
                             </div>
-                            <span className={`transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0 w-0 h-0 overflow-hidden'}`}>
-                                {isPinned ? 'Collapse Sidebar' : 'Expand Sidebar'}
-                            </span>
                         </button>
                     </div>
                 </div>

@@ -1,12 +1,21 @@
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { Package, CheckCircle, Clock, XCircle, TrendingUp } from 'lucide-react';
+import { Package, CheckCircle, Clock, XCircle, TrendingUp, Zap, Award, Star, ShieldCheck } from 'lucide-react';
 import { authService } from '../../services/authService';
+import MarketBenchmarking from '../../components/supplier/MarketBenchmarking';
+import api from '../../services/api';
 
 const SupplierOverview = () => {
     // Consume shared context from Layout
-    const { stats, loadingStats } = useOutletContext();
+    const { stats, loadingStats, profile } = useOutletContext();
     const user = authService.getCurrentUser();
+
+    const ICON_MAP = {
+        Zap: Zap,
+        Award: Award,
+        Star: Star,
+        ShieldCheck: ShieldCheck
+    };
 
     // Use loadingStats from layout
     const loading = loadingStats;
@@ -58,6 +67,25 @@ const SupplierOverview = () => {
                     <p className="text-primary-100 text-lg">
                         Manage your rice listings, track approvals, and grow your business on QR BRAND marketplace.
                     </p>
+
+                    {/* Performance Badges */}
+                    {profile?.badges?.length > 0 && (
+                        <div className="flex flex-wrap gap-3 pt-4">
+                            {profile.badges.map((badge, idx) => {
+                                const Icon = ICON_MAP[badge.icon] || Award;
+                                return (
+                                    <div
+                                        key={idx}
+                                        className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20 group/badge cursor-help transition-all hover:bg-white/20"
+                                        title={badge.description}
+                                    >
+                                        <Icon className={`w-4 h-4 ${badge.color || 'text-gold-400'}`} />
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-white">{badge.title}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
 
                 {/* Background blobs */}
@@ -93,6 +121,9 @@ const SupplierOverview = () => {
                     })}
                 </div>
             )}
+
+            {/* AI Insights & Benchmarking */}
+            <MarketBenchmarking />
 
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
