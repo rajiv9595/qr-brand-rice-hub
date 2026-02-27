@@ -1,0 +1,191 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply font-body text-gray-800 bg-rice-50;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display text-field-800;
+  }
+}
+
+@layer components {
+
+  /* Buttons - Reference Style */
+  .btn {
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg;
+  }
+
+  .btn-primary {
+    @apply btn bg-field-500 hover:bg-field-600 text-white shadow-lg shadow-field-500/30 hover:-translate-y-0.5 active:translate-y-0;
+  }
+
+  .btn-secondary {
+    @apply btn bg-rice-400 hover:bg-rice-500 text-white shadow-md hover:shadow-lg;
+  }
+
+  .btn-outline {
+    @apply btn bg-transparent border-2 border-field-500 text-field-500 hover:bg-field-500 hover:text-white shadow-none;
+  }
+
+  .btn-accent {
+    @apply btn bg-rice-500 text-white hover:bg-rice-600 shadow-lg shadow-rice-500/30;
+  }
+
+  /* Cards - Reference Style */
+  .card {
+    @apply bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-rice-100;
+  }
+
+  .glass {
+    @apply bg-white/90 backdrop-blur-md border border-white/40 shadow-lg;
+  }
+
+  /* Inputs - Reference Style */
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 focus:border-field-500 focus:ring-2 focus:ring-field-500/20 outline-none transition-all duration-200 font-body;
+  }
+
+  /* Badges - Mixed Style (keeping semantic names for compatibility) */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider;
+  }
+
+  .badge-success {
+    @apply badge bg-field-50 text-field-700 border border-field-200;
+  }
+
+  .badge-warning {
+    @apply badge bg-rice-100 text-rice-700 border border-rice-200;
+  }
+
+  .badge-danger {
+    @apply badge bg-red-50 text-red-700 border border-red-200;
+  }
+
+  .badge-neutral {
+    @apply badge bg-gray-100 text-gray-600 border border-gray-200;
+  }
+
+  /* Reference specific badges if needed */
+  .badge-green {
+    @apply badge bg-field-50 text-field-600;
+  }
+
+  .badge-gold {
+    @apply badge bg-rice-100 text-rice-600;
+  }
+
+  .section-title {
+    @apply font-display text-3xl md:text-4xl font-bold text-field-800 mb-6;
+  }
+
+  .section-subtitle {
+    @apply text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed font-body;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-rice-50;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-field-300 rounded-full border-2 border-rice-50;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-field-500;
+}
+
+@layer utilities {
+  .animate-in {
+    animation-duration: 0.5s;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: forwards;
+  }
+
+  .fade-in {
+    animation-name: fadeIn;
+  }
+
+  .slide-in-from-bottom-4 {
+    animation-name: slideInFromBottom4;
+  }
+
+  .slide-in-from-bottom-10 {
+    animation-name: slideInFromBottom10;
+  }
+
+  .slide-in-from-top-2 {
+    animation-name: slideInFromTop2;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideInFromBottom4 {
+    from {
+      transform: translateY(1rem);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideInFromBottom10 {
+    from {
+      transform: translateY(2.5rem);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideInFromTop2 {
+    from {
+      transform: translateY(-0.5rem);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}

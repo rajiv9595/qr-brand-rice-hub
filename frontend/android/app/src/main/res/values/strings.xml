@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">QR Brand</string>
+    <string name="title_activity_main">QR Brand</string>
+    <string name="package_name">com.qrbrand.ricehub</string>
+    <string name="custom_url_scheme">com.qrbrand.ricehub</string>
+</resources>
