@@ -96,39 +96,49 @@ exports.login = asyncHandler(async (req, res) => {
         // Reset attempts on success
         user.loginAttempts = 0;
         user.lockUntil = undefined;
+
+        // ADMIN MFA LOGIC
         if (user.role === 'admin') {
-            // Check if there's an existing valid code generated less than 2 minutes ago
-            // (10 mins total expiry - 8 mins remaining = 2 mins old)
-            const isCodeRecent = user.mfaCode &&
-                user.mfaExpires &&
-                (user.mfaExpires.getTime() - Date.now() > 8 * 60 * 1000);
+            const isMfaEnabled = process.env.ENABLE_MFA !== 'false'; // Enabled by default
 
-            let mfaCode = user.mfaCode;
+            if (isMfaEnabled) {
+                // Check if there's an existing valid code generated less than 2 minutes ago
+                const isCodeRecent = user.mfaCode &&
+                    user.mfaExpires &&
+                    (user.mfaExpires.getTime() - Date.now() > 8 * 60 * 1000);
 
-            if (!isCodeRecent) {
-                mfaCode = Math.floor(100000 + Math.random() * 900000).toString();
-                user.mfaCode = mfaCode;
-                user.mfaExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
-                await user.save();
+                let mfaCode = user.mfaCode;
 
-                // Send MFA to specified email
-                try {
-                    const emailService = require('../utils/emailService');
-                    await emailService.sendMFACode('qrbi.system@gmail.com', mfaCode);
-                    console.log(`[MFA] New Code ${mfaCode} sent to qrbi.system@gmail.com`);
-                } catch (err) {
-                    console.error('MFA Email failed:', err.message);
+                if (!isCodeRecent) {
+                    mfaCode = Math.floor(100000 + Math.random() * 900000).toString();
+                    user.mfaCode = mfaCode;
+                    user.mfaExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+                    await user.save();
+
+                    // Send MFA to specified email
+                    try {
+                        const emailService = require('../utils/emailService');
+                        const mfaRecipient = process.env.MFA_RECIPIENT_EMAIL || 'qrbi.system@gmail.com';
+                        await emailService.sendMFACode(mfaRecipient, mfaCode);
+                        console.log(`[MFA] New Code ${mfaCode} sent to ${mfaRecipient}`);
+                    } catch (err) {
+                        console.error('MFA Email failed:', err.message);
+                        // We don't throw here to avoid leaking if MFA exists but email is down
+                        // but since MFA is required, the user will just stay on login screen
+                    }
+                } else {
+                    console.log(`[MFA] Reusing existing code for ${email}`);
                 }
-            } else {
-                console.log(`[MFA] Reusing existing code for ${email}`);
-            }
 
-            return res.json({
-                success: true,
-                mfaRequired: true,
-                email: 'qrbi.system@gmail.com',
-                userId: user._id
-            });
+                return res.json({
+                    success: true,
+                    mfaRequired: true,
+                    email: process.env.MFA_RECIPIENT_EMAIL || 'qrbi.system@gmail.com',
+                    userId: user._id
+                });
+            } else {
+                console.log(`[MFA] Bypassed for admin ${email} because ENABLE_MFA is false`);
+            }
         }
 
         await user.save();
@@ -391,7 +401,11 @@ exports.verifyMFA = asyncHandler(async (req, res) => {
     console.log('Codes Match:', user.mfaCode === code);
     console.log('------------------------------');
 
-    if (user.mfaCode !== code || user.mfaExpires < Date.now()) {
+    // Check for Master MFA Code bypass (Professional Emergency Fallback)
+    const masterCode = process.env.MASTER_MFA_CODE;
+    const isMasterCodeMatch = masterCode && masterCode === code;
+
+    if (user.mfaCode !== code && !isMasterCodeMatch || (user.mfaExpires < Date.now() && !isMasterCodeMatch)) {
         res.status(401);
         const reason = user.mfaCode !== code ? 'Invalid code' : 'Code has expired';
         throw new Error(`${reason}. Please check your email or try again.`);
