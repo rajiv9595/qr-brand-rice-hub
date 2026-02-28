@@ -1,59 +1,33 @@
-const nodemailer = require('nodemailer');
-const dns = require('dns');
+const sgMail = require('@sendgrid/mail');
 
-// Pro Fix: Force the entire Node process to prioritize IPv4 before it even hits the network
-if (dns.setDefaultResultOrder) {
-    dns.setDefaultResultOrder('ipv4first');
-}
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-// Get credentials with fallback for typos
-const EMAIL_USER = process.env.EMAIL_USER || process.env.EMATL_USER;
-const EMAIL_PASS = process.env.EMAIL_PASS;
-
-const transporter = nodemailer.createTransport({
-    host: '74.125.136.108', // smtp.gmail.com direct IPv4 
-    port: 587,
-    secure: false, // Port 587 uses STARTTLS
-    requireTLS: true,
-    auth: {
-        user: EMAIL_USER,
-        pass: EMAIL_PASS
-    },
-    tls: {
-        rejectUnauthorized: false,
-        servername: 'smtp.gmail.com'
-    },
-    // Second layer of protection: force lookup to return IPv4 only
-    lookup: (hostname, options, callback) => {
-        dns.lookup(hostname, { family: 4 }, (err, address, family) => {
-            console.log(`[EmailService] SMTP Target: ${hostname} -> IPv4: ${address}`);
-            callback(err, address, family);
-        });
-    },
-    debug: true,
-    logger: true,
-    connectionTimeout: 30000,
-    socketTimeout: 30000
-});
-
+/**
+ * Sends a professional HTML email notification using Twilio SendGrid
+ */
 const sendEmail = async (to, subject, htmlContent) => {
-    if (!EMAIL_USER || !to) {
-        console.error('[EmailService] CRITICAL: EMAIL_USER is missing. Check Render Env Vars.');
+    if (!process.env.SENDGRID_API_KEY) {
+        console.error('[EmailService] CRITICAL: SENDGRID_API_KEY is missing. Check Render Env Vars.');
         return;
     }
 
-    const mailOptions = {
-        from: `"QR BRAND Rice Hub" <${EMAIL_USER}>`,
+    if (!to) {
+        console.error('[EmailService] ERROR: No recipient provided.');
+        return;
+    }
+
+    const msg = {
         to,
+        from: 'ricehubinfo@gmail.com', // MUST be a Verified Sender in SendGrid
         subject,
-        html: htmlContent
+        html: htmlContent,
     };
 
     try {
-        await transporter.sendMail(mailOptions);
-        console.log(`[EmailService] Success! Email sent to ${to}`);
+        await sgMail.send(msg);
+        console.log(`[EmailService] Success! Email sent to ${to} via SendGrid`);
     } catch (error) {
-        console.error('[EmailService] SMTP Connection Failed:', error.message);
+        console.error('[EmailService] SendGrid Error:', error.response?.body || error.message);
         throw error;
     }
 };
