@@ -1,57 +1,52 @@
 const nodemailer = require('nodemailer');
 const dns = require('dns');
 
-// 1. Configure the Transporter
-// This example uses Gmail, but standard SMTP is better for production
-// Strictly force IPv4 via DNS lookup to bypass Render's broken IPv6 routing
+// Get credentials with fallback for typos
+const EMAIL_USER = process.env.EMAIL_USER || process.env.EMATL_USER;
+const EMAIL_PASS = process.env.EMAIL_PASS;
+
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
+    service: 'gmail',
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+        user: EMAIL_USER,
+        pass: EMAIL_PASS
     },
     tls: {
-        rejectUnauthorized: false,
-        servername: 'smtp.gmail.com'
+        rejectUnauthorized: false
     },
-    // This is the professional fix: overriding the lookup function
+    // Force IPv4 only - the professional fix for ENETUNREACH
     lookup: (hostname, options, callback) => {
-        dns.lookup(hostname, { family: 4 }, callback);
+        dns.lookup(hostname, { family: 4 }, (err, address, family) => {
+            console.log(`[EmailService] Resolving ${hostname} to IPv4: ${address}`);
+            callback(err, address, family);
+        });
     },
+    debug: true,
+    logger: true,
     connectionTimeout: 15000,
     greetingTimeout: 15000,
-    socketTimeout: 15000,
-    family: 4
+    socketTimeout: 30000
 });
 
-/**
- * Sends a professional HTML email notification.
- * 
- * @param {string} to - Recipient email address
- * @param {string} subject - Email subject line
- * @param {string} htmlContent - HTML body content
- */
 const sendEmail = async (to, subject, htmlContent) => {
-    if (!process.env.EMAIL_USER || !to) {
-        console.log('[EmailService] Email not configured or no recipient.');
+    if (!EMAIL_USER || !to) {
+        console.error('[EmailService] Error: Missing user config or recipient email.');
         return;
     }
 
     const mailOptions = {
-        from: `"QR BRAND Rice Hub" <${process.env.EMAIL_USER}>`,
-        to: to,
-        subject: subject,
+        from: `"QR BRAND Rice Hub" <${EMAIL_USER}>`,
+        to,
+        subject,
         html: htmlContent
     };
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log(`[EmailService] Email sent to ${to}`);
+        console.log(`[EmailService] Success! Email sent to ${to}`);
     } catch (error) {
-        console.error('[EmailService] Failed to send email:', error.message);
-        throw error; // Rethrow so the caller knows it failed
+        console.error('[EmailService] SMTP Error:', error.message);
+        throw error;
     }
 };
 
