@@ -5,15 +5,17 @@ const nodemailer = require('nodemailer');
 // 1. Configure the Transporter
 // Explicitly use smtp.gmail.com on Port 587 (TLS) to avoid ETIMEDOUT
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
+    // Use an explicit IPv4 address for smtp.gmail.com to bypass IPv6 ENETUNREACH issues on Render
+    host: '74.125.136.108',
     port: 587,
-    secure: false, // true for 465, false for other ports
+    secure: false,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     },
     tls: {
-        rejectUnauthorized: false
+        rejectUnauthorized: false,
+        servername: 'smtp.gmail.com' // Crucial for certificate validation when using IP as host
     },
     family: 4
 });
