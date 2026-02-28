@@ -23,7 +23,6 @@ services:
   - type: web
     name: qr-brand-rice-hub
     env: static
-    plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
