@@ -3,11 +3,15 @@ const crypto = require('crypto');
 const asyncHandler = require('../utils/asyncHandler');
 const Order = require('../models/Order');
 
-// Initialize Razorpay
-const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
+let razorpay;
+if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
+    razorpay = new Razorpay({
+        key_id: process.env.RAZORPAY_KEY_ID,
+        key_secret: process.env.RAZORPAY_KEY_SECRET,
+    });
+} else {
+    console.warn("⚠️ RAZORPAY_KEY_ID or RAZORPAY_KEY_SECRET is missing. Payment functionality will be disabled.");
+}
 
 // @desc    Create a new payment order
 // @route   POST /api/payments/create-order
@@ -20,6 +24,11 @@ exports.createOrder = asyncHandler(async (req, res) => {
     if (!order) {
         res.status(404);
         throw new Error('Order not found');
+    }
+
+    if (!razorpay) {
+        res.status(503); // Service Unavailable
+        throw new Error('Payment gateway is not currently configured on this server. Please contact support.');
     }
 
     const options = {
@@ -53,6 +62,11 @@ exports.verifyPayment = asyncHandler(async (req, res) => {
     } = req.body;
 
     const body = razorpay_order_id + "|" + razorpay_payment_id;
+
+    if (!process.env.RAZORPAY_KEY_SECRET) {
+        res.status(503);
+        throw new Error('Payment verification is currently unavailable. Contact support.');
+    }
 
     const expectedSignature = crypto
         .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
