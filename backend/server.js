@@ -66,6 +66,11 @@ app.get('/', (req, res) => {
     res.send('QR BRAND RICE HUB API is running...');
 });
 
+// Added API health/root route
+app.get('/api', (req, res) => {
+    res.json({ success: true, message: 'QR BRAND RICE HUB API is active' });
+});
+
 // Serve static files
 const path = require('path');
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
