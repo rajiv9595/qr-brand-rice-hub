@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { LogIn, UserPlus, Mail, Lock, User, Phone, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { GoogleLogin } from '@react-oauth/google';
 import { authService } from '../services/authService';
 import Logo from '../components/common/Logo';
 
@@ -61,6 +62,32 @@ const LoginPage = () => {
             setLoading(false);
         }
     };
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        setLoading(true);
+        setError('');
+        try {
+            await authService.googleAuth(credentialResponse.credential, formData.role);
+            const user = authService.getCurrentUser();
+            if (user) {
+                if (user.role === 'supplier') {
+                    navigate('/supplier');
+                } else if (user.role === 'admin') {
+                    navigate('/admin');
+                } else {
+                    navigate('/search');
+                }
+            } else {
+                setError('Login succeeded but user data is missing');
+            }
+        } catch (err) {
+            console.error('Google Auth Error:', err);
+            setError(err.response?.data?.message || 'Google Auth failed. Is the API correctly configured?');
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     return (
         <div className="min-h-screen bg-rice-50 flex flex-col items-center pt-8 sm:pt-12 px-4 font-body">
@@ -231,7 +258,28 @@ const LoginPage = () => {
                             )}
                         </button>
 
-                        <p className="text-xs text-center text-gray-400 mt-4">
+                        <div className="flex items-center justify-between text-xs text-gray-400 pt-3 pb-1">
+                            <span className="w-[30%] border-b border-gray-200"></span>
+                            <span className="flex-1 text-center font-bold tracking-widest uppercase">Or Continue With</span>
+                            <span className="w-[30%] border-b border-gray-200"></span>
+                        </div>
+
+                        {/* Google Auth Button Wrapper */}
+                        <div className="flex justify-center w-full">
+                            <div className="w-full [&>div]:w-full transition-transform hover:scale-[1.02]">
+                                <GoogleLogin
+                                    onSuccess={handleGoogleSuccess}
+                                    onError={() => setError('Google Authentication Failed')}
+                                    type="standard"
+                                    theme="outline"
+                                    size="large"
+                                    text={isLogin ? "signin_with" : "signup_with"}
+                                    shape="rectangular"
+                                />
+                            </div>
+                        </div>
+
+                        <p className="text-xs text-center text-gray-400 mt-6">
                             By continuing, you agree to our <a href="#" className="underline hover:text-field-600">Terms of Service</a> and <a href="#" className="underline hover:text-field-600">Privacy Policy</a>.
                         </p>
                     </form>

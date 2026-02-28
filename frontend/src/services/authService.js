@@ -11,6 +11,16 @@ export const authService = {
         return res.data;
     },
 
+    googleAuth: async (idToken, role) => {
+        const res = await api.post('/auth/google', { idToken, role });
+        if (res.data.success && res.data.data) {
+            const { token, ...user } = res.data.data;
+            sessionStorage.setItem('token', token);
+            sessionStorage.setItem('user', JSON.stringify(user));
+        }
+        return res.data;
+    },
+
     verifyMFA: async (userId, code) => {
         const res = await api.post('/auth/verify-mfa', { userId, code });
         if (res.data.success) {

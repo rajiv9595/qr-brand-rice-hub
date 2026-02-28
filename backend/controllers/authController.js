@@ -3,6 +3,10 @@ const generateToken = require('../utils/generateToken');
 const Joi = require('joi');
 const asyncHandler = require('../utils/asyncHandler');
 const { ROLES } = require('../utils/constants');
+const { OAuth2Client } = require('google-auth-library');
+const crypto = require('crypto');
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || 'dummy_client_id_for_dev');
 
 // @desc    Register a new user
 // @route   POST /api/auth/register
@@ -186,6 +190,69 @@ exports.login = asyncHandler(async (req, res) => {
         } else {
             throw new Error('Invalid email or password');
         }
+    }
+});
+
+// @desc    Authenticate/Register user with Google
+// @route   POST /api/auth/google
+// @access  Public
+exports.googleAuth = asyncHandler(async (req, res) => {
+    const { idToken, role } = req.body;
+
+    if (!idToken) {
+        res.status(400);
+        throw new Error('No Google ID token provided');
+    }
+
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken,
+            audience: process.env.GOOGLE_CLIENT_ID || 'dummy_client_id_for_dev',
+        });
+        const payload = ticket.getPayload();
+        const { email, name, picture } = payload;
+
+        // Check if user already exists
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            // First time Google Login -> Register
+            const randomPassword = crypto.randomBytes(20).toString('hex') + 'A1!'; // Satisfy minlength & strong checks if any
+
+            user = await User.create({
+                name,
+                email,
+                password: randomPassword,
+                role: role || ROLES.CUSTOMER,
+                isVerified: true, // Google emails are already verified
+            });
+            console.log(`[Google Auth] Created new user: ${email} with role: ${user.role}`);
+        } else {
+            // Existing user logging in with Google
+            // Reset lockings on success
+            user.loginAttempts = 0;
+            user.lockUntil = undefined;
+            // Optionally, we could update their name or picture here, but let's keep it minimal
+            await user.save();
+        }
+
+        // Return standard login payload
+        res.json({
+            success: true,
+            data: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                address: user.address,
+                token: generateToken(user._id),
+            },
+        });
+
+    } catch (error) {
+        console.error('Google Auth Error:', error.message);
+        res.status(401);
+        throw new Error('Google authentication failed. Invalid token.');
     }
 });
 
