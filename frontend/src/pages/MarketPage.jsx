@@ -104,13 +104,13 @@ const MarketPage = () => {
     return (
         <div className="w-full max-w-[90rem] ml-0 px-4 md:px-12 py-12 space-y-10 animate-in fade-in duration-700">
             {/* Header */}
-            <div className="text-left space-y-3">
-                <h1 className="text-4xl text-field-900 font-display font-bold tracking-tight">Rice Knowledge & Market Intelligence</h1>
-                <p className="text-gray-500 text-lg max-w-2xl">Stay updated with rice market trends, quality tips, price alerts, and supply information.</p>
+            <div className="text-left space-y-2">
+                <h1 className="text-2xl md:text-4xl text-field-900 font-display font-bold tracking-tight">Rice Knowledge & Market Intelligence</h1>
+                <p className="text-gray-500 text-base md:text-lg max-w-2xl">Stay updated with rice market trends, quality tips, price alerts, and supply information.</p>
             </div>
 
             {/* Filters */}
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex overflow-x-auto pb-4 no-scrollbar items-center gap-3 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap">
                 {categories.map((cat) => (
                     <button
                         key={cat.label}
@@ -212,10 +212,10 @@ const MarketPage = () => {
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-8 sm:p-12">
                                 <span className={`inline-block px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest w-max mb-4 ${selectedArticle.category?.includes('Price') ? 'bg-green-500 text-white' :
-                                        selectedArticle.category?.includes('Market') ? 'bg-blue-500 text-white' :
-                                            selectedArticle.category?.includes('Supply') ? 'bg-gray-100 text-gray-800' :
-                                                selectedArticle.category?.includes('Quality') ? 'bg-emerald-500 text-white' :
-                                                    'bg-orange-500 text-white'
+                                    selectedArticle.category?.includes('Market') ? 'bg-blue-500 text-white' :
+                                        selectedArticle.category?.includes('Supply') ? 'bg-gray-100 text-gray-800' :
+                                            selectedArticle.category?.includes('Quality') ? 'bg-emerald-500 text-white' :
+                                                'bg-orange-500 text-white'
                                     }`}>
                                     {selectedArticle.category || 'Update'}
                                 </span>

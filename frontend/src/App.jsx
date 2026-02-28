@@ -173,6 +173,31 @@ const Layout = ({ children }) => {
                   </Link>
                 );
               })}
+
+              {/* Mobile Dashboard Links (for logged in users) */}
+              {user && (
+                <div className="pt-2 border-t border-rice-100 mt-2">
+                  {user.role === 'customer' && (
+                    <Link to="/buyer" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-field-700 bg-field-50 mb-1">
+                      <LayoutDashboard className="w-5 h-5" />
+                      My Dashboard
+                    </Link>
+                  )}
+                  {user.role === 'supplier' && (
+                    <Link to="/supplier" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-orange-700 bg-orange-50 mb-1">
+                      <BarChart2 className="w-5 h-5" />
+                      Supplier Panel
+                    </Link>
+                  )}
+                  {user.role === 'admin' && (
+                    <Link to="/admin" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-indigo-700 bg-indigo-50 mb-1">
+                      <Shield className="w-5 h-5" />
+                      Admin Panel
+                    </Link>
+                  )}
+                </div>
+              )}
+
               {!user && (
                 <Link to="/login" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-field-600 bg-field-50 mt-1">
                   <LogIn className="w-5 h-5" /> Login / Register

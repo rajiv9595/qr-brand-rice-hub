@@ -94,9 +94,9 @@ const SearchPage = () => {
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-display font-black text-gray-900 tracking-tight">Marketplace</h1>
-                    <p className="text-gray-500 mt-1">Browse premium rice listings from verified mills</p>
+                <div className="text-left w-full">
+                    <h1 className="text-2xl md:text-3xl font-display font-black text-gray-900 tracking-tight">Marketplace</h1>
+                    <p className="text-gray-500 mt-1 text-sm md:text-base">Browse premium rice listings from verified mills</p>
                 </div>
             </div>
             {/* Search Bar & Stats */}

@@ -15,6 +15,9 @@ connectDB();
 
 const app = express();
 
+// Trust proxy for Render/Vercel
+app.set('trust proxy', 1);
+
 // Enable CORS
 app.use(cors());
 
