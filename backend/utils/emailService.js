@@ -18,7 +18,10 @@ const sendEmail = async (to, subject, htmlContent) => {
 
     const msg = {
         to,
-        from: process.env.SENDGRID_FROM_EMAIL || 'medapatirajiv9494@gmail.com', // MUST be a Verified Sender in SendGrid
+        from: {
+            email: 'medapatirajiv9494@gmail.com', // MUST exactly match the verified Sender Identity in SendGrid
+            name: 'QR BRAND'
+        },
         subject,
         html: htmlContent,
     };
