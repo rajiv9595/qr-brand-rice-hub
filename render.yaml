@@ -1,0 +1,34 @@
+services:
+  # Backend Web Service
+  - type: web
+    name: qr-brand-rice-hub-api
+    env: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: FRONTEND_URL
+        value: https://qr-brand-rice-hub.onrender.com
+      - key: MONGO_URI
+        sync: false # Requires manual entry in Render Dashboard
+      - key: JWT_SECRET
+        sync: false # Requires manual entry in Render Dashboard
+
+  # Frontend Static Site
+  - type: web
+    name: qr-brand-rice-hub
+    env: static
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: VITE_API_URL
+        value: https://qr-brand-rice-hub-api.onrender.com/api
