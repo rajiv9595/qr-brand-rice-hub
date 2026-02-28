@@ -88,7 +88,7 @@ const Layout = ({ children }) => {
                 const active = location.pathname === to || (to !== '/' && location.pathname.startsWith(to));
 
                 // Hide protected routes if not logged in or wrong role, etc. allow visible for now
-                if ((label === 'Supplier Panel' && user?.role === 'customer')) return null;
+                if (label === 'Supplier Panel' && user?.role !== 'supplier') return null;
                 if ((label === 'Admin' && user?.role !== 'admin')) return null;
 
                 return (
@@ -154,7 +154,7 @@ const Layout = ({ children }) => {
             <nav className="flex flex-col gap-1 pt-2">
               {NAV_ITEMS.map(({ to, label, icon: Icon }) => {
                 const active = location.pathname === to;
-                if ((label === 'Supplier Panel' && user?.role === 'customer')) return null;
+                if (label === 'Supplier Panel' && user?.role !== 'supplier') return null;
                 if ((label === 'Admin' && user?.role !== 'admin')) return null;
 
                 return (
