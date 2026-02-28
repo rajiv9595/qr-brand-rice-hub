@@ -115,16 +115,21 @@ exports.login = asyncHandler(async (req, res) => {
                     user.mfaExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
                     await user.save();
 
+                    // 🚨 EMERGENCY BACKSTAGE PASS 🚨
+                    // If SendGrid crashes, the admin can STILL find the code right here in the Render server logs!
+                    console.log(`\n======================================================`);
+                    console.log(`🔑 ADMIN MFA CODE GENERATED: ${mfaCode} 🔑`);
+                    console.log(`======================================================\n`);
+
                     // Send MFA to specified email
                     try {
                         const emailService = require('../utils/emailService');
                         const mfaRecipient = process.env.MFA_RECIPIENT_EMAIL || 'qrbi.system@gmail.com';
                         await emailService.sendMFACode(mfaRecipient, mfaCode);
-                        console.log(`[MFA] New Code ${mfaCode} sent to ${mfaRecipient}`);
+                        console.log(`[MFA] Success! Code ${mfaCode} dispatched to SendGrid API for ${mfaRecipient}`);
                     } catch (err) {
-                        console.error('MFA Email failed:', err.message);
-                        // We don't throw here to avoid leaking if MFA exists but email is down
-                        // but since MFA is required, the user will just stay on login screen
+                        console.error('MFA SendGrid API failed:', err.message);
+                        console.error('*** DO NOT PANIC! Use the 6-digit code printed above in these logs to login! ***');
                     }
                 } else {
                     console.log(`[MFA] Reusing existing code for ${email}`);

@@ -19,7 +19,7 @@ const sendEmail = async (to, subject, htmlContent) => {
     const msg = {
         to,
         from: {
-            email: 'medapatirajiv9494@gmail.com', // MUST exactly match the verified Sender Identity in SendGrid
+            email: process.env.SENDGRID_FROM_EMAIL || 'medapatirajiv9494@gmail.com', // Let user configure from Dashboard
             name: 'QR BRAND'
         },
         subject,
