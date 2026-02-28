@@ -1,36 +1,44 @@
 const nodemailer = require('nodemailer');
 const dns = require('dns');
 
+// Pro Fix: Force the entire Node process to prioritize IPv4 before it even hits the network
+if (dns.setDefaultResultOrder) {
+    dns.setDefaultResultOrder('ipv4first');
+}
+
 // Get credentials with fallback for typos
 const EMAIL_USER = process.env.EMAIL_USER || process.env.EMATL_USER;
 const EMAIL_PASS = process.env.EMAIL_PASS;
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: '74.125.136.108', // smtp.gmail.com direct IPv4 
+    port: 587,
+    secure: false, // Port 587 uses STARTTLS
+    requireTLS: true,
     auth: {
         user: EMAIL_USER,
         pass: EMAIL_PASS
     },
     tls: {
-        rejectUnauthorized: false
+        rejectUnauthorized: false,
+        servername: 'smtp.gmail.com'
     },
-    // Force IPv4 only - the professional fix for ENETUNREACH
+    // Second layer of protection: force lookup to return IPv4 only
     lookup: (hostname, options, callback) => {
         dns.lookup(hostname, { family: 4 }, (err, address, family) => {
-            console.log(`[EmailService] Resolving ${hostname} to IPv4: ${address}`);
+            console.log(`[EmailService] SMTP Target: ${hostname} -> IPv4: ${address}`);
             callback(err, address, family);
         });
     },
     debug: true,
     logger: true,
-    connectionTimeout: 15000,
-    greetingTimeout: 15000,
+    connectionTimeout: 30000,
     socketTimeout: 30000
 });
 
 const sendEmail = async (to, subject, htmlContent) => {
     if (!EMAIL_USER || !to) {
-        console.error('[EmailService] Error: Missing user config or recipient email.');
+        console.error('[EmailService] CRITICAL: EMAIL_USER is missing. Check Render Env Vars.');
         return;
     }
 
@@ -45,7 +53,7 @@ const sendEmail = async (to, subject, htmlContent) => {
         await transporter.sendMail(mailOptions);
         console.log(`[EmailService] Success! Email sent to ${to}`);
     } catch (error) {
-        console.error('[EmailService] SMTP Error:', error.message);
+        console.error('[EmailService] SMTP Connection Failed:', error.message);
         throw error;
     }
 };
