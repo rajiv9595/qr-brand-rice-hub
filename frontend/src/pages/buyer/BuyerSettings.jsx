@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Lock, Bell, Moon, Sun, Monitor, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { authService } from '../../services/authService';
 
 const BuyerSettings = () => {
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('security');
     const [loading, setLoading] = useState(false);
 
@@ -50,6 +52,22 @@ const BuyerSettings = () => {
             alert(err.response?.data?.message || 'Failed to update password');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDeleteAccount = async () => {
+        const confirmDelete = window.confirm("Are you sure you want to permanently delete your account? This action cannot be undone.");
+        if (!confirmDelete) return;
+
+        try {
+            const res = await authService.deleteAccount();
+            if (res.success) {
+                alert("Your account has been successfully deleted.");
+                navigate('/');
+            }
+        } catch (error) {
+            console.error('Failed to delete account:', error);
+            alert(error.response?.data?.message || 'Failed to delete account');
         }
     };
 
@@ -216,8 +234,8 @@ const BuyerSettings = () => {
                                 </h2>
                                 <p className="text-red-600/80 mb-6 text-sm">Once you delete your account, there is no going back. Please be certain.</p>
                                 <button
-                                    className="px-6 py-2 bg-white border border-red-200 text-red-600 rounded-lg text-sm font-bold hover:bg-red-50 transition-colors shadow-sm"
-                                    onClick={() => alert("Please contact support to delete your account.")}
+                                    className="px-6 py-2 bg-white border border-red-200 text-red-600 rounded-lg text-sm font-bold hover:bg-red-50 transition-colors shadow-sm active:scale-95"
+                                    onClick={handleDeleteAccount}
                                 >
                                     Delete Account
                                 </button>

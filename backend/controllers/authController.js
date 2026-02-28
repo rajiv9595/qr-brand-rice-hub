@@ -342,6 +342,27 @@ exports.updateProfile = asyncHandler(async (req, res) => {
     });
 });
 
+// @desc    Delete user account
+// @route   DELETE /api/auth/profile
+// @access  Private
+exports.deleteAccount = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+        res.status(404);
+        throw new Error('User not found');
+    }
+
+    // Optionally cleanup dependencies of this user here (SupplierProfile, listings etc.) if required.
+    // For now we just physically delete the user document.
+    await User.findByIdAndDelete(req.user._id);
+
+    res.json({
+        success: true,
+        message: 'Account deleted successfully'
+    });
+});
+
 // @desc    Verify MFA Code
 // @route   POST /api/auth/verify-mfa
 // @access  Public

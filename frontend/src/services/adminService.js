@@ -55,4 +55,12 @@ export const adminService = {
     getTopSuppliers: () => api.get('/admin/dashboard/top-suppliers'),
 
     togglePriority: (id) => api.patch(`/admin/market-updates/${id}/toggle-priority`),
+
+    // Platform Settings
+    getSettings: () => api.get('/admin/settings'),
+    updateSettings: (data) => api.put('/admin/settings', data),
+
+    // System Actions
+    triggerBackup: () => api.post('/admin/system/backup'),
+    clearCache: () => api.post('/admin/system/clear-cache')
 };

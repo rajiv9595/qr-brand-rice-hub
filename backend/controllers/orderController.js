@@ -175,6 +175,10 @@ exports.updateOrderStatus = async (req, res) => {
         if (!supplierProfile || order.supplierId.toString() !== supplierProfile._id.toString()) {
             return res.status(403).json({ success: false, message: 'Not authorized to manage this order' });
         }
+        // Prevent redundant status updates and duplicate emails
+        if (order.status === status) {
+            return res.json({ success: true, data: order, message: 'Status is already ' + status });
+        }
 
         // If cancelling, restore stock
         if (status === 'Cancelled' && order.status !== 'Cancelled') {

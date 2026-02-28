@@ -85,6 +85,14 @@ export const authService = {
         return res.data;
     },
 
+    deleteAccount: async () => {
+        const res = await api.delete('/auth/profile');
+        if (res.data.success) {
+            authService.logout();
+        }
+        return res.data;
+    },
+
     forgotPassword: async (email) => {
         const res = await api.post('/auth/forgotpassword', { email });
         return res.data;

@@ -19,7 +19,11 @@ const {
     getAllSupportTickets,
     updateTicketStatus,
     replyToTicket,
-    getPlatformAnalytics
+    getPlatformAnalytics,
+    getSettings,
+    updateSettings,
+    triggerBackup,
+    clearCache
 } = require('../controllers/adminController');
 
 const {
@@ -62,5 +66,13 @@ router.post('/support/:id/reply', protect, authorize('admin'), replyToTicket);
 router.get('/reviews', protect, authorize('admin'), getAllReviews);
 router.patch('/reviews/:id/flag', protect, authorize('admin'), flagReview);
 router.delete('/reviews/:id', protect, authorize('admin'), deleteReview);
+
+// Platform Settings
+router.get('/settings', protect, authorize('admin'), getSettings);
+router.put('/settings', protect, authorize('admin'), updateSettings);
+
+// System Actions
+router.post('/system/backup', protect, authorize('admin'), triggerBackup);
+router.post('/system/clear-cache', protect, authorize('admin'), clearCache);
 
 module.exports = router;

@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-    Settings, User, Bell, Shield, Database, Globe,
+    Settings as SettingsIcon, User, Bell, Shield, Database, Globe,
     Moon, Sun, Save, RefreshCw, X, ChevronRight, Check
 } from 'lucide-react';
+import { authService } from '../../services/authService';
+import { adminService } from '../../services/adminService';
 
 const AdminSettings = () => {
     const [activeTab, setActiveTab] = useState('general');
     const [loading, setLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
 
-    // Mock Settings State
     const [settings, setSettings] = useState({
         siteName: 'QR Brand Rice Hub',
         siteDescription: 'Premium Rice Intelligence Platform',
@@ -22,14 +23,56 @@ const AdminSettings = () => {
         language: 'en'
     });
 
-    const handleSave = () => {
+    useEffect(() => {
+        fetchSettings();
+    }, []);
+
+    const fetchSettings = async () => {
+        try {
+            const res = await adminService.getSettings();
+            if (res.data?.data) {
+                setSettings(prev => ({
+                    ...prev,
+                    ...res.data.data
+                }));
+            }
+        } catch (error) {
+            console.error('Failed to fetch settings:', error);
+        }
+    };
+
+    const handleSave = async () => {
         setLoading(true);
-        // Simulate API call
-        setTimeout(() => {
-            setLoading(false);
+        try {
+            await adminService.updateSettings(settings);
             setSuccessMessage('Settings saved successfully!');
             setTimeout(() => setSuccessMessage(''), 3000);
-        }, 1500);
+        } catch (error) {
+            console.error('Failed to save settings:', error);
+            alert('Failed to save settings');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleBackup = async () => {
+        try {
+            const res = await adminService.triggerBackup();
+            setSuccessMessage(res.data.message || 'Backup initiated successfully');
+            setTimeout(() => setSuccessMessage(''), 4000);
+        } catch (error) {
+            alert('Failed to initiate backup');
+        }
+    };
+
+    const handleClearCache = async () => {
+        try {
+            const res = await adminService.clearCache();
+            setSuccessMessage(res.data.message || 'Cache cleared successfully');
+            setTimeout(() => setSuccessMessage(''), 4000);
+        } catch (error) {
+            alert('Failed to clear cache');
+        }
     };
 
     const toggleSetting = (key) => {
@@ -47,6 +90,10 @@ const AdminSettings = () => {
         { id: 'security', label: 'Security', icon: Shield },
         { id: 'system', label: 'System', icon: Database },
     ];
+
+    const user = authService.getCurrentUser() || { name: 'Admin User', email: 'admin@qrbrand.com' };
+    const firstName = user.name.split(' ')[0] || '';
+    const lastName = user.name.split(' ').slice(1).join(' ') || '';
 
     return (
         <div className="flex flex-col h-full bg-gray-50/50">
@@ -66,8 +113,8 @@ const AdminSettings = () => {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${activeTab === tab.id
-                                            ? 'bg-field-50 text-field-700 shadow-sm'
-                                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                        ? 'bg-field-50 text-field-700 shadow-sm'
+                                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                                         }`}
                                 >
                                     <tab.icon className={`w-5 h-5 ${activeTab === tab.id ? 'text-field-600' : 'text-gray-400'}`} />
@@ -148,8 +195,8 @@ const AdminSettings = () => {
                                         <p className="text-sm text-gray-500 mb-6">Manage your administrator profile details.</p>
 
                                         <div className="flex items-center gap-6 mb-8">
-                                            <div className="w-20 h-20 rounded-full bg-field-100 flex items-center justify-center text-field-600 text-2xl font-bold border-4 border-white shadow-lg">
-                                                A
+                                            <div className="w-20 h-20 rounded-full bg-field-100 flex items-center justify-center text-field-600 text-2xl font-bold border-4 border-white shadow-lg uppercase">
+                                                {firstName ? firstName.charAt(0) : 'A'}
                                             </div>
                                             <div>
                                                 <button className="text-sm font-medium text-field-600 hover:text-field-700 bg-field-50 px-4 py-2 rounded-lg transition-colors">
@@ -163,16 +210,16 @@ const AdminSettings = () => {
                                             <div className="grid sm:grid-cols-2 gap-6">
                                                 <div className="grid gap-2">
                                                     <label className="text-sm font-medium text-gray-700">First Name</label>
-                                                    <input type="text" defaultValue="Admin" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 outline-none" disabled />
+                                                    <input type="text" value={firstName} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 outline-none" disabled />
                                                 </div>
                                                 <div className="grid gap-2">
                                                     <label className="text-sm font-medium text-gray-700">Last Name</label>
-                                                    <input type="text" defaultValue="User" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 outline-none" disabled />
+                                                    <input type="text" value={lastName} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 outline-none" disabled />
                                                 </div>
                                             </div>
                                             <div className="grid gap-2">
                                                 <label className="text-sm font-medium text-gray-700">Email Address</label>
-                                                <input type="email" defaultValue="admin@qrbrand.com" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 outline-none" disabled />
+                                                <input type="email" value={user.email} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 outline-none" disabled />
                                             </div>
                                         </div>
                                     </div>
@@ -232,8 +279,8 @@ const AdminSettings = () => {
                                                 <button
                                                     onClick={() => toggleSetting('twoFactorAuth')}
                                                     className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${settings.twoFactorAuth
-                                                            ? 'bg-red-50 text-red-600 hover:bg-red-100'
-                                                            : 'bg-field-600 text-white hover:bg-field-700'
+                                                        ? 'bg-red-50 text-red-600 hover:bg-red-100'
+                                                        : 'bg-field-600 text-white hover:bg-field-700'
                                                         }`}
                                                 >
                                                     {settings.twoFactorAuth ? 'Disable' : 'Enable 2FA'}
@@ -271,7 +318,7 @@ const AdminSettings = () => {
                                         <p className="text-sm text-gray-500 mb-6">Advanced system controls and maintenance.</p>
 
                                         <div className="grid sm:grid-cols-2 gap-4">
-                                            <div className="p-4 border border-gray-200 rounded-xl hover:shadow-md transition-shadow cursor-pointer group">
+                                            <div onClick={handleBackup} className="p-4 border border-gray-200 rounded-xl hover:shadow-md hover:bg-gray-50 transition-all cursor-pointer group active:scale-[0.98]">
                                                 <div className="flex items-center gap-3 mb-2">
                                                     <div className="p-2 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-100 transition-colors">
                                                         <Database className="w-5 h-5" />
@@ -281,7 +328,7 @@ const AdminSettings = () => {
                                                 <p className="text-xs text-gray-500">Create a full backup of the database and system files.</p>
                                             </div>
 
-                                            <div className="p-4 border border-gray-200 rounded-xl hover:shadow-md transition-shadow cursor-pointer group">
+                                            <div onClick={handleClearCache} className="p-4 border border-gray-200 rounded-xl hover:shadow-md hover:bg-gray-50 transition-all cursor-pointer group active:scale-[0.98]">
                                                 <div className="flex items-center gap-3 mb-2">
                                                     <div className="p-2 bg-purple-50 text-purple-600 rounded-lg group-hover:bg-purple-100 transition-colors">
                                                         <RefreshCw className="w-5 h-5" />

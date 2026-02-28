@@ -6,6 +6,7 @@ const {
     verifyMFA,
     getProfile,
     updateProfile,
+    deleteAccount,
     forgotPassword,
     resetPassword,
     googleAuth
@@ -18,7 +19,8 @@ router.post('/google', googleAuth);
 router.post('/verify-mfa', verifyMFA);
 router.route('/profile')
     .get(protect, getProfile)
-    .put(protect, updateProfile);
+    .put(protect, updateProfile)
+    .delete(protect, deleteAccount);
 
 router.post('/forgotpassword', forgotPassword);
 router.put('/resetpassword/:resettoken', resetPassword);

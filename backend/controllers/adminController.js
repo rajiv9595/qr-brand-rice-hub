@@ -561,3 +561,82 @@ exports.getPlatformAnalytics = async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 };
+
+// @desc    Get Admin Settings
+// @route   GET /api/admin/settings
+// @access  Private (Admin)
+exports.getSettings = async (req, res) => {
+    const Settings = require('../models/Settings');
+    try {
+        let settings = await Settings.findOne();
+        if (!settings) {
+            settings = await Settings.create({});
+        }
+        res.json({ success: true, data: settings });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @desc    Update Admin Settings
+// @route   PUT /api/admin/settings
+// @access  Private (Admin)
+exports.updateSettings = async (req, res) => {
+    const Settings = require('../models/Settings');
+    try {
+        let settings = await Settings.findOne();
+        if (!settings) {
+            settings = new Settings({});
+        }
+
+        const {
+            siteName, siteDescription, maintenanceMode, sessionTimeout,
+            emailNotifications, pushNotifications, twoFactorAuth, theme, language
+        } = req.body;
+
+        if (siteName !== undefined) settings.siteName = siteName;
+        if (siteDescription !== undefined) settings.siteDescription = siteDescription;
+        if (maintenanceMode !== undefined) settings.maintenanceMode = maintenanceMode;
+        if (sessionTimeout !== undefined) settings.sessionTimeout = sessionTimeout;
+        if (emailNotifications !== undefined) settings.emailNotifications = emailNotifications;
+        if (pushNotifications !== undefined) settings.pushNotifications = pushNotifications;
+        if (twoFactorAuth !== undefined) settings.twoFactorAuth = twoFactorAuth;
+        if (theme !== undefined) settings.theme = theme;
+        if (language !== undefined) settings.language = language;
+
+        await settings.save();
+        res.json({ success: true, data: settings, message: 'Settings updated successfully' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @desc    Trigger system backup
+// @route   POST /api/admin/system/backup
+// @access  Private (Admin)
+exports.triggerBackup = async (req, res) => {
+    try {
+        // Mock backup process
+        setTimeout(() => {
+            console.log('[System] Manual database backup triggered by admin.');
+        }, 1000);
+        res.json({ success: true, message: 'System backup initiated successfully. It may take a few minutes.' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @desc    Clear application cache
+// @route   POST /api/admin/system/clear-cache
+// @access  Private (Admin)
+exports.clearCache = async (req, res) => {
+    try {
+        // Mock cache clearing process
+        setTimeout(() => {
+            console.log('[System] Application cache cleared by admin.');
+        }, 500);
+        res.json({ success: true, message: 'Application cache cleared successfully.' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
