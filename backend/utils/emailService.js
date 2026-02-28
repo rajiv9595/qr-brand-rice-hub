@@ -1,9 +1,9 @@
 const nodemailer = require('nodemailer');
+const dns = require('dns');
 
 // 1. Configure the Transporter
 // This example uses Gmail, but standard SMTP is better for production
-// 1. Configure the Transporter
-// Explicitly use smtp.gmail.com on Port 587 (TLS) to avoid ETIMEDOUT
+// Strictly force IPv4 via DNS lookup to bypass Render's broken IPv6 routing
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
@@ -13,11 +13,16 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS
     },
     tls: {
-        rejectUnauthorized: false
+        rejectUnauthorized: false,
+        servername: 'smtp.gmail.com'
     },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 10000,
+    // This is the professional fix: overriding the lookup function
+    lookup: (hostname, options, callback) => {
+        dns.lookup(hostname, { family: 4 }, callback);
+    },
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 15000,
     family: 4
 });
 
