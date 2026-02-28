@@ -3,6 +3,8 @@ const dotenv = require('dotenv');
 const morgan = require('morgan');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
 const connectDB = require('./config/db');
 
 // Load env vars
@@ -16,16 +18,24 @@ const app = express();
 // Enable CORS
 app.use(cors());
 
-// Rate limiting
+// Set security headers
+app.use(helmet({
+    crossOriginResourcePolicy: false, // allow images from external domains
+}));
+
+// Rate limiting (High limit to prevent 429 during normal development but still restrict DoS)
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 1000, // limit each IP to 1000 requests per windowMs
+    max: 3000,
     message: 'Too many requests from this IP, please try again after 15 minutes'
 });
-// app.use('/api/', limiter); // Temporarily disabled for dev stability
+app.use('/api/', limiter);
 
 // Body parser
-app.use(express.json());
+app.use(express.json({ limit: '50mb' })); // Increased limit for parsing larger inputs
+
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize());
 
 // Dev logging middleware
 if (process.env.NODE_ENV === 'development') {

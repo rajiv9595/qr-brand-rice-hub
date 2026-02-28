@@ -3,6 +3,7 @@ import api from './api';
 export const adminService = {
     // Dashboard Stats
     getDashboardStats: () => api.get('/admin/dashboard/stats'),
+    getPlatformAnalytics: (params) => api.get('/admin/analytics/platform', { params }),
 
     // Listing Management
     getAllListings: (params) => api.get('/admin/listings', { params }),

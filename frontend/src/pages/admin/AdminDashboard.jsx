@@ -196,7 +196,7 @@ const AdminDashboard = () => {
                         <TrendingUp className="w-5 h-5 text-gray-400" />
                     </div>
                     <p className="text-sm text-gray-600 mb-6">View detailed reports on traffic, sales, and user growth.</p>
-                    <button className="btn-secondary w-full text-center text-sm py-2" disabled>Coming Soon</button>
+                    <a href="/admin/analytics" className="btn-primary w-full text-center text-sm py-2">View Analytics</a>
                 </div>
             </div>
 

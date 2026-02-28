@@ -18,7 +18,8 @@ const {
     updateUserStatus,
     getAllSupportTickets,
     updateTicketStatus,
-    replyToTicket
+    replyToTicket,
+    getPlatformAnalytics
 } = require('../controllers/adminController');
 
 const {
@@ -31,6 +32,7 @@ const { getDemandHeatmap } = require('../controllers/insightsController');
 
 // Dashboard Stats
 router.get('/dashboard/stats', protect, authorize('admin'), getDashboardStats);
+router.get('/analytics/platform', protect, authorize('admin'), getPlatformAnalytics);
 router.get('/dashboard/top-suppliers', protect, authorize('admin'), getTopSuppliers);
 router.get('/insights/heatmap', protect, authorize('admin'), getDemandHeatmap);
 

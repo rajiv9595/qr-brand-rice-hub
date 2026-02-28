@@ -46,6 +46,7 @@ const CookingTipsManagement = React.lazy(() => import('./pages/admin/CookingTips
 const AdminSettings = React.lazy(() => import('./pages/admin/AdminSettings'));
 const UserManagement = React.lazy(() => import('./pages/admin/UserManagement'));
 const SupportManagement = React.lazy(() => import('./pages/admin/SupportManagement'));
+const PlatformAnalytics = React.lazy(() => import('./pages/admin/PlatformAnalytics'));
 
 const NAV_ITEMS = [
   { to: '/', label: 'Home', icon: Wheat },
@@ -310,6 +311,7 @@ function App() {
             }
           >
             <Route index element={<AdminDashboard />} />
+            <Route path="analytics" element={<PlatformAnalytics />} />
             <Route path="listings" element={<ListingManagement />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="suppliers" element={<SupplierManagement />} />

@@ -26,6 +26,7 @@ const AdminLayout = () => {
 
     const navItems = [
         { path: '/admin', icon: LayoutDashboard, label: 'Dashboard', exact: true },
+        { path: '/admin/analytics', icon: TrendingUp, label: 'Platform Analytics' },
         { path: '/admin/listings', icon: Package, label: 'Listings' },
         { path: '/admin/users', icon: UserCheck, label: 'Users' },
         { path: '/admin/suppliers', icon: Users, label: 'Suppliers' },
