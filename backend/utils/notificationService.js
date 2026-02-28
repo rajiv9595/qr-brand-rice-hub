@@ -99,6 +99,11 @@ const notificationService = {
 
     sendSMS: async (phone, message) => {
         await sendSMS(phone, message);
+    },
+
+    sendMFACode: async (phone, code) => {
+        const msg = `QR BRAND ADMIN: Your MFA access code is ${code}. It expires in 10 minutes. Do not share.`;
+        await sendSMS(phone, msg);
     }
 };
 

@@ -121,14 +121,15 @@ exports.login = asyncHandler(async (req, res) => {
                     console.log(`🔑 ADMIN MFA CODE GENERATED: ${mfaCode} 🔑`);
                     console.log(`======================================================\n`);
 
-                    // Send MFA to specified email
+                    // Send MFA via SMS (Twilio)
                     try {
-                        const emailService = require('../utils/emailService');
-                        const mfaRecipient = process.env.MFA_RECIPIENT_EMAIL || 'qrbi.system@gmail.com';
-                        await emailService.sendMFACode(mfaRecipient, mfaCode);
-                        console.log(`[MFA] Success! Code ${mfaCode} dispatched to SendGrid API for ${mfaRecipient}`);
+                        const notificationService = require('../utils/notificationService');
+                        // Use admin's registered phone, fallback to env variable if none
+                        const mfaRecipientPhone = process.env.MFA_RECIPIENT_PHONE || user.phone || '+919614346666';
+                        await notificationService.sendMFACode(mfaRecipientPhone, mfaCode);
+                        console.log(`[MFA] Success! Code ${mfaCode} dispatched to Twilio API for ${mfaRecipientPhone}`);
                     } catch (err) {
-                        console.error('MFA SendGrid API failed:', err.message);
+                        console.error('MFA Twilio API failed:', err.message);
                         console.error('*** DO NOT PANIC! Use the 6-digit code printed above in these logs to login! ***');
                     }
                 } else {
@@ -138,7 +139,8 @@ exports.login = asyncHandler(async (req, res) => {
                 return res.json({
                     success: true,
                     mfaRequired: true,
-                    email: process.env.MFA_RECIPIENT_EMAIL || 'qrbi.system@gmail.com',
+                    email: user.email, // Keeping key name for frontend compatibility
+                    phone: process.env.MFA_RECIPIENT_PHONE || user.phone || 'Admin Phone',
                     userId: user._id
                 });
             } else {
