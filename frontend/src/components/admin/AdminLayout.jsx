@@ -51,7 +51,7 @@ const AdminLayout = () => {
     const isExpanded = isPinned || isHovered;
 
     return (
-        <div className="min-h-screen bg-rice-50 flex">
+        <div className="min-h-screen bg-rice-50 flex pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0">
             {/* Mobile Sidebar Overlay */}
             {sidebarOpen && (
                 <div

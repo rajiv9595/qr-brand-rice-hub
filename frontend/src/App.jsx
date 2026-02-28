@@ -9,6 +9,7 @@ import { authService } from './services/authService';
 import { useAppStore, AppProvider } from './context/AppContext';
 import SupportWidget from './components/common/SupportWidget';
 import Logo from './components/common/Logo';
+import MobileBottomNav from './components/common/MobileBottomNav';
 
 // Helper function to handle ChunkLoadError during new deployments
 const lazyRetry = (componentImport) => {
@@ -96,7 +97,7 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-rice-50 font-body">
+    <div className="min-h-screen flex flex-col bg-rice-50 font-body pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-rice-200 shadow-sm">
         <div className="w-full max-w-[90rem] ml-0 px-4 md:px-12">
@@ -393,6 +394,7 @@ function App() {
             <Route path="settings" element={<BuyerSettings />} />
           </Route>
         </Routes>
+        <MobileBottomNav />
       </Router>
     </AppProvider>
   );
