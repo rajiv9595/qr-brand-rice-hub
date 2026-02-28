@@ -159,7 +159,7 @@ exports.getPublicListings = asyncHandler(async (req, res) => {
     const listings = await RiceListing.find({
         approvalStatus: APPROVAL_STATUS.APPROVED,
         isActive: true,
-    }).populate('supplierId', 'millName district state');
+    }).populate('supplierId', 'millName district state badges trustScore metrics');
 
     res.json({ success: true, data: listings });
 });
@@ -225,7 +225,7 @@ exports.searchListings = asyncHandler(async (req, res) => {
 
     const totalResults = await RiceListing.countDocuments(query);
     const results = await RiceListing.find(query)
-        .populate('supplierId', 'millName district state')
+        .populate('supplierId', 'millName district state badges trustScore metrics')
         .sort(sort)
         .skip(skip)
         .limit(Number(limit))
@@ -261,7 +261,7 @@ exports.compareListings = asyncHandler(async (req, res) => {
         approvalStatus: APPROVAL_STATUS.APPROVED,
         isActive: true,
     })
-        .populate('supplierId', 'millName district state')
+        .populate('supplierId', 'millName district state badges trustScore metrics')
         .select('brandName riceVariety pricePerBag bagWeightKg usageCategory supplierId bagImageUrl averageRating ratingDetails dispatchTimeline specifications');
 
     const formattedComparison = comparison.map((item) => ({
@@ -287,7 +287,7 @@ exports.compareListings = asyncHandler(async (req, res) => {
 // @access  Public
 exports.getListingById = asyncHandler(async (req, res) => {
     const listing = await RiceListing.findById(req.params.id)
-        .populate('supplierId', 'millName district state');
+        .populate('supplierId', 'millName district state badges trustScore metrics');
 
     if (!listing) {
         res.status(404);

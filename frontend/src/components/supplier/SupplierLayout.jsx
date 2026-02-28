@@ -22,12 +22,17 @@ const SupplierLayout = () => {
 
     // Shared Stats State
     const [stats, setStats] = useState({ total: 0, approved: 0, pending: 0, rejected: 0 });
+    const [profile, setProfile] = useState(null);
     const [loadingStats, setLoadingStats] = useState(true);
 
     const fetchStats = async () => {
         try {
-            const data = await supplierService.getDashboardStats();
-            setStats(data);
+            const [statsData, profileRes] = await Promise.all([
+                supplierService.getDashboardStats(),
+                supplierService.getProfile()
+            ]);
+            setStats(statsData);
+            setProfile(profileRes.data);
         } catch (err) {
             console.error('Failed to fetch supplier stats', err);
         } finally {
@@ -201,7 +206,7 @@ const SupplierLayout = () => {
                 {/* Page Content */}
                 <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
                     {/* Provide Shared Context */}
-                    <Outlet context={{ stats, refreshStats, loadingStats }} />
+                    <Outlet context={{ stats, refreshStats, loadingStats, profile }} />
                 </main>
                 <SupportWidget />
             </div>

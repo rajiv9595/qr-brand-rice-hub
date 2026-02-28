@@ -3,6 +3,7 @@ const User = require('../models/User');
 const Joi = require('joi');
 const asyncHandler = require('../utils/asyncHandler');
 const { ROLES } = require('../utils/constants');
+const { syncSupplierTrust } = require('../utils/trustScoreGenerator');
 
 // @desc    Create or update supplier profile
 // @route   POST /api/supplier/profile
@@ -79,6 +80,9 @@ exports.upsertProfile = asyncHandler(async (req, res) => {
             await User.findByIdAndUpdate(req.user._id, { phone: req.body.phone });
         }
 
+        // Add trust sync calculation after updating
+        profile = await syncSupplierTrust(profile);
+
         return res.json({ success: true, data: profile });
     }
 
@@ -87,6 +91,10 @@ exports.upsertProfile = asyncHandler(async (req, res) => {
     }
 
     profile = await SupplierProfile.create(profileFields);
+
+    // Calculate initial trust properties
+    profile = await syncSupplierTrust(profile);
+
     res.status(201).json({ success: true, data: profile });
 });
 
@@ -103,13 +111,16 @@ exports.getProfile = asyncHandler(async (req, res) => {
         await userData.save();
     }
 
-    const profile = await SupplierProfile.findOne({ userId: req.user._id })
+    let profile = await SupplierProfile.findOne({ userId: req.user._id })
         .populate('userId', 'name email phone isVerified role autoActivateAt');
 
     if (!profile) {
         res.status(404);
         throw new Error('Supplier profile not found');
     }
+
+    // Force sync the latest trust indicators
+    profile = await syncSupplierTrust(profile);
 
     res.json({ success: true, data: profile });
 });

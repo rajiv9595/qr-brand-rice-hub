@@ -58,7 +58,16 @@ const supplierProfileSchema = new mongoose.Schema(
             color: String,
             description: String,
             awardedAt: { type: Date, default: Date.now }
-        }]
+        }],
+        trustScore: {
+            type: Number,
+            default: 0
+        },
+        metrics: {
+            totalSuccessfulOrders: { type: Number, default: 0 },
+            averageRating: { type: Number, default: 0 },
+            totalReviews: { type: Number, default: 0 }
+        }
     },
     {
         timestamps: true,

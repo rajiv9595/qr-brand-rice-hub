@@ -37,9 +37,10 @@ const NegotiationHub = () => {
     const fetchNegotiations = async () => {
         try {
             const res = await negotiationService.getMyNegotiations();
-            setNegotiations(res.data);
-            if (res.data.length > 0 && !activeNegotiationId) {
-                setActiveNegotiationId(res.data[0]._id);
+            const negotiationsData = res.data?.data || [];
+            setNegotiations(negotiationsData);
+            if (negotiationsData.length > 0 && !activeNegotiationId) {
+                setActiveNegotiationId(negotiationsData[0]._id);
             }
         } catch (err) {
             console.error('Error fetching negotiations:', err);

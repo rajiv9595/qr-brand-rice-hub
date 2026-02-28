@@ -68,22 +68,39 @@ const SupplierOverview = () => {
                         Manage your rice listings, track approvals, and grow your business on QR BRAND marketplace.
                     </p>
 
-                    {/* Performance Badges */}
-                    {profile?.badges?.length > 0 && (
-                        <div className="flex flex-wrap gap-3 pt-4">
-                            {profile.badges.map((badge, idx) => {
-                                const Icon = ICON_MAP[badge.icon] || Award;
-                                return (
-                                    <div
-                                        key={idx}
-                                        className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20 group/badge cursor-help transition-all hover:bg-white/20"
-                                        title={badge.description}
-                                    >
-                                        <Icon className={`w-4 h-4 ${badge.color || 'text-gold-400'}`} />
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-white">{badge.title}</span>
-                                    </div>
-                                );
-                            })}
+                    {/* Performance Badges and Trust Score */}
+                    {profile && (
+                        <div className="pt-6 mt-4 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                            {/* Trust Score Circle */}
+                            <div className="flex items-center gap-4 bg-white/5 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/10">
+                                <div className="relative flex items-center justify-center w-14 h-14 bg-gradient-to-br from-gold-400 to-orange-500 rounded-full shadow-[0_0_15px_rgba(234,179,8,0.5)]">
+                                    <div className="absolute inset-0 rounded-full border-2 border-dashed border-white/40 animate-[spin_10s_linear_infinite]" />
+                                    <span className="text-xl font-black text-white relative z-10">{profile.trustScore || 0}</span>
+                                </div>
+                                <div className="space-y-0.5">
+                                    <h4 className="text-sm font-black text-white uppercase tracking-widest">Trust Score</h4>
+                                    <p className="text-[10px] text-gold-200 uppercase font-bold">Platform Rating</p>
+                                </div>
+                            </div>
+
+                            {/* Dynamic Badges */}
+                            {profile.badges?.length > 0 && (
+                                <div className="flex flex-wrap gap-2">
+                                    {profile.badges.map((badge, idx) => {
+                                        const Icon = ICON_MAP[badge.icon] || Award;
+                                        return (
+                                            <div
+                                                key={idx}
+                                                className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-2 rounded-xl border border-white/20 group/badge cursor-help transition-all hover:bg-white/20 hover:-translate-y-1"
+                                                title={badge.description}
+                                            >
+                                                <Icon className={`w-4 h-4 ${badge.color || 'text-gold-400'}`} />
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-white">{badge.title}</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

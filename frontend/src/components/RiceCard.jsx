@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Scale, CheckCircle2, XCircle } from 'lucide-react';
+import { MapPin, Scale, CheckCircle2, XCircle, ShieldCheck, FileCheck, Award, Star, TrendingUp } from 'lucide-react';
 import StarRating from './StarRating';
 import { useAppStore } from '../context/AppContext';
 import { optimizeImage } from '../utils/imageOptimizer';
@@ -24,6 +24,7 @@ function RiceCard({ rice }) {
     const imageUrl = optimizeImage(rawImageUrl, 400); // Optimize for card size
     const stockAvailable = rice.stockAvailable ?? true;
     const averageRating = rice.averageRating || 4.5;
+    const supplierBadges = rice.supplierId?.badges || [];
 
     // Safe Access for complex objects
     let usageTags = rice.usageCategory || rice.tags || [];
@@ -43,6 +44,15 @@ function RiceCard({ rice }) {
         : expertReview.recommendation === 'Budget Pick'
             ? 'bg-blue-50 text-blue-600 badge'
             : 'badge-green';
+
+    // Helper mapping for badge icons
+    const IconMap = {
+        'ShieldCheck': ShieldCheck,
+        'FileCheck': FileCheck,
+        'Award': Award,
+        'Star': Star,
+        'TrendingUp': TrendingUp
+    };
 
     return (
         <div className="card group h-full flex flex-col">
@@ -96,6 +106,25 @@ function RiceCard({ rice }) {
                         <Scale className="w-4 h-4" />
                     </button>
                 </div>
+
+                {/* Trust Badges - Dynamic Supplier Awards */}
+                {supplierBadges.length > 0 && (
+                    <div className="mt-4 pt-3 border-t border-gray-100 flex flex-wrap gap-2">
+                        {supplierBadges.slice(0, 3).map((badge, idx) => {
+                            const BadgeIcon = IconMap[badge.icon] || ShieldCheck;
+                            return (
+                                <div
+                                    key={idx}
+                                    title={badge.description}
+                                    className={`flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-black tracking-wide uppercase transition-transform hover:scale-105 cursor-help ${badge.color || 'bg-gray-100 text-gray-600'}`}
+                                >
+                                    <BadgeIcon className="w-3 h-3" />
+                                    {badge.title}
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
         </div>
     );
