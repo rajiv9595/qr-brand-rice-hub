@@ -247,7 +247,7 @@ const Layout = ({ children }) => {
 
       {/* Compare Float Bar */}
       {compareIds.length > 0 && location.pathname !== '/compare' && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] bg-white border border-primary-100 shadow-[0_20px_50px_rgba(0,0,0,0.1)] p-2 pr-4 rounded-full flex items-center gap-4 animate-in slide-in-from-bottom-12 duration-700">
+        <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] lg:bottom-10 left-1/2 -translate-x-1/2 z-[100] bg-white border border-primary-100 shadow-[0_20px_50px_rgba(0,0,0,0.1)] p-2 pr-4 rounded-full flex items-center gap-4 animate-in slide-in-from-bottom-12 duration-700">
           <div className="flex -space-x-2 ml-2">
             {[...Array(compareIds.length)].map((_, i) => (
               <div key={i} className="w-8 h-8 rounded-full bg-primary-600 border-2 border-white flex items-center justify-center text-[10px] font-black text-white shadow-sm ring-1 ring-primary-100">

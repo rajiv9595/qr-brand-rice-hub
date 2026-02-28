@@ -103,7 +103,7 @@ const SupportWidget = () => {
     };
 
     return (
-        <div className="fixed bottom-6 right-6 z-[9999]">
+        <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] lg:bottom-6 right-4 lg:right-6 z-[9999]">
             {/* Toggle Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
