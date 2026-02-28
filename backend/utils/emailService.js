@@ -19,7 +19,7 @@ const sendEmail = async (to, subject, htmlContent) => {
     const msg = {
         to,
         from: {
-            email: process.env.SENDGRID_FROM_EMAIL || 'medapatirajiv9494@gmail.com', // Let user configure from Dashboard
+            email: process.env.SENDGRID_FROM_EMAIL || 'ricehubinfo@gmail.com', // Let user configure from Dashboard
             name: 'QR BRAND'
         },
         subject,

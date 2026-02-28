@@ -173,8 +173,8 @@ const AdminLogin = () => {
                             <div className="space-y-2">
                                 <h2 className="text-xl font-bold text-white">Verification Required</h2>
                                 <p className="text-sm text-gray-400">
-                                    We've sent a 6-digit code via SMS to:<br />
-                                    <span className="text-primary-400 font-mono mt-1 inline-block">{mfaData.phone || mfaData.email}</span>
+                                    We've sent a 6-digit code to:<br />
+                                    <span className="text-primary-400 font-mono mt-1 inline-block">{mfaData.email}</span>
                                 </p>
                             </div>
 
