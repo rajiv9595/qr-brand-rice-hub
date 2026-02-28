@@ -18,7 +18,7 @@ const sendEmail = async (to, subject, htmlContent) => {
 
     const msg = {
         to,
-        from: 'ricehubinfo@gmail.com', // MUST be a Verified Sender in SendGrid
+        from: process.env.SENDGRID_FROM_EMAIL || 'medapatirajiv9494@gmail.com', // MUST be a Verified Sender in SendGrid
         subject,
         html: htmlContent,
     };
