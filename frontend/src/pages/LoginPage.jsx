@@ -213,7 +213,7 @@ const LoginPage = () => {
                                     <input type="checkbox" className="rounded border-gray-300 text-field-600 focus:ring-field-500" />
                                     Remember me
                                 </label>
-                                <a href="#" className="font-bold text-field-600 hover:text-field-700">Forgot password?</a>
+                                <Link to="/forgotpassword" className="font-bold text-field-600 hover:text-field-700">Forgot password?</Link>
                             </div>
                         )}
 

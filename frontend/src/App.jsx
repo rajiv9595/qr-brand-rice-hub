@@ -17,6 +17,8 @@ const RiceDetailPage = React.lazy(() => import('./pages/RiceDetailPage'));
 const ComparePage = React.lazy(() => import('./pages/ComparePage'));
 const MarketPage = React.lazy(() => import('./pages/MarketPage'));
 const LoginPage = React.lazy(() => import('./pages/LoginPage'));
+const ForgotPasswordPage = React.lazy(() => import('./pages/ForgotPasswordPage'));
+const ResetPasswordPage = React.lazy(() => import('./pages/ResetPasswordPage'));
 
 // Supplier pages
 const SupplierOverview = React.lazy(() => import('./pages/supplier/SupplierOverview'));
@@ -277,6 +279,8 @@ function App() {
           <Route path="/compare" element={<Layout><ComparePage /></Layout>} />
           <Route path="/market" element={<Layout><MarketPage /></Layout>} />
           <Route path="/login" element={<React.Suspense fallback={<div>Loading...</div>}><LoginPage /></React.Suspense>} />
+          <Route path="/forgotpassword" element={<React.Suspense fallback={<div>Loading...</div>}><ForgotPasswordPage /></React.Suspense>} />
+          <Route path="/resetpassword/:token" element={<React.Suspense fallback={<div>Loading...</div>}><ResetPasswordPage /></React.Suspense>} />
           <Route path="/admin/login" element={<React.Suspense fallback={<div>Loading...</div>}><AdminLogin /></React.Suspense>} />
 
           {/* Supplier Protected Routes */}

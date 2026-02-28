@@ -73,5 +73,19 @@ export const authService = {
             sessionStorage.setItem('user', JSON.stringify(user));
         }
         return res.data;
+    },
+
+    forgotPassword: async (email) => {
+        const res = await api.post('/auth/forgotpassword', { email });
+        return res.data;
+    },
+
+    resetPassword: async (token, password) => {
+        const res = await api.put(`/auth/resetpassword/${token}`, { password });
+        if (res.data.success && res.data.token) {
+            // Optional: Auto log in by setting token, but for now we won't 
+            // since getProfile is requested later, let user login manually or just set it.
+        }
+        return res.data;
     }
 };

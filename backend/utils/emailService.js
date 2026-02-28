@@ -145,6 +145,36 @@ const emailService = {
             </div>
         `;
         await sendEmail(email, subject, html);
+    },
+
+    sendPasswordResetEmail: async (email, resetUrl) => {
+        const subject = 'QR BRAND - Password Reset Request';
+        const html = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+                <div style="background-color: #1a4d2e; padding: 20px; text-align: center;">
+                    <h1 style="color: #ffffff; margin: 0; font-size: 24px;">QR BRAND</h1>
+                    <p style="color: #a3cfbb; margin: 5px 0 0;">Password Reset</p>
+                </div>
+                <div style="padding: 30px; background-color: #ffffff;">
+                    <h2 style="color: #333333; margin-top: 0;">Hello,</h2>
+                    <p style="color: #555555; line-height: 1.6; font-size: 16px;">
+                        You are receiving this email because a password reset request was made for your account. 
+                        If you did not make this request, please ignore this email.
+                    </p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="${resetUrl}" style="display: inline-block; background-color: #1a4d2e; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 4px; font-weight: bold;">Reset Password</a>
+                    </div>
+                    <p style="color: #888888; font-size: 14px; margin-top: 20px;">
+                        Or copy and paste this link into your browser:<br/>
+                        <a href="${resetUrl}" style="word-break: break-all; color: #1a4d2e;">${resetUrl}</a>
+                    </p>
+                </div>
+                <div style="background-color: #f4f4f4; padding: 15px; text-align: center; font-size: 12px; color: #888888;">
+                    <p>&copy; ${new Date().getFullYear()} QR Brand Rice Hub. All rights reserved.</p>
+                </div>
+            </div>
+        `;
+        await sendEmail(email, subject, html);
     }
 };
 
