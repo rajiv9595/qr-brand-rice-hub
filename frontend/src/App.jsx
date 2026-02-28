@@ -10,46 +10,67 @@ import { useAppStore, AppProvider } from './context/AppContext';
 import SupportWidget from './components/common/SupportWidget';
 import Logo from './components/common/Logo';
 
+// Helper function to handle ChunkLoadError during new deployments
+const lazyRetry = (componentImport) => {
+  return React.lazy(async () => {
+    const pageHasAlreadyBeenForceRefreshed = JSON.parse(
+      window.localStorage.getItem('page-has-been-force-refreshed') || 'false'
+    );
+
+    try {
+      const component = await componentImport();
+      window.localStorage.setItem('page-has-been-force-refreshed', 'false');
+      return component;
+    } catch (error) {
+      if (!pageHasAlreadyBeenForceRefreshed) {
+        window.localStorage.setItem('page-has-been-force-refreshed', 'true');
+        return window.location.reload();
+      }
+      throw error;
+    }
+  });
+};
+
 // Lazy load pages
-const HomePage = React.lazy(() => import('./pages/HomePage'));
-const SearchPage = React.lazy(() => import('./pages/SearchPage'));
-const RiceDetailPage = React.lazy(() => import('./pages/RiceDetailPage'));
-const ComparePage = React.lazy(() => import('./pages/ComparePage'));
-const MarketPage = React.lazy(() => import('./pages/MarketPage'));
-const LoginPage = React.lazy(() => import('./pages/LoginPage'));
-const ForgotPasswordPage = React.lazy(() => import('./pages/ForgotPasswordPage'));
-const ResetPasswordPage = React.lazy(() => import('./pages/ResetPasswordPage'));
+const HomePage = lazyRetry(() => import('./pages/HomePage'));
+const SearchPage = lazyRetry(() => import('./pages/SearchPage'));
+const RiceDetailPage = lazyRetry(() => import('./pages/RiceDetailPage'));
+const ComparePage = lazyRetry(() => import('./pages/ComparePage'));
+const MarketPage = lazyRetry(() => import('./pages/MarketPage'));
+const LoginPage = lazyRetry(() => import('./pages/LoginPage'));
+const ForgotPasswordPage = lazyRetry(() => import('./pages/ForgotPasswordPage'));
+const ResetPasswordPage = lazyRetry(() => import('./pages/ResetPasswordPage'));
 
 // Supplier pages
-const SupplierOverview = React.lazy(() => import('./pages/supplier/SupplierOverview'));
-const CreateListing = React.lazy(() => import('./pages/supplier/CreateListing'));
-const MyListings = React.lazy(() => import('./pages/supplier/MyListings'));
-const EditListing = React.lazy(() => import('./pages/supplier/EditListing'));
-const SupplierProfile = React.lazy(() => import('./pages/supplier/SupplierProfile'));
-const SupplierOrders = React.lazy(() => import('./pages/supplier/SupplierOrders'));
-const SupplierReviews = React.lazy(() => import('./pages/supplier/SupplierReviews'));
-const NegotiationHub = React.lazy(() => import('./pages/NegotiationHub'));
+const SupplierOverview = lazyRetry(() => import('./pages/supplier/SupplierOverview'));
+const CreateListing = lazyRetry(() => import('./pages/supplier/CreateListing'));
+const MyListings = lazyRetry(() => import('./pages/supplier/MyListings'));
+const EditListing = lazyRetry(() => import('./pages/supplier/EditListing'));
+const SupplierProfile = lazyRetry(() => import('./pages/supplier/SupplierProfile'));
+const SupplierOrders = lazyRetry(() => import('./pages/supplier/SupplierOrders'));
+const SupplierReviews = lazyRetry(() => import('./pages/supplier/SupplierReviews'));
+const NegotiationHub = lazyRetry(() => import('./pages/NegotiationHub'));
 
 // Buyer pages
-const BuyerLayout = React.lazy(() => import('./components/buyer/BuyerLayout'));
-const BuyerOverview = React.lazy(() => import('./pages/buyer/BuyerOverview'));
-const MyOrders = React.lazy(() => import('./pages/buyer/MyOrders'));
-const BuyerProfile = React.lazy(() => import('./pages/buyer/BuyerProfile'));
-const BuyerSettings = React.lazy(() => import('./pages/buyer/BuyerSettings'));
+const BuyerLayout = lazyRetry(() => import('./components/buyer/BuyerLayout'));
+const BuyerOverview = lazyRetry(() => import('./pages/buyer/BuyerOverview'));
+const MyOrders = lazyRetry(() => import('./pages/buyer/MyOrders'));
+const BuyerProfile = lazyRetry(() => import('./pages/buyer/BuyerProfile'));
+const BuyerSettings = lazyRetry(() => import('./pages/buyer/BuyerSettings'));
 
 // Admin pages
-const AdminLogin = React.lazy(() => import('./pages/admin/AdminLogin'));
-const AdminDashboard = React.lazy(() => import('./pages/admin/AdminDashboard'));
-const ListingManagement = React.lazy(() => import('./pages/admin/ListingManagement'));
-const SupplierManagement = React.lazy(() => import('./pages/admin/SupplierManagement'));
-const ReviewModeration = React.lazy(() => import('./pages/admin/ReviewModeration'));
-const ExpertReviewManagement = React.lazy(() => import('./pages/admin/ExpertReviewManagement'));
-const MarketUpdateManagement = React.lazy(() => import('./pages/admin/MarketUpdateManagement'));
-const CookingTipsManagement = React.lazy(() => import('./pages/admin/CookingTipsManagement'));
-const AdminSettings = React.lazy(() => import('./pages/admin/AdminSettings'));
-const UserManagement = React.lazy(() => import('./pages/admin/UserManagement'));
-const SupportManagement = React.lazy(() => import('./pages/admin/SupportManagement'));
-const PlatformAnalytics = React.lazy(() => import('./pages/admin/PlatformAnalytics'));
+const AdminLogin = lazyRetry(() => import('./pages/admin/AdminLogin'));
+const AdminDashboard = lazyRetry(() => import('./pages/admin/AdminDashboard'));
+const ListingManagement = lazyRetry(() => import('./pages/admin/ListingManagement'));
+const SupplierManagement = lazyRetry(() => import('./pages/admin/SupplierManagement'));
+const ReviewModeration = lazyRetry(() => import('./pages/admin/ReviewModeration'));
+const ExpertReviewManagement = lazyRetry(() => import('./pages/admin/ExpertReviewManagement'));
+const MarketUpdateManagement = lazyRetry(() => import('./pages/admin/MarketUpdateManagement'));
+const CookingTipsManagement = lazyRetry(() => import('./pages/admin/CookingTipsManagement'));
+const AdminSettings = lazyRetry(() => import('./pages/admin/AdminSettings'));
+const UserManagement = lazyRetry(() => import('./pages/admin/UserManagement'));
+const SupportManagement = lazyRetry(() => import('./pages/admin/SupportManagement'));
+const PlatformAnalytics = lazyRetry(() => import('./pages/admin/PlatformAnalytics'));
 
 const NAV_ITEMS = [
   { to: '/', label: 'Home', icon: Wheat },
