@@ -10,6 +10,7 @@ import {
 import { riceService, reviewService, expertService, cookingService } from '../services';
 import { orderService } from '../services/orderService';
 import { authService } from '../services/authService';
+import { negotiationService } from '../services/negotiationService';
 import { useNavigate } from 'react-router-dom';
 import RiceCard from '../components/RiceCard';
 import ProfessionalAddressSearch from '../components/common/ProfessionalAddressSearch';
@@ -28,6 +29,13 @@ const RiceDetailPage = () => {
     // Order State
     const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
     const [orderQuantity, setOrderQuantity] = useState(1);
+
+    // Negotiation State
+    const [isNegotiateModalOpen, setIsNegotiateModalOpen] = useState(false);
+    const [negotiateQuantity, setNegotiateQuantity] = useState(50);
+    const [negotiatePrice, setNegotiatePrice] = useState('');
+    const [negotiateMessage, setNegotiateMessage] = useState('');
+    const [negotiateLoading, setNegotiateLoading] = useState(false);
 
     const [user, setUser] = useState(authService.getCurrentUser());
     const hasProfileAddress = !!(user?.address?.street && user?.address?.city);
@@ -145,6 +153,37 @@ const RiceDetailPage = () => {
         }
     };
 
+    const handleNegotiateSubmit = async (e) => {
+        e.preventDefault();
+        setNegotiateLoading(true);
+        try {
+            if (!user) {
+                navigate('/login');
+                return;
+            }
+
+            if (!negotiateQuantity || negotiateQuantity < 1) {
+                alert('Please request a valid quantity for bulk orders');
+                return;
+            }
+
+            await negotiationService.createNegotiation({
+                listingId: rice._id,
+                initialMessage: negotiateMessage || `I am interested in buying ${negotiateQuantity} bags. Can we discuss pricing?`,
+                proposedPrice: negotiatePrice || rice.pricePerBag,
+                proposedQuantity: negotiateQuantity
+            });
+
+            alert('Quote requested successfully! Check your Negotiation dashboard.');
+            setIsNegotiateModalOpen(false);
+            navigate('/buyer/negotiations');
+        } catch (err) {
+            alert(err.response?.data?.message || 'Failed to submit quote request');
+        } finally {
+            setNegotiateLoading(false);
+        }
+    };
+
     if (loading) return <div className="p-8 text-center text-gray-400 animate-pulse">Wait a moment, gathering details...</div>;
     if (!rice) return <div className="p-8 text-center">Listing not found.</div>;
 
@@ -226,14 +265,25 @@ const RiceDetailPage = () => {
 
                             {/* Large Action Button */}
                             {user?.role !== 'supplier' && (
-                                <button
-                                    onClick={handleBuyNow}
-                                    disabled={isOutOfStock}
-                                    className={`w-full bg-field-700 hover:bg-field-800 text-white py-4 rounded-2xl shadow-xl shadow-field-200 transition-all flex items-center justify-center gap-3 text-lg font-bold ${isOutOfStock ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
-                                >
-                                    <ShoppingBag className="w-5 h-5" />
-                                    <span>{isOutOfStock ? 'Currently Unavailable' : 'Order Now'}</span>
-                                </button>
+                                <div className="space-y-3 pt-6">
+                                    <button
+                                        onClick={handleBuyNow}
+                                        disabled={isOutOfStock}
+                                        className={`w-full bg-field-700 hover:bg-field-800 text-white py-4 rounded-2xl shadow-xl shadow-field-200 transition-all flex items-center justify-center gap-3 text-lg font-bold ${isOutOfStock ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+                                    >
+                                        <ShoppingBag className="w-5 h-5" />
+                                        <span>{isOutOfStock ? 'Currently Unavailable' : 'Order Now'}</span>
+                                    </button>
+
+                                    <button
+                                        onClick={() => setIsNegotiateModalOpen(true)}
+                                        disabled={isOutOfStock}
+                                        className={`w-full bg-white hover:bg-gray-50 text-field-700 border-2 border-field-100 hover:border-field-200 py-3 rounded-2xl transition-all flex items-center justify-center gap-2 font-bold ${isOutOfStock ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+                                    >
+                                        <MessageSquare className="w-5 h-5 text-field-500" />
+                                        <span>Request Custom Quote / Negotiate</span>
+                                    </button>
+                                </div>
                             )}
                         </div>
                     </div>
@@ -746,6 +796,86 @@ const RiceDetailPage = () => {
                                         </>
                                     )}
                                 </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+
+            {/* Negotiation Modal */}
+            {isNegotiateModalOpen && (
+                <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+                        <div className="px-6 py-4 flex justify-between items-center border-b border-gray-100 bg-gray-50/50">
+                            <div>
+                                <h3 className="text-xl font-bold font-display text-gray-900 flex items-center gap-2">
+                                    <MessageSquare className="w-5 h-5 text-field-600" /> Request Custom Quote
+                                </h3>
+                                <p className="text-sm font-medium text-gray-500">Negotiate directly with {rice.supplierId?.millName || 'Supplier'}</p>
+                            </div>
+                            <button onClick={() => setIsNegotiateModalOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-full">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <div className="px-6 py-6 pb-2">
+                            <form onSubmit={handleNegotiateSubmit} className="space-y-5">
+                                <div className="p-4 rounded-xl bg-field-50 border border-field-100 flex items-center gap-4">
+                                    <img src={optimizeImage(rice.bagImageUrl, 200)} alt="" className="w-12 h-12 rounded object-cover" />
+                                    <div>
+                                        <div className="font-bold text-gray-900">{rice.brandName}</div>
+                                        <div className="text-xs text-field-600 font-bold tracking-wider">₹{rice.pricePerBag} / {rice.bagWeightKg}kg bg</div>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2 ml-1">Proposed Quantity (Bags)</label>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            value={negotiateQuantity}
+                                            onChange={e => setNegotiateQuantity(e.target.value)}
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-field-500/20 focus:border-field-500 transition-all outline-none font-medium"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2 ml-1">Target Price (/Bag)</label>
+                                        <div className="relative">
+                                            <span className="absolute left-4 top-3.5 text-gray-400">₹</span>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                value={negotiatePrice}
+                                                onChange={e => setNegotiatePrice(e.target.value)}
+                                                className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-field-500/20 focus:border-field-500 transition-all outline-none font-medium"
+                                                placeholder={rice.pricePerBag}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2 ml-1">Message to Supplier</label>
+                                    <textarea
+                                        value={negotiateMessage}
+                                        onChange={e => setNegotiateMessage(e.target.value)}
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-field-500/20 focus:border-field-500 transition-all outline-none resize-none font-medium h-24"
+                                        placeholder={`E.g., I'm interested in buying ${negotiateQuantity} bags for wholesale. Can we discuss a better price?`}
+                                    />
+                                </div>
+
+                                <div className="border-t border-gray-100 pt-5 pb-5">
+                                    <button
+                                        type="submit"
+                                        disabled={negotiateLoading}
+                                        className="w-full bg-field-600 hover:bg-field-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-field-600/30 transition-all transform hover:-translate-y-0.5"
+                                    >
+                                        {negotiateLoading ? 'Sending...' : 'Send Quote Request'}
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>

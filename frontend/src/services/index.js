@@ -29,3 +29,4 @@ export { authService } from './authService';
 export { supplierService } from './supplierService';
 export { adminService } from './adminService';
 export { watchlistService } from './watchlistService';
+export { negotiationService } from './negotiationService';

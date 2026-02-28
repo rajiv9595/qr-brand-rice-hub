@@ -52,6 +52,7 @@ const SupplierLayout = () => {
         { path: '/supplier', icon: LayoutDashboard, label: 'Overview', exact: true },
         { path: '/supplier/listings', icon: Package, label: 'My Listings' },
         { path: '/supplier/orders', icon: ShoppingBag, label: 'Orders' },
+        { path: '/supplier/negotiations', icon: MessageSquare, label: 'Negotiations' },
         { path: '/supplier/reviews', icon: MessageSquare, label: 'Reviews' },
         { path: '/supplier/create', icon: PlusCircle, label: 'Create Listing' },
         { path: '/supplier/profile', icon: User, label: 'Profile' },

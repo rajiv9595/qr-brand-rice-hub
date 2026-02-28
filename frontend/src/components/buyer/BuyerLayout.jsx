@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard, ShoppingBag, User, Settings,
-    LogOut, Menu, X, ShoppingCart, Search
+    LogOut, Menu, X, ShoppingCart, Search, MessageSquare
 } from 'lucide-react';
 import { authService } from '../../services/authService';
 import SupportWidget from '../common/SupportWidget';
@@ -27,6 +27,7 @@ const BuyerLayout = () => {
     const navItems = [
         { path: '/buyer', icon: LayoutDashboard, label: 'Overview', exact: true },
         { path: '/buyer/orders', icon: ShoppingBag, label: 'My Orders' },
+        { path: '/buyer/negotiations', icon: MessageSquare, label: 'Negotiations' },
         { path: '/buyer/profile', icon: User, label: 'Profile' },
         { path: '/buyer/settings', icon: Settings, label: 'Settings' },
     ];

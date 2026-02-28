@@ -28,6 +28,7 @@ const EditListing = React.lazy(() => import('./pages/supplier/EditListing'));
 const SupplierProfile = React.lazy(() => import('./pages/supplier/SupplierProfile'));
 const SupplierOrders = React.lazy(() => import('./pages/supplier/SupplierOrders'));
 const SupplierReviews = React.lazy(() => import('./pages/supplier/SupplierReviews'));
+const NegotiationHub = React.lazy(() => import('./pages/NegotiationHub'));
 
 // Buyer pages
 const BuyerLayout = React.lazy(() => import('./components/buyer/BuyerLayout'));
@@ -297,6 +298,7 @@ function App() {
             <Route index element={<SupplierOverview />} />
             <Route path="listings" element={<MyListings />} />
             <Route path="orders" element={<SupplierOrders />} />
+            <Route path="negotiations" element={<NegotiationHub />} />
             <Route path="reviews" element={<SupplierReviews />} />
             <Route path="create" element={<CreateListing />} />
             <Route path="edit/:id" element={<EditListing />} />
@@ -340,6 +342,7 @@ function App() {
           >
             <Route index element={<BuyerOverview />} />
             <Route path="orders" element={<MyOrders />} />
+            <Route path="negotiations" element={<NegotiationHub />} />
             <Route path="profile" element={<BuyerProfile />} />
             <Route path="settings" element={<BuyerSettings />} />
           </Route>

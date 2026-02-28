@@ -56,6 +56,7 @@ app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/support', require('./routes/supportRoutes'));
 app.use('/api/payments', require('./routes/paymentRoutes'));
 app.use('/api/watchlist', require('./routes/watchlistRoutes'));
+app.use('/api/negotiations', require('./routes/negotiationRoutes'));
 
 // Basic route
 app.get('/', (req, res) => {
