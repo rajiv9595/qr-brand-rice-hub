@@ -1,5 +1,18 @@
 {
   "appId": "com.qrbrand.ricehub",
   "appName": "QRBRAND",
-  "webDir": "dist"
+  "webDir": "dist",
+  "plugins": {
+    "StatusBar": {
+      "overlay": false
+    },
+    "GoogleAuth": {
+      "scopes": [
+        "profile",
+        "email"
+      ],
+      "serverClientId": "560560528502-tmn1ipqd55a0or1r6ss8j5uurb5cssj7.apps.googleusercontent.com",
+      "forceCodeForRefreshToken": true
+    }
+  }
 }

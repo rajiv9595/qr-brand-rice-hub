@@ -10,6 +10,13 @@ import { useAppStore, AppProvider } from './context/AppContext';
 import SupportWidget from './components/common/SupportWidget';
 import Logo from './components/common/Logo';
 import MobileBottomNav from './components/common/MobileBottomNav';
+import { StatusBar } from '@capacitor/status-bar';
+
+try {
+  StatusBar.setOverlaysWebView({ overlay: false });
+} catch (e) {
+  // Ignore error if running on web
+}
 
 // Helper function to handle ChunkLoadError during new deployments
 const lazyRetry = (componentImport) => {
