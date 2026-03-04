@@ -124,26 +124,27 @@ const LoginPage = () => {
 
 
     return (
-        <div className="min-h-screen bg-rice-50 flex flex-col items-center pt-8 sm:pt-12 px-4 font-body">
+        <div className="relative min-h-screen bg-rice-50 flex flex-col items-center pt-16 sm:pt-12 px-4 font-body">
+
+            {/* Language Selector - Top Right */}
+            <div className="absolute top-4 right-4 sm:top-6 sm:right-6 animate-in fade-in duration-700 z-10">
+                <select
+                    onChange={(e) => i18n.changeLanguage(e.target.value)}
+                    value={i18n.language}
+                    className="text-xs bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-700 py-1.5 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-field-500 focus:border-field-500 font-bold shadow-sm transition-all"
+                >
+                    <option value="en">English</option>
+                    <option value="te">తెలుగు (Telugu)</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                </select>
+            </div>
 
             {/* Logo Header */}
-            <div className="text-center mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 relative w-full max-w-[480px]">
-                <div className="flex justify-between items-center w-full relative">
-                    <div className="w-24"></div> {/* spacer */}
+            <div className="text-center mb-6 sm:mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 relative w-full max-w-[480px]">
+                <div className="flex justify-center items-center w-full">
                     <Link to="/" className="inline-block transform hover:scale-105 transition-transform">
                         <Logo size="lg" className="transition-transform" />
                     </Link>
-                    <div className="w-24 flex justify-end">
-                        <select
-                            onChange={(e) => i18n.changeLanguage(e.target.value)}
-                            value={i18n.language}
-                            className="text-xs bg-white border border-gray-200 text-gray-700 py-1.5 px-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-field-500 font-bold"
-                        >
-                            <option value="en">English</option>
-                            <option value="te">తెలుగు (Telugu)</option>
-                            <option value="hi">हिंदी (Hindi)</option>
-                        </select>
-                    </div>
                 </div>
             </div>
 
