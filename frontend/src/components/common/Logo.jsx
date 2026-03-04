@@ -34,7 +34,7 @@ const Logo = ({
             {!iconOnly && (
                 <div className="flex flex-col gap-0.5 ml-1 overflow-hidden">
                     <h1 className={`${currentSize.text} font-black ${isDarkBg ? 'text-white' : 'text-emerald-950'} leading-none tracking-tight uppercase font-display whitespace-nowrap`}>
-                        QR <span className="text-emerald-500">BRAND</span>
+                        QR <span className="text-emerald-500">BRAND'S</span>
                     </h1>
                     <p className={`${currentSize.subtext} font-black ${isDarkBg ? 'text-amber-400' : 'text-amber-600'} tracking-[0.05em] uppercase opacity-90 truncate`}>
                         Quality Rice Intelligence

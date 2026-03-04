@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const settingsSchema = new mongoose.Schema({
-    siteName: { type: String, default: 'QR Brand Rice Hub' },
+    siteName: { type: String, default: "QR Brand's Rice Hub" },
     siteDescription: { type: String, default: 'Premium Rice Intelligence Platform' },
     maintenanceMode: { type: Boolean, default: false },
     sessionTimeout: { type: Number, default: 30 },

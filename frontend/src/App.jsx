@@ -314,7 +314,7 @@ const Layout = ({ children }) => {
             </div>
           </div>
           <div className="border-t border-field-700 mt-10 pt-6 text-center text-field-400 text-xs font-body tracking-wide">
-            © 2026 QR Brand Rice Hub. All rights reserved. A trusted rice intelligence platform.
+            © 2026 QR Brand's Rice Hub. All rights reserved. A trusted rice intelligence platform.
           </div>
         </div>
       </footer>

@@ -9,7 +9,7 @@ const MOCK_UPDATES = [
         description: 'Learn to check grain length, color uniformity, broken grain percentage, and aroma to identify premium rice. A simple guide for every household...',
         category: 'Quality',
         imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&q=80',
-        createdBy: { name: 'QR Brand Research Team' },
+        createdBy: { name: "QR Brand's Research Team" },
         createdAt: '2026-02-15'
     },
     {
@@ -17,7 +17,7 @@ const MOCK_UPDATES = [
         title: 'Rice Market Trends: February 2026 Update',
         description: 'Sona Masoori prices have stabilized at ₹48-55/kg. Basmati shows a slight upward trend due to export demand. Farmers in Godavari districts are expecting a bumper harvest this season.',
         category: 'Market Trends',
-        createdBy: { name: 'QR Brand Market Analysts' },
+        createdBy: { name: "QR Brand's Market Analysts" },
         createdAt: '2026-02-14'
     },
     {
@@ -25,7 +25,7 @@ const MOCK_UPDATES = [
         title: 'Understanding Rice Varieties in Telugu States',
         description: 'Telugu states produce some of India\'s finest rice varieties: Sona Masoori (most popular), BPT 5204, HMT, Kolam. Understand which variety suits your cooking style best.',
         category: 'Education',
-        createdBy: { name: 'QR Brand Expert Team' },
+        createdBy: { name: "QR Brand's Expert Team" },
         createdAt: '2026-02-12'
     },
     {
@@ -171,7 +171,7 @@ const MarketPage = () => {
                                 </p>
 
                                 <div className="pt-6 mt-auto flex items-center justify-between text-xs text-gray-400 font-bold">
-                                    <span className="text-gray-400 font-medium">{item.createdBy?.name || 'QR Brand Team'}</span>
+                                    <span className="text-gray-400 font-medium">{item.createdBy?.name || "QR Brand's Team"}</span>
                                     <span className="text-gray-400">{new Date(item.createdAt).toISOString().split('T')[0]}</span>
                                 </div>
                             </div>
@@ -231,7 +231,7 @@ const MarketPage = () => {
                                     <div className="w-8 h-8 rounded-full bg-field-100 text-field-700 flex items-center justify-center font-bold">
                                         {selectedArticle.createdBy?.name?.charAt(0) || 'Q'}
                                     </div>
-                                    <span className="text-gray-900 font-bold">{selectedArticle.createdBy?.name || 'QR Brand Team'}</span>
+                                    <span className="text-gray-900 font-bold">{selectedArticle.createdBy?.name || "QR Brand's Team"}</span>
                                 </div>
                                 <span className="text-gray-300">•</span>
                                 <span>{new Date(selectedArticle.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>

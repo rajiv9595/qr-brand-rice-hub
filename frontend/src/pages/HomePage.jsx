@@ -25,7 +25,7 @@ const USAGE_LABELS = {
 
 const FEATURES = [
     { icon: <ShieldCheck className="w-8 h-8 text-field-500" />, title: 'Verified Suppliers', desc: 'Every supplier is verified and every listing is admin-approved before publishing.' },
-    { icon: <BarChart3 className="w-8 h-8 text-field-500" />, title: 'Expert Reviews', desc: 'QR Brand expert team grades every rice for quality, fairness and suitability.' },
+    { icon: <BarChart3 className="w-8 h-8 text-field-500" />, title: 'Expert Reviews', desc: "QR Brand's expert team grades every rice for quality, fairness and suitability." },
     { icon: <ChefHat className="w-8 h-8 text-field-500" />, title: 'Cooking Guidance', desc: 'Detailed cooking tips for every variety — water ratio, method, best dishes.' },
 ];
 
@@ -36,7 +36,7 @@ const MOCK_KNOWLEDGE = [
         content: 'Learn to check grain length, color uniformity, broken grain percentage, and aroma to identify premium rice...',
         category: 'quality',
         imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&q=80',
-        author: 'QR Brand Research Team',
+        author: "QR Brand's Research Team",
         publishedAt: '2026-02-15'
     },
     {
@@ -45,7 +45,7 @@ const MOCK_KNOWLEDGE = [
         content: 'Sona Masoori prices have stabilized at ₹48-55/kg. Basmati shows a slight upward trend due to export demand...',
         category: 'market',
         imageUrl: 'https://images.unsplash.com/photo-1695150601855-f545034a070a?w=600&q=80',
-        author: 'QR Brand Market Analysts',
+        author: "QR Brand's Market Analysts",
         publishedAt: '2026-02-14'
     },
     {
@@ -54,7 +54,7 @@ const MOCK_KNOWLEDGE = [
         content: 'Telugu states produce some of India\'s finest rice varieties: Sona Masoori (most popular), BPT 5204, HMT, Kolam...',
         category: 'education',
         imageUrl: 'https://images.unsplash.com/photo-1627482265910-5c0ff6bee088?w=600&q=80',
-        author: 'QR Brand Expert Team',
+        author: "QR Brand's Expert Team",
         publishedAt: '2026-02-12'
     }
 ];
@@ -159,7 +159,7 @@ export default function HomePage() {
             <section className="bg-white py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-4 tracking-tight">How to use QR Brand?</h2>
+                        <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-4 tracking-tight">How to use QR Brand's?</h2>
                         <p className="text-gray-500 font-bold uppercase text-xs tracking-widest">Simple 3-Step Process for Everyone</p>
                     </div>
 
@@ -263,7 +263,7 @@ export default function HomePage() {
                     </div>
                     <h2 className="section-title mb-4">Are You a Rice Supplier?</h2>
                     <p className="text-gray-600 max-w-xl mx-auto mb-6">
-                        List your rice brands on QR Brand Rice Hub. Reach customers across Telugu states with verified, trusted listings.
+                        List your rice brands on QR Brand's Rice Hub. Reach customers across Telugu states with verified, trusted listings.
                     </p>
                     <Link to="/login" className="btn-primary inline-flex items-center gap-2">
                         Register as Supplier <ArrowRight className="w-5 h-5" />

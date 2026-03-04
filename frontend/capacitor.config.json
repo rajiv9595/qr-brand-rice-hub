@@ -1,6 +1,6 @@
 {
   "appId": "com.qrbrand.ricehub",
-  "appName": "QRBRAND",
+  "appName": "QR BRAND'S",
   "webDir": "dist",
   "plugins": {
     "StatusBar": {

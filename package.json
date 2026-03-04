@@ -1,7 +1,7 @@
 {
     "name": "qr-brand-rice-hub-workspace",
     "version": "1.0.0",
-    "description": "Monorepo for QR Brand Rice Hub",
+    "description": "Monorepo for QR Brand's Rice Hub",
     "scripts": {
         "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend",
         "backend": "npm run dev --prefix backend",

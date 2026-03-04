@@ -14,6 +14,7 @@ const SearchPage = () => {
     const [pagination, setPagination] = useState({ totalResults: 0, totalPages: 0 });
     const [watchlist, setWatchlist] = useState([]);
     const [searchTerm, setSearchTerm] = useState(searchParams.get('riceVariety') || '');
+    const [marketTab, setMarketTab] = useState('all');
     const user = React.useMemo(() => authService.getCurrentUser(), []);
     const userId = user?._id;
 
@@ -91,6 +92,44 @@ const SearchPage = () => {
         return () => clearTimeout(timer);
     }, [searchTerm]);
 
+    // Calculate Budget/Premium Logic based on average price per variety
+    const processedResults = React.useMemo(() => {
+        const varietyStats = {};
+        results.forEach(item => {
+            const variety = item.riceVariety?.toLowerCase();
+            if (!variety) return;
+            const pricePerKg = item.pricePerBag / item.bagWeightKg;
+            if (!varietyStats[variety]) {
+                varietyStats[variety] = { prices: [], avg: 0 };
+            }
+            varietyStats[variety].prices.push(pricePerKg);
+        });
+
+        Object.keys(varietyStats).forEach(variety => {
+            const prices = varietyStats[variety].prices;
+            const sum = prices.reduce((a, b) => a + b, 0);
+            varietyStats[variety].avg = sum / prices.length;
+        });
+
+        return results.map(item => {
+            const variety = item.riceVariety?.toLowerCase();
+            let isBudget = true;
+            if (variety && varietyStats[variety]) {
+                const pricePerKg = item.pricePerBag / item.bagWeightKg;
+                isBudget = pricePerKg <= varietyStats[variety].avg;
+            }
+            return {
+                ...item,
+                budgetCategory: isBudget ? 'budget' : 'premium'
+            };
+        });
+    }, [results]);
+
+    const displayResults = React.useMemo(() => {
+        if (marketTab === 'all') return processedResults;
+        return processedResults.filter(item => item.budgetCategory === marketTab);
+    }, [processedResults, marketTab]);
+
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -101,7 +140,29 @@ const SearchPage = () => {
             </div>
             {/* Search Bar & Stats */}
             <div className="flex flex-col gap-4">
-                <div className="flex flex-col md:flex-row gap-4">
+                {/* Budget vs Premium Tabs */}
+                <div className="flex flex-wrap gap-2 bg-gray-50 p-1.5 rounded-2xl w-full md:w-fit mx-auto border border-gray-100 shadow-sm">
+                    <button
+                        onClick={() => setMarketTab('all')}
+                        className={`px-8 py-2.5 rounded-xl text-sm font-black uppercase tracking-wider transition-all duration-300 ${marketTab === 'all' ? 'bg-white text-gray-900 shadow drop-shadow-sm scale-105' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`}
+                    >
+                        All Products
+                    </button>
+                    <button
+                        onClick={() => setMarketTab('budget')}
+                        className={`px-8 py-2.5 rounded-xl text-sm font-black uppercase tracking-wider transition-all duration-300 flex items-center gap-2 ${marketTab === 'budget' ? 'bg-green-500 text-white shadow-lg shadow-green-500/30 scale-105 hover:bg-green-600' : 'text-gray-500 hover:text-green-600 hover:bg-green-50'}`}
+                    >
+                        💰 Budget Friendly
+                    </button>
+                    <button
+                        onClick={() => setMarketTab('premium')}
+                        className={`px-8 py-2.5 rounded-xl text-sm font-black uppercase tracking-wider transition-all duration-300 flex items-center gap-2 ${marketTab === 'premium' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/30 scale-105 hover:bg-amber-600' : 'text-gray-500 hover:text-amber-600 hover:bg-amber-50'}`}
+                    >
+                        ✨ Premium
+                    </button>
+                </div>
+
+                <div className="flex flex-col md:flex-row gap-4 mt-2">
                     <div className="relative flex-1">
                         <input
                             type="text"
@@ -219,7 +280,7 @@ const SearchPage = () => {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pb-20">
-                    {results.map((item) => (
+                    {displayResults.map((item) => (
                         <Link key={item._id} to={`/rice/${item._id}`} className="bg-white rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 border border-gray-100 transition-all duration-300 group overflow-hidden flex flex-col">
 
                             {/* Image Container with Consistent Aspect Ratio */}
@@ -259,9 +320,16 @@ const SearchPage = () => {
                                     <h3 className="font-display font-bold text-gray-900 group-hover:text-field-700 transition-colors truncate text-base mb-1">
                                         {item.brandName}
                                     </h3>
-                                    <p className="text-xs font-medium text-gray-500 flex items-center gap-1">
-                                        <Tag className="w-3 h-3" /> {item.riceVariety}
-                                    </p>
+                                    <div className="flex items-center gap-2">
+                                        <p className="text-xs font-medium text-gray-500 flex items-center gap-1">
+                                            <Tag className="w-3 h-3" /> {item.riceVariety}
+                                        </p>
+                                        {item.budgetCategory && (
+                                            <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${item.budgetCategory === 'budget' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                                                {item.budgetCategory === 'budget' ? 'Budget' : 'Premium'}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
 
                                 <div className="mt-4 pt-3 border-t border-gray-50 flex items-end justify-between">
@@ -278,12 +346,12 @@ const SearchPage = () => {
                             </div>
                         </Link>
                     ))}
-                    {results.length === 0 && (
+                    {displayResults.length === 0 && (
                         <div className="col-span-full py-20 text-center space-y-4">
                             <div className="text-6xl">🌾</div>
-                            <h3 className="text-xl font-bold text-gray-800">No rice matches your search.</h3>
-                            <p className="text-gray-500">Try adjusting your filters or search terms.</p>
-                            <button onClick={() => setSearchParams({})} className="btn-primary">Clear all filters</button>
+                            <h3 className="text-xl font-bold text-gray-800">No rice matches your filters.</h3>
+                            <p className="text-gray-500">Try adjusting your category or search terms.</p>
+                            <button onClick={() => { setSearchParams({}); setMarketTab('all'); }} className="btn-primary">Clear all filters</button>
                         </div>
                     )}
                 </div>

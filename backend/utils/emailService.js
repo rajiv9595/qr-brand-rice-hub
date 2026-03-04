@@ -20,7 +20,7 @@ const sendEmail = async (to, subject, htmlContent) => {
         to,
         from: {
             email: process.env.SENDGRID_FROM_EMAIL || 'ricehubinfo@gmail.com', // Let user configure from Dashboard
-            name: 'QR BRAND'
+            name: "QR BRAND'S"
         },
         subject,
         html: htmlContent,
@@ -43,7 +43,7 @@ const createTemplate = (title, message, orderId, additionalInfo = '') => {
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
         <!-- Header -->
         <div style="background-color: #1a4d2e; padding: 20px; text-align: center;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">QR BRAND</h1>
+            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">QR BRAND'S</h1>
             <p style="color: #a3cfbb; margin: 5px 0 0;">Premium Rice Intelligence Hub</p>
         </div>
 
@@ -68,7 +68,7 @@ const createTemplate = (title, message, orderId, additionalInfo = '') => {
 
         <!-- Footer -->
         <div style="background-color: #f4f4f4; padding: 15px; text-align: center; font-size: 12px; color: #888888;">
-            <p>&copy; ${new Date().getFullYear()} QR Brand Rice Hub. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} QR Brand's Rice Hub. All rights reserved.</p>
             <p>This is an automated message, please do not reply.</p>
         </div>
     </div>
@@ -127,7 +127,7 @@ const emailService = {
         const html = `
             <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
                 <h2 style="color: #1a4d2e; text-align: center;">MFA Authentication</h2>
-                <p>A login attempt was made to the QR BRAND Admin Portal.</p>
+                <p>A login attempt was made to the QR BRAND'S Admin Portal.</p>
                 <div style="background: #f4f4f4; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0;">
                     <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1a4d2e;">${code}</span>
                 </div>
@@ -140,11 +140,11 @@ const emailService = {
     },
 
     sendPasswordResetEmail: async (email, resetUrl) => {
-        const subject = 'QR BRAND - Password Reset Request';
+        const subject = "QR BRAND'S - Password Reset Request";
         const html = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
                 <div style="background-color: #1a4d2e; padding: 20px; text-align: center;">
-                    <h1 style="color: #ffffff; margin: 0; font-size: 24px;">QR BRAND</h1>
+                    <h1 style="color: #ffffff; margin: 0; font-size: 24px;">QR BRAND'S</h1>
                     <p style="color: #a3cfbb; margin: 5px 0 0;">Password Reset</p>
                 </div>
                 <div style="padding: 30px; background-color: #ffffff;">
@@ -162,7 +162,7 @@ const emailService = {
                     </p>
                 </div>
                 <div style="background-color: #f4f4f4; padding: 15px; text-align: center; font-size: 12px; color: #888888;">
-                    <p>&copy; ${new Date().getFullYear()} QR Brand Rice Hub. All rights reserved.</p>
+                    <p>&copy; ${new Date().getFullYear()} QR Brand's Rice Hub. All rights reserved.</p>
                 </div>
             </div>
         `;

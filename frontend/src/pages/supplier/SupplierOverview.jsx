@@ -65,7 +65,7 @@ const SupplierOverview = () => {
                         <span className="text-gold-400 drop-shadow-sm">{user?.name || 'Supplier'}!</span>
                     </h1>
                     <p className="text-primary-100 text-lg">
-                        Manage your rice listings, track approvals, and grow your business on QR BRAND marketplace.
+                        Manage your rice listings, track approvals, and grow your business on QR BRAND'S marketplace.
                     </p>
 
                     {/* Performance Badges and Trust Score */}

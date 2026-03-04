@@ -12,7 +12,7 @@ const AdminSettings = () => {
     const [successMessage, setSuccessMessage] = useState('');
 
     const [settings, setSettings] = useState({
-        siteName: 'QR Brand Rice Hub',
+        siteName: "QR Brand's Rice Hub",
         siteDescription: 'Premium Rice Intelligence Platform',
         maintenanceMode: false,
         emailNotifications: true,
@@ -91,7 +91,7 @@ const AdminSettings = () => {
         { id: 'system', label: 'System', icon: Database },
     ];
 
-    const user = authService.getCurrentUser() || { name: 'Admin User', email: 'admin@qrbrand.com' };
+    const user = authService.getCurrentUser() || { name: 'Admin User', email: 'admin@qrbrands.com' };
     const firstName = user.name.split(' ')[0] || '';
     const lastName = user.name.split(' ').slice(1).join(' ') || '';
 

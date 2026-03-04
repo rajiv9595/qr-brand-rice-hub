@@ -63,12 +63,12 @@ app.use('/api/negotiations', require('./routes/negotiationRoutes'));
 
 // Basic route
 app.get('/', (req, res) => {
-    res.send('QR BRAND RICE HUB API is running...');
+    res.send("QR BRAND'S RICE HUB API is running...");
 });
 
 // Added API health/root route
 app.get('/api', (req, res) => {
-    res.json({ success: true, message: 'QR BRAND RICE HUB API is active' });
+    res.json({ success: true, message: "QR BRAND'S RICE HUB API is active" });
 });
 
 // Serve static files

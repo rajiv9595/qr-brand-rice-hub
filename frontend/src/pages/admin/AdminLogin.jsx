@@ -133,7 +133,7 @@ const AdminLogin = () => {
                                         onChange={handleChange}
                                         required
                                         className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
-                                        placeholder="admin@qrbrand.com"
+                                        placeholder="admin@qrbrands.com"
                                     />
                                 </div>
                             </div>
@@ -241,7 +241,7 @@ const AdminLogin = () => {
                         &larr; Return to Main Hub
                     </button>
                     <p className="text-gray-600 text-[10px] mt-8 font-mono">
-                        &copy; 2026 QR Brand Rice Hub. System Integrity: v2.0.4.SEC
+                        &copy; 2026 QR Brand's Rice Hub. System Integrity: v2.0.4.SEC
                     </p>
                 </div>
             </div>

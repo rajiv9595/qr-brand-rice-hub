@@ -68,32 +68,32 @@ const sendSMS = async (phone, message) => {
 
 const notificationService = {
     sendOrderPlaced: async (phone, orderId, amount) => {
-        const msg = `QR BRAND: Your order #${orderId} for Rs.${amount} has been placed successfully. We will notify you when it is confirmed.`;
+        const msg = `QR BRAND'S: Your order #${orderId} for Rs.${amount} has been placed successfully. We will notify you when it is confirmed.`;
         await sendSMS(phone, msg);
     },
 
     sendOrderConfirmed: async (phone, orderId) => {
-        const msg = `QR BRAND: Good news! Your order #${orderId} has been CONFIRMED by the supplier.`;
+        const msg = `QR BRAND'S: Good news! Your order #${orderId} has been CONFIRMED by the supplier.`;
         await sendSMS(phone, msg);
     },
 
     sendOrderShipped: async (phone, orderId) => {
-        const msg = `QR BRAND: Your order #${orderId} has been SHIPPED. It is on its way to you!`;
+        const msg = `QR BRAND'S: Your order #${orderId} has been SHIPPED. It is on its way to you!`;
         await sendSMS(phone, msg);
     },
 
     sendOrderDelivered: async (phone, orderId) => {
-        const msg = `QR BRAND: Order #${orderId} has been DELIVERED. Thank you for shopping with us!`;
+        const msg = `QR BRAND'S: Order #${orderId} has been DELIVERED. Thank you for shopping with us!`;
         await sendSMS(phone, msg);
     },
 
     sendOrderCancelled: async (phone, orderId) => {
-        const msg = `QR BRAND: Your order #${orderId} has been CANCELLED. If this was a mistake, please contact support.`;
+        const msg = `QR BRAND'S: Your order #${orderId} has been CANCELLED. If this was a mistake, please contact support.`;
         await sendSMS(phone, msg);
     },
 
     sendStockAlert: async (phone, brandName, currentStock) => {
-        const msg = `QR BRAND ALERT: Low Stock! Your listing '${brandName}' has only ${currentStock} bags left. Update stock now to avoid losing orders.`;
+        const msg = `QR BRAND'S ALERT: Low Stock! Your listing '${brandName}' has only ${currentStock} bags left. Update stock now to avoid losing orders.`;
         await sendSMS(phone, msg);
     },
 
@@ -102,7 +102,7 @@ const notificationService = {
     },
 
     sendMFACode: async (phone, code) => {
-        const msg = `QR BRAND ADMIN: Your MFA access code is ${code}. It expires in 10 minutes. Do not share.`;
+        const msg = `QR BRAND'S ADMIN: Your MFA access code is ${code}. It expires in 10 minutes. Do not share.`;
         await sendSMS(phone, msg);
     }
 };
