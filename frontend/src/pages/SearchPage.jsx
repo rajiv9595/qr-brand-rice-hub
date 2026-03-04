@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { Search, Filter, SlidersHorizontal, MapPin, Tag, ArrowUpDown, Star, Scale, Info, Heart, XCircle, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../context/AppContext';
 import { riceService, watchlistService } from '../services';
 import { authService } from '../services/authService';
 
 const SearchPage = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const [results, setResults] = useState([]);
@@ -134,8 +136,8 @@ const SearchPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="text-left w-full">
-                    <h1 className="text-2xl md:text-3xl font-display font-black text-gray-900 tracking-tight">Marketplace</h1>
-                    <p className="text-gray-500 mt-1 text-sm md:text-base">Browse premium rice listings from verified mills</p>
+                    <h1 className="text-2xl md:text-3xl font-display font-black text-gray-900 tracking-tight">{t("Marketplace")}</h1>
+                    <p className="text-gray-500 mt-1 text-sm md:text-base">{t("Browse premium rice listings from verified mills")}</p>
                 </div>
             </div>
             {/* Search Bar & Stats */}
@@ -146,19 +148,19 @@ const SearchPage = () => {
                         onClick={() => setMarketTab('all')}
                         className={`px-8 py-2.5 rounded-xl text-sm font-black uppercase tracking-wider transition-all duration-300 ${marketTab === 'all' ? 'bg-white text-gray-900 shadow drop-shadow-sm scale-105' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`}
                     >
-                        All Products
+                        {t("All Products")}
                     </button>
                     <button
                         onClick={() => setMarketTab('budget')}
                         className={`px-8 py-2.5 rounded-xl text-sm font-black uppercase tracking-wider transition-all duration-300 flex items-center gap-2 ${marketTab === 'budget' ? 'bg-green-500 text-white shadow-lg shadow-green-500/30 scale-105 hover:bg-green-600' : 'text-gray-500 hover:text-green-600 hover:bg-green-50'}`}
                     >
-                        💰 Budget Friendly
+                        💰 {t("Budget Friendly")}
                     </button>
                     <button
                         onClick={() => setMarketTab('premium')}
                         className={`px-8 py-2.5 rounded-xl text-sm font-black uppercase tracking-wider transition-all duration-300 flex items-center gap-2 ${marketTab === 'premium' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/30 scale-105 hover:bg-amber-600' : 'text-gray-500 hover:text-amber-600 hover:bg-amber-50'}`}
                     >
-                        ✨ Premium
+                        ✨ {t("Premium")}
                     </button>
                 </div>
 
@@ -166,7 +168,7 @@ const SearchPage = () => {
                     <div className="relative flex-1">
                         <input
                             type="text"
-                            placeholder="Search variety, brand..."
+                            placeholder={t("Search variety, brand...")}
                             className="w-full card py-3 pl-12 pr-4 focus:ring-2 focus:ring-primary-500 transition-all outline-none"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -188,13 +190,13 @@ const SearchPage = () => {
                         `}
                     >
                         <Scale className={`w-4 h-4 ${compareIds.length > 0 ? 'animate-bounce' : ''}`} />
-                        {compareIds.length > 0 ? `Analyze ${compareIds.length} Selected` : 'Comparison Mode'}
+                        {compareIds.length > 0 ? `${t("Analyze Selected")} (${compareIds.length})` : t('Comparison Mode')}
                     </button>
                 </div>
 
                 <div className="flex items-center justify-between">
                     <p className="text-sm text-gray-500 font-medium tracking-tight">
-                        Found <span className="text-primary-700 font-bold">{pagination.totalResults}</span> varieties
+                        {t("Found")} <span className="text-primary-700 font-bold">{pagination.totalResults}</span> {t("varieties")}
                     </p>
                     <div className="flex gap-2">
                         <button
@@ -203,17 +205,17 @@ const SearchPage = () => {
                                 ${showFilters ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-100 hover:bg-gray-50'}
                             `}
                         >
-                            <Filter className="w-4 h-4" /> Filters
+                            <Filter className="w-4 h-4" /> {t("Filters")}
                         </button>
                         <select
                             className="bg-white px-4 py-2.5 rounded-xl border border-gray-100 shadow-sm text-xs font-bold uppercase tracking-wider focus:ring-2 focus:ring-primary-500 outline-none"
                             onChange={(e) => updateParam('sortBy', e.target.value)}
                             value={searchParams.get('sortBy') || ''}
                         >
-                            <option value="">Sort By</option>
-                            <option value="priceAsc">Price: Low</option>
-                            <option value="priceDesc">Price: High</option>
-                            <option value="newest">Latest</option>
+                            <option value="">{t("Sort By")}</option>
+                            <option value="priceAsc">{t("Price: Low")}</option>
+                            <option value="priceDesc">{t("Price: High")}</option>
+                            <option value="newest">{t("Latest")}</option>
                         </select>
                     </div>
                 </div>
@@ -225,21 +227,20 @@ const SearchPage = () => {
             {showFilters && (
                 <div className="card p-6 grid grid-cols-1 md:grid-cols-3 gap-6 animate-in slide-in-from-top-4 duration-300">
                     <div>
-                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">Category</label>
+                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">{t("Category")}</label>
                         <select
                             className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary-500 font-bold"
                             onChange={(e) => updateParam('usageCategory', e.target.value)}
                             value={searchParams.get('usageCategory') || ''}
                         >
-                            <option value="">All Uses</option>
-                            <option value="Daily Family Use">Daily Family Use</option>
-                            <option value="Guests/Special Meal Use">Guests/Special Meal Use</option>
-                            <option value="Biryani/Pulao Special">Biryani/Pulao Special</option>
-                            <option value="Hotel/Commercial Use">Hotel/Commercial Use</option>
+                            <option value="">{t("All Uses")}</option>
+                            <option value="Daily Family Use">{t("Daily Family Use")}</option>
+                            <option value="Guests/Special Meal Use">{t("Guests / Special Meal")}</option>
+                            <option value="Function / Catering">{t("Function / Catering")}</option>
                         </select>
                     </div>
                     <div>
-                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">State</label>
+                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">{t("State")}</label>
                         <input
                             type="text"
                             placeholder="e.g. Haryana"
@@ -250,7 +251,7 @@ const SearchPage = () => {
                     </div>
                     <div className="flex gap-4">
                         <div className="flex-1">
-                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">Min Price</label>
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">{t("Min Price")}</label>
                             <input
                                 type="number"
                                 placeholder="₹"
@@ -260,7 +261,7 @@ const SearchPage = () => {
                             />
                         </div>
                         <div className="flex-1">
-                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">Max Price</label>
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">{t("Max Price")}</label>
                             <input
                                 type="number"
                                 placeholder="₹"
@@ -349,9 +350,9 @@ const SearchPage = () => {
                     {displayResults.length === 0 && (
                         <div className="col-span-full py-20 text-center space-y-4">
                             <div className="text-6xl">🌾</div>
-                            <h3 className="text-xl font-bold text-gray-800">No rice matches your filters.</h3>
-                            <p className="text-gray-500">Try adjusting your category or search terms.</p>
-                            <button onClick={() => { setSearchParams({}); setMarketTab('all'); }} className="btn-primary">Clear all filters</button>
+                            <h3 className="text-xl font-bold text-gray-800">{t("No rice matches your filters.")}</h3>
+                            <p className="text-gray-500">{t("Try adjusting your category or search terms.")}</p>
+                            <button onClick={() => { setSearchParams({}); setMarketTab('all'); }} className="btn-primary">{t("Clear all filters")}</button>
                         </div>
                     )}
                 </div>

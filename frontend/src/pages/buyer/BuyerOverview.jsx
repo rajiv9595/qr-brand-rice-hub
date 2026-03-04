@@ -3,8 +3,10 @@ import { ShoppingBag, ChevronRight, Package, Clock } from 'lucide-react';
 import { orderService } from '../../services/orderService';
 import { Link } from 'react-router-dom';
 import { authService } from '../../services/authService';
+import { useTranslation } from 'react-i18next';
 
 const BuyerOverview = () => {
+    const { t } = useTranslation();
     const user = authService.getCurrentUser();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -28,16 +30,16 @@ const BuyerOverview = () => {
             {/* Welcome Banner */}
             <div className="bg-gradient-to-br from-primary-600 to-primary-800 rounded-3xl p-8 text-white relative overflow-hidden shadow-2xl">
                 <div className="relative z-10">
-                    <h1 className="text-3xl font-black mb-2">Welcome back, {user?.name?.split(' ')[0]}!</h1>
+                    <h1 className="text-3xl font-black mb-2">{t("Welcome back")}, {user?.name?.split(' ')[0]}!</h1>
                     <p className="text-primary-100 max-w-lg">
-                        Track your rice orders and manage your account details securely.
+                        {t("Track your rice orders and manage your account details securely.")}
                     </p>
                     <div className="mt-8 flex gap-4">
                         <Link to="/search" className="btn bg-white text-primary-700 hover:bg-white/90 font-bold border-0 shadow-lg">
-                            Browse Market
+                            {t("Browse Market")}
                         </Link>
                         <Link to="/buyer/orders" className="btn bg-primary-700/50 hover:bg-primary-700 text-white font-bold border border-white/20">
-                            View All Orders
+                            {t("View All Orders")}
                         </Link>
                     </div>
                 </div>
@@ -50,10 +52,10 @@ const BuyerOverview = () => {
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                        <Clock className="w-5 h-5 text-gray-400" /> Recent Purchases
+                        <Clock className="w-5 h-5 text-gray-400" /> {t("Recent Purchases")}
                     </h2>
                     <Link to="/buyer/orders" className="text-primary-600 text-sm font-bold flex items-center hover:underline">
-                        View All <ChevronRight className="w-4 h-4" />
+                        {t("View All")} <ChevronRight className="w-4 h-4" />
                     </Link>
                 </div>
 
@@ -70,8 +72,8 @@ const BuyerOverview = () => {
                                         <Package className="w-6 h-6 text-primary-600" />
                                     </div>
                                     <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${order.status === 'Delivered' ? 'bg-green-100 text-green-700' :
-                                            order.status === 'Cancelled' ? 'bg-red-100 text-red-700' :
-                                                'bg-blue-100 text-blue-700'
+                                        order.status === 'Cancelled' ? 'bg-red-100 text-red-700' :
+                                            'bg-blue-100 text-blue-700'
                                         }`}>
                                         {order.status}
                                     </span>
@@ -90,10 +92,10 @@ const BuyerOverview = () => {
                 ) : (
                     <div className="card p-12 text-center border-dashed border-2 border-gray-200">
                         <ShoppingBag className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                        <h3 className="font-bold text-gray-900">No orders yet</h3>
-                        <p className="text-gray-500 mb-6 text-sm">Start exploring fresh rice from verified mills.</p>
+                        <h3 className="font-bold text-gray-900">{t("No orders yet")}</h3>
+                        <p className="text-gray-500 mb-6 text-sm">{t("Start exploring fresh rice from verified mills.")}</p>
                         <Link to="/search" className="btn-primary inline-flex items-center gap-2">
-                            Start Shopping <ChevronRight className="w-4 h-4" />
+                            {t("Start Shopping")} <ChevronRight className="w-4 h-4" />
                         </Link>
                     </div>
                 )}

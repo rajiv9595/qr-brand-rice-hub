@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Wheat, Users, ChefHat, BarChart3, ShieldCheck, Sparkles, MessageSquare, MapPin, ShoppingBag, BookOpen } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { riceService, marketService } from '../services';
 import RiceCard from '../components/RiceCard';
 import Logo from '../components/common/Logo';
@@ -60,6 +61,7 @@ const MOCK_KNOWLEDGE = [
 ];
 
 export default function HomePage() {
+    const { t } = useTranslation();
     const { setSelectedCategory } = useAppStore();
     const [featured, setFeatured] = useState([]);
     const [marketUpdates, setMarketUpdates] = useState([]);
@@ -116,23 +118,23 @@ export default function HomePage() {
                 </div>
                 <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-20 w-full text-center sm:text-left">
                     <div className="max-w-xl mx-auto sm:mx-0">
-                        <span className="badge-gold mb-6 inline-block uppercase tracking-widest text-[10px]">🌾 Trusted Rice Intelligence Platform</span>
+                        <span className="badge-gold mb-6 inline-block uppercase tracking-widest text-[10px]">🌾 {t("Trusted Rice Intelligence Platform")}</span>
                         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-white mb-4 flex flex-col gap-1 tracking-tight">
-                            <span>సరియైన బియ్యం</span>
-                            <span className="text-rice-300">సరైన ధర</span>
+                            <span>{t("Right Rice")}</span>
+                            <span className="text-rice-300">{t("Right Price")}</span>
                         </h1>
                         <p className="text-field-100 text-lg sm:text-xl font-body mb-8 leading-relaxed max-w-lg">
-                            Compare rice brands, read expert reviews, get cooking tips — all verified and transparent. Your trusted guide for rice selection.
+                            {t("Compare rice brands, read expert reviews, get cooking tips — all verified and transparent. Your trusted guide for rice selection.")}
                         </p>
                         <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4">
                             <Link to="/search" className="btn-primary flex items-center gap-2 px-8">
-                                Start Searching <ArrowRight className="w-5 h-5" />
+                                {t("Start Searching")} <ArrowRight className="w-5 h-5" />
                             </Link>
                             <a href="https://wa.me/91XXXXXXXXXX" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-white font-bold group">
                                 <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center shadow-lg shadow-green-500/20 group-hover:scale-110 transition-transform">
                                     <MessageSquare className="w-5 h-5 text-white" />
                                 </div>
-                                <span className="text-sm">Help on WhatsApp</span>
+                                <span className="text-sm">{t("Help on WhatsApp")}</span>
                             </a>
                         </div>
                     </div>
@@ -149,7 +151,7 @@ export default function HomePage() {
                             <div className="w-14 h-14 rounded-2xl bg-field-50 text-field-500 flex items-center justify-center group-hover:bg-field-500 group-hover:text-white transition-all duration-300">
                                 {CATEGORY_ICONS[cat]}
                             </div>
-                            <span className="text-sm font-semibold text-gray-700 group-hover:text-field-600 transition-colors">{USAGE_LABELS[cat]}</span>
+                            <span className="text-sm font-semibold text-gray-700 group-hover:text-field-600 transition-colors">{t(USAGE_LABELS[cat])}</span>
                         </div>
                     ))}
                 </div>
@@ -159,8 +161,8 @@ export default function HomePage() {
             <section className="bg-white py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-4 tracking-tight">How to use QR Brand's?</h2>
-                        <p className="text-gray-500 font-bold uppercase text-xs tracking-widest">Simple 3-Step Process for Everyone</p>
+                        <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-4 tracking-tight">{t("How to use QR Brand's?")}</h2>
+                        <p className="text-gray-500 font-bold uppercase text-xs tracking-widest">{t("Simple 3-Step Process for Everyone")}</p>
                     </div>
 
                     <div className="grid sm:grid-cols-3 gap-12 relative">
@@ -168,9 +170,9 @@ export default function HomePage() {
                         <div className="hidden sm:block absolute top-1/4 left-1/4 right-1/4 h-0.5 border-t-2 border-dashed border-gray-100 -z-10" />
 
                         {[
-                            { step: '1', title: 'Find Your Village', desc: 'Type your village name or Pincode to see what rice is available near you.', icon: <MapPin className="w-8 h-8" />, color: 'bg-blue-500' },
-                            { step: '2', title: 'Compare & Select', desc: 'Check prices and expert reviews to pick the best rice for your family.', icon: <BarChart3 className="w-8 h-8" />, color: 'bg-orange-500' },
-                            { step: '3', title: 'Order for Home', desc: 'Place your order in 30 seconds. We deliver directly to your village address.', icon: <ShoppingBag className="w-8 h-8" />, color: 'bg-primary-600' }
+                            { step: '1', title: t('Find Your Village'), desc: t('Type your village name or Pincode to see what rice is available near you.'), icon: <MapPin className="w-8 h-8" />, color: 'bg-blue-500' },
+                            { step: '2', title: t('Compare & Select'), desc: t('Check prices and expert reviews to pick the best rice for your family.'), icon: <BarChart3 className="w-8 h-8" />, color: 'bg-orange-500' },
+                            { step: '3', title: t('Order for Home'), desc: t('Place your order in 30 seconds. We deliver directly to your village address.'), icon: <ShoppingBag className="w-8 h-8" />, color: 'bg-primary-600' }
                         ].map((item, i) => (
                             <div key={i} className="flex flex-col items-center text-center group">
                                 <div className={`w-20 h-20 rounded-full ${item.color} text-white flex items-center justify-center mb-6 shadow-2xl shadow-gray-200 group-hover:scale-110 transition-transform relative`}>
@@ -186,9 +188,9 @@ export default function HomePage() {
                     <div className="mt-16 text-center">
                         <div className="inline-flex flex-col gap-4">
                             <Link to="/search" className="btn-primary px-10 py-5 rounded-2xl text-lg shadow-2xl shadow-primary-500/30">
-                                Start Searching Now
+                                {t("Start Searching Now")}
                             </Link>
-                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">No English knowledge needed — Just type your village name</p>
+                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t("No English knowledge needed — Just type your village name")}</p>
                         </div>
                     </div>
                 </div>
@@ -197,9 +199,9 @@ export default function HomePage() {
             {/* Featured Rice */}
             <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
                 <div className="flex items-center justify-between mb-8">
-                    <h2 className="section-title">Featured Rice</h2>
+                    <h2 className="section-title">{t("Featured Rice")}</h2>
                     <Link to="/search" className="text-field-500 hover:text-field-600 font-semibold text-sm flex items-center gap-1">
-                        View All <ArrowRight className="w-4 h-4" />
+                        {t("View All")} <ArrowRight className="w-4 h-4" />
                     </Link>
                 </div>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -215,11 +217,11 @@ export default function HomePage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6">
                     <div className="flex items-center justify-between mb-8">
                         <div>
-                            <h2 className="section-title !text-white">Market Intelligence</h2>
-                            <p className="text-field-200 mt-1 text-sm">Latest rice market updates and knowledge</p>
+                            <h2 className="section-title !text-white">{t("Market Intelligence")}</h2>
+                            <p className="text-field-200 mt-1 text-sm">{t("Latest rice market updates and knowledge")}</p>
                         </div>
                         <Link to="/market" className="text-rice-300 hover:text-rice-200 font-semibold text-sm flex items-center gap-1">
-                            All Updates <ArrowRight className="w-4 h-4" />
+                            {t("All Updates")} <ArrowRight className="w-4 h-4" />
                         </Link>
                     </div>
                     <div className="grid sm:grid-cols-3 gap-6">
@@ -261,12 +263,12 @@ export default function HomePage() {
                     <div className="flex justify-center mb-6">
                         <Logo iconOnly size="lg" />
                     </div>
-                    <h2 className="section-title mb-4">Are You a Rice Supplier?</h2>
+                    <h2 className="section-title mb-4">{t("Are You a Rice Supplier?")}</h2>
                     <p className="text-gray-600 max-w-xl mx-auto mb-6">
-                        List your rice brands on QR Brand's Rice Hub. Reach customers across Telugu states with verified, trusted listings.
+                        {t("List your rice brands on QR Brand's Rice Hub. Reach customers across Telugu states with verified, trusted listings.")}
                     </p>
                     <Link to="/login" className="btn-primary inline-flex items-center gap-2">
-                        Register as Supplier <ArrowRight className="w-5 h-5" />
+                        {t("Register as Supplier")} <ArrowRight className="w-5 h-5" />
                     </Link>
                 </div>
             </section>

@@ -7,8 +7,10 @@ import {
 import { authService } from '../../services/authService';
 import SupportWidget from '../common/SupportWidget';
 import Logo from '../common/Logo';
+import { useTranslation } from 'react-i18next';
 
 const BuyerLayout = () => {
+    const { t } = useTranslation();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isPinned, setIsPinned] = useState(() => {
         const saved = localStorage.getItem('buyerSidebarPinned');
@@ -25,11 +27,11 @@ const BuyerLayout = () => {
     };
 
     const navItems = [
-        { path: '/buyer', icon: LayoutDashboard, label: 'Overview', exact: true },
-        { path: '/buyer/orders', icon: ShoppingBag, label: 'My Orders' },
-        { path: '/buyer/negotiations', icon: MessageSquare, label: 'Negotiations' },
-        { path: '/buyer/profile', icon: User, label: 'Profile' },
-        { path: '/buyer/settings', icon: Settings, label: 'Settings' },
+        { path: '/buyer', icon: LayoutDashboard, label: t('Overview'), exact: true },
+        { path: '/buyer/orders', icon: ShoppingBag, label: t('My Orders') },
+        { path: '/buyer/negotiations', icon: MessageSquare, label: t('Negotiations') },
+        { path: '/buyer/profile', icon: User, label: t('Profile') },
+        { path: '/buyer/settings', icon: Settings, label: t('Settings') },
     ];
 
     const togglePin = () => {
@@ -68,8 +70,8 @@ const BuyerLayout = () => {
                             </span>
                         </div>
                         <div className={`transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
-                            <p className="font-bold text-sm truncate">{user?.name || 'Buyer'}</p>
-                            <p className="text-xs text-slate-500 uppercase tracking-wider font-bold">Customer</p>
+                            <p className="font-bold text-sm truncate">{user?.name || t('Buyer')}</p>
+                            <p className="text-xs text-slate-500 uppercase tracking-wider font-bold">{t('Customer')}</p>
                         </div>
                     </div>
                 </div>
@@ -108,26 +110,26 @@ const BuyerLayout = () => {
                 <div className="p-3 border-t border-slate-800 space-y-1">
                     <Link
                         to="/search"
-                        title={!isExpanded ? 'Browse Market' : ''}
+                        title={!isExpanded ? t('Browse Market') : ''}
                         className="flex items-center gap-3 px-3 py-3 rounded-xl font-bold text-primary-400 hover:bg-slate-800 transition-all group"
                     >
                         <div className="min-w-[24px] flex justify-center">
                             <Search className="w-5 h-5" />
                         </div>
                         <span className={`transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0 w-0 h-0 overflow-hidden'}`}>
-                            Browse Market
+                            {t('Browse Market')}
                         </span>
                     </Link>
                     <button
                         onClick={handleLogout}
-                        title={!isExpanded ? 'Logout' : ''}
+                        title={!isExpanded ? t('Logout') : ''}
                         className="flex items-center gap-3 px-3 py-3 rounded-xl font-medium text-red-400 hover:bg-red-400/10 transition-all w-full group"
                     >
                         <div className="min-w-[24px] flex justify-center">
                             <LogOut className="w-5 h-5" />
                         </div>
                         <span className={`transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0 w-0 h-0 overflow-hidden'}`}>
-                            Logout
+                            {t('Logout')}
                         </span>
                     </button>
 
@@ -154,7 +156,7 @@ const BuyerLayout = () => {
                     <button onClick={() => setSidebarOpen(true)} className="p-2 text-gray-600">
                         <Menu className="w-6 h-6" />
                     </button>
-                    <span className="font-bold text-gray-900">My Account</span>
+                    <span className="font-bold text-gray-900">{t("My Account")}</span>
                     <button onClick={handleLogout} className="p-2 text-gray-400">
                         <LogOut className="w-5 h-5" />
                     </button>
