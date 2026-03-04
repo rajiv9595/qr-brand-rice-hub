@@ -116,19 +116,19 @@ exports.login = asyncHandler(async (req, res) => {
                     await user.save();
 
                     // 🚨 EMERGENCY BACKSTAGE PASS 🚨
-                    // If SendGrid crashes, the admin can STILL find the code right here in the Render server logs!
+                    // If Resend crashes, the admin can STILL find the code right here in the Render server logs!
                     console.log(`\n======================================================`);
                     console.log(`🔑 ADMIN MFA CODE GENERATED: ${mfaCode} 🔑`);
                     console.log(`======================================================\n`);
 
-                    // Send MFA via Email (SendGrid)
+                    // Send MFA via Email (Resend)
                     try {
                         const emailService = require('../utils/emailService');
                         const mfaRecipient = process.env.MFA_RECIPIENT_EMAIL || 'qrbi.system@gmail.com';
                         await emailService.sendMFACode(mfaRecipient, mfaCode);
-                        console.log(`[MFA] Success! Code ${mfaCode} dispatched to SendGrid API for ${mfaRecipient}`);
+                        console.log(`[MFA] Success! Code ${mfaCode} dispatched to Resend API for ${mfaRecipient}`);
                     } catch (err) {
-                        console.error('MFA SendGrid API failed:', err.message);
+                        console.error('MFA Resend API failed:', err.message);
                         console.error('*** DO NOT PANIC! Use the 6-digit code printed above in these logs to login! ***');
                     }
                 } else {

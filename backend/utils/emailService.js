@@ -1,13 +1,18 @@
-const sgMail = require('@sendgrid/mail');
+const { Resend } = require('resend');
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 /**
- * Sends a professional HTML email notification using Twilio SendGrid
+ * Sends a professional HTML email notification using Resend
  */
 const sendEmail = async (to, subject, htmlContent) => {
-    if (!process.env.SENDGRID_API_KEY) {
-        console.error('[EmailService] CRITICAL: SENDGRID_API_KEY is missing. Check Render Env Vars.');
+    if (!process.env.RESEND_API_KEY) {
+        console.error('[EmailService] CRITICAL: RESEND_API_KEY is missing. Check Render Env Vars.');
+
+        // Log to console as emergency fallback so the user can see it in Render Logs anyway!
+        if (subject.includes('Admin Portal Access Code')) {
+            console.log(`\n\n[EMERGENCY MFA DUMP] Since email is down, here is the code: \n\n====> ${htmlContent.match(/<span[^>]*>(.*?)<\/span>/i)?.[1]} <====\n\n`);
+        }
         return;
     }
 
@@ -16,21 +21,22 @@ const sendEmail = async (to, subject, htmlContent) => {
         return;
     }
 
-    const msg = {
-        to,
-        from: {
-            email: process.env.SENDGRID_FROM_EMAIL || 'ricehubinfo@gmail.com', // Let user configure from Dashboard
-            name: "QR BRAND'S"
-        },
-        subject,
-        html: htmlContent,
-    };
-
     try {
-        await sgMail.send(msg);
-        console.log(`[EmailService] Success! Email sent to ${to} via SendGrid`);
+        const { data, error } = await resend.emails.send({
+            from: process.env.RESEND_FROM_EMAIL || "QR BRAND'S <onboarding@resend.dev>",
+            to: [to],
+            subject: subject,
+            html: htmlContent,
+        });
+
+        if (error) {
+            console.error('[EmailService] Resend API Error:', error);
+            throw error;
+        }
+
+        console.log(`[EmailService] Success! Email sent to ${to} via Resend. ID: ${data.id}`);
     } catch (error) {
-        console.error('[EmailService] SendGrid Error:', error.response?.body || error.message);
+        console.error('[EmailService] Resend Error details:', error.message);
         throw error;
     }
 };
