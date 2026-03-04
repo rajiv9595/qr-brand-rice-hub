@@ -73,6 +73,19 @@ const userSchema = new mongoose.Schema(
         mfaExpires: {
             type: Date,
         },
+        hashedOtp: {
+            type: String,
+        },
+        otpExpires: {
+            type: Date,
+        },
+        otpAttempts: {
+            type: Number,
+            default: 0
+        },
+        otpLockUntil: {
+            type: Date
+        },
         resetPasswordToken: String,
         resetPasswordExpire: Date,
     },

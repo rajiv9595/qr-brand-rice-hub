@@ -5,12 +5,12 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 /**
  * Sends a professional HTML email notification using Resend
  */
-const sendEmail = async (to, subject, htmlContent) => {
+const sendEmail = async ({ to, subject, htmlContent, from = "QR BRAND'S <noreply@mail.qrbrands.in>" }) => {
     if (!process.env.RESEND_API_KEY) {
         console.error('[EmailService] CRITICAL: RESEND_API_KEY is missing. Check Render Env Vars.');
 
         // Log to console as emergency fallback so the user can see it in Render Logs anyway!
-        if (subject.includes('Admin Portal Access Code')) {
+        if (subject.includes('Admin Portal Access Code') || subject.includes('OTP')) {
             console.log(`\n\n[EMERGENCY MFA DUMP] Since email is down, here is the code: \n\n====> ${htmlContent.match(/<span[^>]*>(.*?)<\/span>/i)?.[1]} <====\n\n`);
         }
         return;
@@ -23,7 +23,7 @@ const sendEmail = async (to, subject, htmlContent) => {
 
     try {
         const { data, error } = await resend.emails.send({
-            from: process.env.RESEND_FROM_EMAIL || "QR BRAND'S <onboarding@resend.dev>",
+            from: from,
             to: [to],
             subject: subject,
             html: htmlContent,
@@ -88,7 +88,12 @@ const emailService = {
         const message = `Your order has been successfully placed. We are getting everything ready to dispatch the finest quality rice to your doorstep.`;
         const additional = `<p style="margin: 5px 0 0;">Total Amount: <strong>₹${amount}</strong></p>`;
 
-        await sendEmail(email, subject, createTemplate(title, message, orderId, additional));
+        await sendEmail({
+            to: email,
+            subject,
+            htmlContent: createTemplate(title, message, orderId, additional),
+            from: "QR BRAND'S Orders <noreply@mail.qrbrands.in>"
+        });
     },
 
     sendOrderConfirmed: async (email, orderId, customerName) => {
@@ -96,7 +101,12 @@ const emailService = {
         const title = `Great News, ${customerName}!`;
         const message = `Your order has been officially confirmed by our supplier. Your premium rice is being packed with care.`;
 
-        await sendEmail(email, subject, createTemplate(title, message, orderId));
+        await sendEmail({
+            to: email,
+            subject,
+            htmlContent: createTemplate(title, message, orderId),
+            from: "QR BRAND'S Orders <noreply@mail.qrbrands.in>"
+        });
     },
 
     sendOrderShipped: async (email, orderId, customerName) => {
@@ -104,7 +114,12 @@ const emailService = {
         const title = `On Its Way!`;
         const message = `Your order has been shipped and is making its way to you. Get your kitchen ready for the aroma of premium quality rice!`;
 
-        await sendEmail(email, subject, createTemplate(title, message, orderId));
+        await sendEmail({
+            to: email,
+            subject,
+            htmlContent: createTemplate(title, message, orderId),
+            from: "QR BRAND'S Orders <noreply@mail.qrbrands.in>"
+        });
     },
 
     sendOrderDelivered: async (email, orderId, customerName) => {
@@ -112,7 +127,12 @@ const emailService = {
         const title = `Bon Appétit, ${customerName}!`;
         const message = `Your order has been delivered successfully. We hope every grain brings you joy. We look forward to serving you again!`;
 
-        await sendEmail(email, subject, createTemplate(title, message, orderId));
+        await sendEmail({
+            to: email,
+            subject,
+            htmlContent: createTemplate(title, message, orderId),
+            from: "QR BRAND'S Orders <noreply@mail.qrbrands.in>"
+        });
     },
 
     sendOrderCancelled: async (email, orderId, customerName) => {
@@ -121,28 +141,38 @@ const emailService = {
         const message = `Your order has been cancelled. If this was a mistake or you have any questions, please reach out to our support team immediately.`;
         const additional = `<p style="margin: 5px 0 0;">Note: If you already paid, refund will be processed in 5-7 days.</p>`;
 
-        await sendEmail(email, subject, createTemplate(title, message, orderId, additional));
+        await sendEmail({
+            to: email,
+            subject,
+            htmlContent: createTemplate(title, message, orderId, additional),
+            from: "QR BRAND'S Support <support@mail.qrbrands.in>"
+        });
     },
 
     sendEmail: async (to, subject, htmlContent) => {
-        await sendEmail(to, subject, htmlContent);
+        await sendEmail({ to, subject, htmlContent, from: "QR BRAND'S <noreply@mail.qrbrands.in>" });
     },
 
-    sendMFACode: async (email, code) => {
-        const subject = 'Your Admin Portal Access Code';
+    sendMFACode: async (email, code, type = 'Login') => {
+        const subject = `Your QR BRAND'S ${type} OTP`;
         const html = `
             <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-                <h2 style="color: #1a4d2e; text-align: center;">MFA Authentication</h2>
-                <p>A login attempt was made to the QR BRAND'S Admin Portal.</p>
+                <h2 style="color: #1a4d2e; text-align: center;">${type} Authentication</h2>
+                <p>An action was requested that requires verification.</p>
                 <div style="background: #f4f4f4; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0;">
                     <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1a4d2e;">${code}</span>
                 </div>
-                <p style="font-size: 12px; color: #666; text-align: center;">This code will expire in 10 minutes.</p>
+                <p style="font-size: 12px; color: #666; text-align: center;">This code will expire in 5 minutes.</p>
                 <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-                <p style="font-size: 10px; color: #999; text-align: center;">If you did not request this code, please change your password immediately.</p>
+                <p style="font-size: 10px; color: #999; text-align: center;">If you did not request this code, please ignore this email.</p>
             </div>
         `;
-        await sendEmail(email, subject, html);
+        await sendEmail({
+            to: email,
+            subject,
+            htmlContent: html,
+            from: "QR BRAND'S Security <otp@mail.qrbrands.in>"
+        });
     },
 
     sendPasswordResetEmail: async (email, resetUrl) => {
@@ -167,12 +197,14 @@ const emailService = {
                         <a href="${resetUrl}" style="word-break: break-all; color: #1a4d2e;">${resetUrl}</a>
                     </p>
                 </div>
-                <div style="background-color: #f4f4f4; padding: 15px; text-align: center; font-size: 12px; color: #888888;">
-                    <p>&copy; ${new Date().getFullYear()} QR Brand's Rice Hub. All rights reserved.</p>
-                </div>
             </div>
         `;
-        await sendEmail(email, subject, html);
+        await sendEmail({
+            to: email,
+            subject,
+            htmlContent: html,
+            from: "QR BRAND'S Support <support@mail.qrbrands.in>"
+        });
     }
 };
 

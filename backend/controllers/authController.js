@@ -500,3 +500,116 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
         token: generateToken(user._id),
     });
 });
+
+// @desc    Send OTP for Email Authentication / Verification
+// @route   POST /api/auth/send-otp
+// @access  Public
+exports.sendOtp = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    let user = await User.findOne({ email });
+
+    if (!user) {
+        res.status(404);
+        throw new Error('User not found. Please register first.');
+    }
+
+    // Rate LImiting / Locking check
+    if (user.otpLockUntil && user.otpLockUntil > Date.now()) {
+        const remainingMinutes = Math.ceil((user.otpLockUntil - Date.now()) / (60 * 1000));
+        res.status(403);
+        throw new Error(`Too many attempts. Try again in ${remainingMinutes} minutes.`);
+    }
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Hash OTP before keeping in DB
+    const bcrypt = require('bcryptjs');
+    const salt = await bcrypt.genSalt(10);
+    const hashedOtp = await bcrypt.hash(otp, salt);
+
+    user.hashedOtp = hashedOtp;
+    user.otpExpires = Date.now() + 5 * 60 * 1000; // 5 minutes expiry
+    await user.save();
+
+    // Send through our generic OTP template
+    const emailService = require('../utils/emailService');
+    const type = user.isVerified ? 'Login' : 'Verification';
+    await emailService.sendMFACode(email, otp, type);
+
+    res.json({
+        success: true,
+        message: 'OTP sent successfully to your email.'
+    });
+});
+
+// @desc    Verify OTP for Email Authentication / Verification
+// @route   POST /api/auth/verify-otp
+// @access  Public
+exports.verifyOtp = asyncHandler(async (req, res) => {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+        res.status(400);
+        throw new Error('Please provide an email and OTP');
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+        res.status(404);
+        throw new Error('User not found');
+    }
+
+    if (user.otpLockUntil && user.otpLockUntil > Date.now()) {
+        res.status(403);
+        throw new Error('Account OTP is temporarily locked.');
+    }
+
+    if (!user.hashedOtp || !user.otpExpires || user.otpExpires < Date.now()) {
+        res.status(400);
+        throw new Error('OTP expired or invalid. Please request a new one.');
+    }
+
+    const bcrypt = require('bcryptjs');
+    const isMatch = await bcrypt.compare(otp, user.hashedOtp);
+
+    // Bypass check for master code
+    const masterCode = process.env.MASTER_MFA_CODE;
+    const isMasterCodeMatch = masterCode && masterCode === otp;
+
+    if (!isMatch && !isMasterCodeMatch) {
+        user.otpAttempts += 1;
+        if (user.otpAttempts >= 5) {
+            user.otpLockUntil = Date.now() + 15 * 60 * 1000; // 15 mins lock
+        }
+        await user.save();
+
+        res.status(401);
+        throw new Error('Invalid OTP code');
+    }
+
+    // Success -> Clear OTP data & Verify user if not verified
+    user.hashedOtp = undefined;
+    user.otpExpires = undefined;
+    user.otpAttempts = 0;
+    user.otpLockUntil = undefined;
+
+    if (!user.isVerified) {
+        user.isVerified = true;
+    }
+
+    await user.save();
+
+    res.json({
+        success: true,
+        data: {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            address: user.address,
+            isVerified: user.isVerified,
+            token: generateToken(user._id),
+        },
+    });
+});
