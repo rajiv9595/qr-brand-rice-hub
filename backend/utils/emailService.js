@@ -1,13 +1,24 @@
-const sgMail = require('@sendgrid/mail');
+const nodemailer = require('nodemailer');
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
 
 /**
- * Sends a professional HTML email notification using Twilio SendGrid
+ * Sends a professional HTML email notification using Nodemailer (Gmail SMTP)
  */
 const sendEmail = async (to, subject, htmlContent) => {
-    if (!process.env.SENDGRID_API_KEY) {
-        console.error('[EmailService] CRITICAL: SENDGRID_API_KEY is missing. Check Render Env Vars.');
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        console.error('[EmailService] CRITICAL: EMAIL_USER or EMAIL_PASS is missing. Check Render Env Vars.');
+
+        // Log to console as emergency fallback so the user can see it in Render Logs anyway!
+        if (subject.includes('Admin Portal Access Code')) {
+            console.log(`\n\n[EMERGENCY MFA DUMP] Since email is down, here is the code: \n\n====> ${htmlContent.match(/<span[^>]*>(.*?)<\/span>/i)?.[1]} <====\n\n`);
+        }
         return;
     }
 
@@ -16,21 +27,18 @@ const sendEmail = async (to, subject, htmlContent) => {
         return;
     }
 
-    const msg = {
+    const mailOptions = {
+        from: `"QR BRAND'S" <${process.env.EMAIL_USER}>`,
         to,
-        from: {
-            email: process.env.SENDGRID_FROM_EMAIL || 'ricehubinfo@gmail.com', // Let user configure from Dashboard
-            name: "QR BRAND'S"
-        },
         subject,
         html: htmlContent,
     };
 
     try {
-        await sgMail.send(msg);
-        console.log(`[EmailService] Success! Email sent to ${to} via SendGrid`);
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`[EmailService] Success! Email sent to ${to} via Gmail. ID: ${info.messageId}`);
     } catch (error) {
-        console.error('[EmailService] SendGrid Error:', error.response?.body || error.message);
+        console.error('[EmailService] Gmail Error:', error.message);
         throw error;
     }
 };
