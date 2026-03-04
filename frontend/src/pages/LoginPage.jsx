@@ -6,8 +6,10 @@ import { Capacitor } from '@capacitor/core';
 import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import { authService } from '../services/authService';
 import Logo from '../components/common/Logo';
+import { useTranslation } from 'react-i18next';
 
 const LoginPage = () => {
+    const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const [isLogin, setIsLogin] = useState(true);
     const [loading, setLoading] = useState(false);
@@ -125,10 +127,24 @@ const LoginPage = () => {
         <div className="min-h-screen bg-rice-50 flex flex-col items-center pt-8 sm:pt-12 px-4 font-body">
 
             {/* Logo Header */}
-            <div className="text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <Link to="/" className="inline-block transform hover:scale-105 transition-transform">
-                    <Logo size="lg" className="transition-transform" />
-                </Link>
+            <div className="text-center mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 relative w-full max-w-[480px]">
+                <div className="flex justify-between items-center w-full relative">
+                    <div className="w-24"></div> {/* spacer */}
+                    <Link to="/" className="inline-block transform hover:scale-105 transition-transform">
+                        <Logo size="lg" className="transition-transform" />
+                    </Link>
+                    <div className="w-24 flex justify-end">
+                        <select
+                            onChange={(e) => i18n.changeLanguage(e.target.value)}
+                            value={i18n.language}
+                            className="text-xs bg-white border border-gray-200 text-gray-700 py-1.5 px-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-field-500 font-bold"
+                        >
+                            <option value="en">English</option>
+                            <option value="te">తెలుగు (Telugu)</option>
+                            <option value="hi">हिंदी (Hindi)</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
             {/* Auth Container */}
@@ -143,7 +159,7 @@ const LoginPage = () => {
                             : 'text-gray-400 hover:text-field-600'
                             }`}
                     >
-                        <LogIn className="w-4 h-4" /> Login
+                        <LogIn className="w-4 h-4" /> {t('Login')}
                     </button>
                     <button
                         onClick={() => { setIsLogin(false); setError(''); }}
@@ -152,7 +168,7 @@ const LoginPage = () => {
                             : 'text-gray-400 hover:text-field-600'
                             }`}
                     >
-                        <UserPlus className="w-4 h-4" /> Register
+                        <UserPlus className="w-4 h-4" /> {t('Register')}
                     </button>
                 </div>
 
@@ -160,7 +176,7 @@ const LoginPage = () => {
                 <div className="bg-white rounded-3xl shadow-xl shadow-rice-200/50 p-6 sm:p-8 border border-white">
                     <div className="mb-5">
                         <h2 className="font-display font-bold text-xl text-field-900 mb-1">
-                            {isLogin ? 'Welcome Back' : 'Create Account'}
+                            {isLogin ? t('Welcome Back') : t('Create Account')}
                         </h2>
                         {error && (
                             <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-600 flex items-start gap-2">
@@ -174,7 +190,7 @@ const LoginPage = () => {
                         {!isLogin && (
                             <>
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">I am a</label>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">{t('I am a')}</label>
                                     <div className="grid grid-cols-3 gap-2">
                                         {['customer', 'supplier', 'expert'].map((role) => (
                                             <button
@@ -186,14 +202,14 @@ const LoginPage = () => {
                                                     : 'bg-gray-50 text-gray-500 border-gray-100 hover:bg-white hover:border-gray-300'
                                                     }`}
                                             >
-                                                {role}
+                                                {t(role)}
                                             </button>
                                         ))}
                                     </div>
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Full Name</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">{t('Full Name')}</label>
                                     <div className="relative">
                                         <User className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
                                         <input
@@ -202,7 +218,7 @@ const LoginPage = () => {
                                             value={formData.name}
                                             onChange={handleChange}
                                             className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-field-500/20 focus:border-field-500 transition-all outline-none text-gray-800 placeholder:text-gray-400 text-sm"
-                                            placeholder="Your full name"
+                                            placeholder={t('Your full name')}
                                             required
                                         />
                                     </div>
@@ -211,7 +227,7 @@ const LoginPage = () => {
                         )}
 
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Email</label>
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">{t('Email')}</label>
                             <div className="relative">
                                 <Mail className="absolute left-4 top-3 w-5 h-5 text-gray-400" />
                                 <input
@@ -228,7 +244,7 @@ const LoginPage = () => {
 
                         {!isLogin && (
                             <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Phone</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">{t('Phone')}</label>
                                 <div className="relative">
                                     <Phone className="absolute left-4 top-3 w-5 h-5 text-gray-400" />
                                     <input
@@ -244,7 +260,7 @@ const LoginPage = () => {
                         )}
 
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Password</label>
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">{t('Password')}</label>
                             <div className="relative">
                                 <Lock className="absolute left-4 top-3 w-5 h-5 text-gray-400" />
                                 <input
@@ -253,7 +269,7 @@ const LoginPage = () => {
                                     value={formData.password}
                                     onChange={handleChange}
                                     className="w-full pl-11 pr-12 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-field-500/20 focus:border-field-500 transition-all outline-none text-gray-800 placeholder:text-gray-400 text-sm"
-                                    placeholder={isLogin ? "Enter your password" : "Create a password"}
+                                    placeholder={isLogin ? t('Enter your password') : t('Create a password')}
                                     required
                                 />
                                 <button
@@ -270,9 +286,9 @@ const LoginPage = () => {
                             <div className="flex items-center justify-between text-sm">
                                 <label className="flex items-center gap-2 cursor-pointer text-gray-600 hover:text-gray-900">
                                     <input type="checkbox" className="rounded border-gray-300 text-field-600 focus:ring-field-500" />
-                                    Remember me
+                                    {t('Remember me')}
                                 </label>
-                                <Link to="/forgotpassword" className="font-bold text-field-600 hover:text-field-700">Forgot password?</Link>
+                                <Link to="/forgotpassword" className="font-bold text-field-600 hover:text-field-700">{t('Forgot password?')}</Link>
                             </div>
                         )}
 
@@ -282,17 +298,17 @@ const LoginPage = () => {
                             disabled={loading}
                         >
                             {loading ? (
-                                'Processing...'
+                                t('Processing...')
                             ) : (
                                 <>
-                                    {isLogin ? 'Sign In' : 'Create Account'} <ArrowRight className="w-4 h-4" />
+                                    {isLogin ? t('Sign In') : t('Create Account')} <ArrowRight className="w-4 h-4" />
                                 </>
                             )}
                         </button>
 
                         <div className="flex items-center justify-between text-xs text-gray-400 pt-3 pb-1">
                             <span className="w-[30%] border-b border-gray-200"></span>
-                            <span className="flex-1 text-center font-bold tracking-widest uppercase">Or Continue With</span>
+                            <span className="flex-1 text-center font-bold tracking-widest uppercase">{t('Or Continue With')}</span>
                             <span className="w-[30%] border-b border-gray-200"></span>
                         </div>
 
@@ -313,7 +329,7 @@ const LoginPage = () => {
                                             <path fill="none" d="M0 0h48v48H0z" />
                                         </svg>
                                         <span className="text-gray-700 font-medium font-body text-[14px]">
-                                            {isLogin ? 'Sign in with Google' : 'Sign up with Google'}
+                                            {isLogin ? t('Sign in with Google') : t('Sign up with Google')}
                                         </span>
                                     </button>
                                 ) : (
@@ -331,7 +347,7 @@ const LoginPage = () => {
                         </div>
 
                         <p className="text-xs text-center text-gray-400 mt-6">
-                            By continuing, you agree to our <a href="#" className="underline hover:text-field-600">Terms of Service</a> and <a href="#" className="underline hover:text-field-600">Privacy Policy</a>.
+                            {t('By continuing, you agree to our')} <a href="#" className="underline hover:text-field-600">{t('Terms of Service')}</a> and <a href="#" className="underline hover:text-field-600">{t('Privacy Policy')}</a>.
                         </p>
                     </form>
                 </div>
@@ -339,7 +355,7 @@ const LoginPage = () => {
 
             <div className="mt-6 mb-4">
                 <Link to="/" className="text-sm font-semibold text-gray-500 hover:text-field-600 transition-colors flex items-center gap-2">
-                    ← Back to Home
+                    ← {t('Back to Home')}
                 </Link>
             </div>
         </div>

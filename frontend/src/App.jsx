@@ -11,6 +11,8 @@ import SupportWidget from './components/common/SupportWidget';
 import Logo from './components/common/Logo';
 import MobileBottomNav from './components/common/MobileBottomNav';
 import { StatusBar } from '@capacitor/status-bar';
+import { useTranslation } from 'react-i18next';
+import { Globe } from 'lucide-react';
 
 try {
   StatusBar.setOverlaysWebView({ overlay: false });
@@ -95,6 +97,7 @@ const Layout = ({ children }) => {
   const user = authService.getCurrentUser();
   const { compareIds, clearCompare } = useAppStore();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { t, i18n } = useTranslation();
 
   const handleLogout = () => {
     const isAdmin = authService.getCurrentUser()?.role === 'admin';
@@ -129,7 +132,7 @@ const Layout = ({ children }) => {
                       ${active ? 'bg-field-500 text-white shadow-md' : 'text-gray-600 hover:bg-field-50 hover:text-field-600'}`}
                   >
                     <Icon className="w-4 h-4" />
-                    {label}
+                    {t(label)}
                     {to === '/compare' && compareIds.length > 0 && (
                       <span className="ml-1 bg-rice-400 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{compareIds.length}</span>
                     )}
@@ -140,24 +143,60 @@ const Layout = ({ children }) => {
 
             {/* Right Actions */}
             <div className="flex items-center gap-3">
+              {(!user || user.role !== 'admin') && (
+                <div className="hidden sm:flex items-center mr-2 bg-gray-50/80 backdrop-blur-sm p-1 rounded-xl border border-gray-200/60 shadow-inner">
+                  <div className="flex items-center px-2 border-r border-gray-200 mr-1 text-gray-400">
+                    <Globe className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => i18n.changeLanguage('en')}
+                      className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all duration-200 ${i18n.language === 'en' || !i18n.language.match(/^(te|hi)$/)
+                        ? 'bg-white text-field-700 shadow-sm ring-1 ring-gray-900/5'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                        }`}
+                    >
+                      EN
+                    </button>
+                    <button
+                      onClick={() => i18n.changeLanguage('te')}
+                      className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all duration-200 ${i18n.language === 'te'
+                        ? 'bg-white text-field-700 shadow-sm ring-1 ring-gray-900/5'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                        }`}
+                    >
+                      TE
+                    </button>
+                    <button
+                      onClick={() => i18n.changeLanguage('hi')}
+                      className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all duration-200 ${i18n.language === 'hi'
+                        ? 'bg-white text-field-700 shadow-sm ring-1 ring-gray-900/5'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                        }`}
+                    >
+                      HI
+                    </button>
+                  </div>
+                </div>
+              )}
               {user ? (
                 <div className="flex items-center gap-3 text-sm font-medium">
                   {user.role === 'customer' && (
                     <Link to="/buyer" className="hidden sm:flex items-center gap-2 px-4 py-2 bg-field-100 text-field-700 rounded-xl hover:bg-field-200 transition-all border border-field-200/50 shadow-sm font-bold">
                       <LayoutDashboard className="w-4 h-4" />
-                      My Dashboard
+                      {t('My Dashboard')}
                     </Link>
                   )}
                   {user.role === 'supplier' && (
                     <Link to="/supplier" className="hidden sm:flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-700 rounded-xl hover:bg-orange-200 transition-all border border-orange-200/50 shadow-sm font-bold">
                       <BarChart2 className="w-4 h-4" />
-                      Supplier Panel
+                      {t('Supplier Panel')}
                     </Link>
                   )}
                   {user.role === 'admin' && (
                     <Link to="/admin" className="hidden sm:flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-xl hover:bg-indigo-200 transition-all border border-indigo-200/50 shadow-sm font-bold">
                       <Shield className="w-4 h-4" />
-                      Admin Panel
+                      {t('Admin Panel')}
                     </Link>
                   )}
                   <div className="flex items-center gap-2 bg-field-50 pl-3 pr-1 py-1 rounded-full border border-field-100">
@@ -169,7 +208,7 @@ const Layout = ({ children }) => {
                 </div>
               ) : (
                 <Link to="/login" className="hidden sm:flex items-center gap-1.5 btn-primary text-sm !px-4 !py-2">
-                  <LogIn className="w-4 h-4" /> Login
+                  <LogIn className="w-4 h-4" /> {t('Login')}
                 </Link>
               )}
 
@@ -183,6 +222,41 @@ const Layout = ({ children }) => {
         {/* Mobile Nav */}
         {mobileOpen && (
           <div className="lg:hidden border-t border-rice-100 bg-white pb-4 px-4 shadow-xl">
+            <div className="py-3 px-2 border-b border-rice-100 mb-2 flex justify-between items-center">
+              <span className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-1.5">
+                <Globe className="w-3.5 h-3.5" /> Language
+              </span>
+              <div className="flex gap-2 bg-gray-50 p-1 rounded-xl border border-gray-100">
+                <button
+                  onClick={() => i18n.changeLanguage('en')}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all duration-200 ${i18n.language === 'en' || !i18n.language.match(/^(te|hi)$/)
+                    ? 'bg-white text-field-700 shadow-sm border border-gray-200/50'
+                    : 'text-gray-500'
+                    }`}
+                >
+                  EN
+                </button>
+                <button
+                  onClick={() => i18n.changeLanguage('te')}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all duration-200 ${i18n.language === 'te'
+                    ? 'bg-white text-field-700 shadow-sm border border-gray-200/50'
+                    : 'text-gray-500'
+                    }`}
+                >
+                  TE
+                </button>
+                <button
+                  onClick={() => i18n.changeLanguage('hi')}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all duration-200 ${i18n.language === 'hi'
+                    ? 'bg-white text-field-700 shadow-sm border border-gray-200/50'
+                    : 'text-gray-500'
+                    }`}
+                >
+                  HI
+                </button>
+              </div>
+            </div>
+
             <nav className="flex flex-col gap-1 pt-2">
               {NAV_ITEMS.map(({ to, label, icon: Icon }) => {
                 const active = location.pathname === to;
@@ -195,7 +269,7 @@ const Layout = ({ children }) => {
                       ${active ? 'bg-field-500 text-white' : 'text-gray-600 hover:bg-field-50'}`}
                   >
                     <Icon className="w-5 h-5" />
-                    {label}
+                    {t(label)}
                     {to === '/compare' && compareIds.length > 0 && (
                       <span className="ml-auto bg-rice-400 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{compareIds.length}</span>
                     )}
@@ -209,19 +283,19 @@ const Layout = ({ children }) => {
                   {user.role === 'customer' && (
                     <Link to="/buyer" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-field-700 bg-field-50 mb-1">
                       <LayoutDashboard className="w-5 h-5" />
-                      My Dashboard
+                      {t('My Dashboard')}
                     </Link>
                   )}
                   {user.role === 'supplier' && (
                     <Link to="/supplier" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-orange-700 bg-orange-50 mb-1">
                       <BarChart2 className="w-5 h-5" />
-                      Supplier Panel
+                      {t('Supplier Panel')}
                     </Link>
                   )}
                   {user.role === 'admin' && (
                     <Link to="/admin" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-indigo-700 bg-indigo-50 mb-1">
                       <Shield className="w-5 h-5" />
-                      Admin Panel
+                      {t('Admin Panel')}
                     </Link>
                   )}
                 </div>
@@ -229,12 +303,12 @@ const Layout = ({ children }) => {
 
               {!user && (
                 <Link to="/login" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-field-600 bg-field-50 mt-1">
-                  <LogIn className="w-5 h-5" /> Login / Register
+                  <LogIn className="w-5 h-5" /> {t('Login')} / {t('Register')}
                 </Link>
               )}
               {user && (
                 <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 w-full text-left">
-                  <LogOut className="w-5 h-5" /> Logout
+                  <LogOut className="w-5 h-5" /> {t('Logout')}
                 </button>
               )}
             </nav>
@@ -264,20 +338,20 @@ const Layout = ({ children }) => {
           </div>
           <div className="h-6 w-px bg-gray-100" />
           <p className="text-xs font-black uppercase tracking-widest text-gray-900 whitespace-nowrap">
-            {compareIds.length} <span className="text-primary-600">Selected</span>
+            {compareIds.length} <span className="text-primary-600">{t('Selected')}</span>
           </p>
           <div className="flex items-center gap-2">
             <button
               onClick={clearCompare}
               className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-red-500 px-2 transition-colors"
             >
-              Clear
+              {t('Clear')}
             </button>
             <Link
               to={`/compare?ids=${compareIds.join(',')}`}
               className="bg-primary-600 hover:bg-primary-700 text-white text-[10px] font-black uppercase tracking-[0.15em] px-6 py-2.5 rounded-full transition-all shadow-lg shadow-primary-200 flex items-center gap-2 group"
             >
-              Analysis <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+              {t('Analysis')} <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>
