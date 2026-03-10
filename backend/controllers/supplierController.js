@@ -25,6 +25,8 @@ exports.upsertProfile = asyncHandler(async (req, res) => {
             branchName: Joi.string().allow('', null),
         }).allow(null),
         upiId: Joi.string().allow('', null),
+        lat: Joi.number().min(-90).max(90).allow(null),
+        lng: Joi.number().min(-180).max(180).allow(null)
     });
 
     const { error } = schema.validate(req.body);
@@ -37,6 +39,16 @@ exports.upsertProfile = asyncHandler(async (req, res) => {
         userId: req.user._id,
         ...req.body,
     };
+
+    // Make sure we correctly map lat and lng to location GeoJSON
+    if (req.body.lat !== undefined && req.body.lng !== undefined && req.body.lat !== null && req.body.lng !== null) {
+        profileFields.location = {
+            type: 'Point',
+            coordinates: [Number(req.body.lng), Number(req.body.lat)]
+        };
+    }
+    delete profileFields.lat;
+    delete profileFields.lng;
 
     if (req.body.gstRegistrationYears !== undefined) {
         const years = Number(req.body.gstRegistrationYears);

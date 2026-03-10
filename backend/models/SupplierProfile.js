@@ -67,6 +67,17 @@ const supplierProfileSchema = new mongoose.Schema(
             totalSuccessfulOrders: { type: Number, default: 0 },
             averageRating: { type: Number, default: 0 },
             totalReviews: { type: Number, default: 0 }
+        },
+        location: {
+            type: {
+                type: String,
+                enum: ['Point'],
+                default: 'Point'
+            },
+            coordinates: {
+                type: [Number],
+                default: [0, 0] // [longitude, latitude]
+            }
         }
     },
     {
@@ -75,5 +86,8 @@ const supplierProfileSchema = new mongoose.Schema(
         toObject: { getters: true }
     }
 );
+
+// Geospatial index for 50km radius search
+supplierProfileSchema.index({ location: '2dsphere' });
 
 module.exports = mongoose.model('SupplierProfile', supplierProfileSchema);

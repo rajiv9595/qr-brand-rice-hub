@@ -176,6 +176,8 @@ exports.searchListings = asyncHandler(async (req, res) => {
         district,
         state,
         sortBy,
+        lat,
+        lng,
         page = 1,
         limit = 20,
     } = req.query;
@@ -196,10 +198,22 @@ exports.searchListings = asyncHandler(async (req, res) => {
         if (maxPrice) query.pricePerBag.$lte = Number(maxPrice);
     }
 
-    if (district || state) {
+    if (district || state || (lat && lng)) {
         let supplierQuery = {};
         if (district) supplierQuery.district = { $regex: district, $options: 'i' };
         if (state) supplierQuery.state = { $regex: state, $options: 'i' };
+
+        if (lat && lng) {
+            supplierQuery.location = {
+                $near: {
+                    $geometry: {
+                        type: 'Point',
+                        coordinates: [Number(lng), Number(lat)]
+                    },
+                    $maxDistance: 50000 // 50km in meters
+                }
+            };
+        }
 
         const suppliers = await SupplierProfile.find(supplierQuery).select('_id');
         const supplierIds = suppliers.map((s) => s._id);
@@ -211,6 +225,7 @@ exports.searchListings = asyncHandler(async (req, res) => {
                 currentPage: Number(page),
                 totalPages: 0,
                 results: [],
+                message: (lat && lng) ? "No suppliers found within 50km of your location." : undefined
             });
         }
         query.supplierId = { $in: supplierIds };

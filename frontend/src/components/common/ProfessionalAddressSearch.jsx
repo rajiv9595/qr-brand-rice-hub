@@ -71,6 +71,8 @@ const ProfessionalAddressSearch = ({ onSelect, initialValue = '' }) => {
                                 city: district,
                                 state,
                                 pincode,
+                                lat: parseFloat(place.lat),
+                                lng: parseFloat(place.lon),
                                 type: 'place'
                             };
                         });
@@ -113,6 +115,8 @@ const ProfessionalAddressSearch = ({ onSelect, initialValue = '' }) => {
                         city: addr.state_district || addr.district || addr.county || addr.city_district || '',
                         state: addr.state || '',
                         pincode: addr.postcode || data.display_name.match(/\b\d{6}\b/)?.[0] || '',
+                        lat: latitude,
+                        lng: longitude,
                         type: 'gps'
                     };
                     setQuery(village);

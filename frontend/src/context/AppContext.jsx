@@ -6,6 +6,7 @@ const AppContext = createContext();
 export const AppProvider = ({ children }) => {
     const [compareIds, setCompareIds] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
+    const [userLocation, setUserLocation] = useState(null); // { lat, lng, name, address }
 
     const toggleCompare = (id) => {
         setCompareIds(prevIds => {
@@ -25,7 +26,9 @@ export const AppProvider = ({ children }) => {
             toggleCompare,
             clearCompare,
             selectedCategory,
-            setSelectedCategory
+            setSelectedCategory,
+            userLocation,
+            setUserLocation
         }}>
             {children}
         </AppContext.Provider>

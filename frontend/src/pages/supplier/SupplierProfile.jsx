@@ -3,6 +3,7 @@ import { Save, User, MapPin, Building2, FileText, CheckCircle, AlertCircle, Edit
 import { supplierService } from '../../services/supplierService';
 import { authService } from '../../services/authService';
 import { indianStatesAndDistricts } from '../../data/indianStates';
+import ProfessionalAddressSearch from '../../components/common/ProfessionalAddressSearch';
 
 const SupplierProfile = () => {
     const [loading, setLoading] = useState(true);
@@ -27,7 +28,9 @@ const SupplierProfile = () => {
             ifscCode: '',
             branchName: ''
         },
-        upiId: ''
+        upiId: '',
+        lat: null,
+        lng: null
     });
 
     const fetchProfile = async () => {
@@ -64,7 +67,9 @@ const SupplierProfile = () => {
                         ifscCode: bankDetails?.ifscCode || '',
                         branchName: bankDetails?.branchName || ''
                     },
-                    upiId: upiId || ''
+                    upiId: upiId || '',
+                    lat: res.data.data.location?.coordinates?.[1] || null,
+                    lng: res.data.data.location?.coordinates?.[0] || null
                 });
             }
         } catch (err) {
@@ -381,8 +386,31 @@ const SupplierProfile = () => {
                                 </div>
                             </div>
 
+                            <div className="col-span-1 md:col-span-2 bg-primary-50/30 p-4 border border-primary-100 rounded-2xl mb-4">
+                                <label className="block text-sm font-bold text-gray-900 mb-4">Set Location Coordinates <span className="text-red-500">*</span></label>
+                                <p className="text-sm text-gray-500 mb-4">Please set your exact location so buyers within 50km can find you easily. You can search by Pincode or use the Current Location button.</p>
+                                <ProfessionalAddressSearch
+                                    initialValue={formData.district ? `${formData.district}, ${formData.state}` : ''}
+                                    onSelect={(selected) => {
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            district: selected.city || prev.district,
+                                            state: selected.state || prev.state,
+                                            lat: selected.lat,
+                                            lng: selected.lng
+                                        }));
+                                        setMessage({ type: 'success', text: `Location set successfully: ${selected.lat}, ${selected.lng}` });
+                                    }}
+                                />
+                                {(!formData.lat || !formData.lng) && (
+                                    <p className="text-xs text-red-500 font-bold mt-2 flex items-center gap-1">
+                                        <AlertCircle className="w-3 h-3" /> Please set your location to be visible in local searches.
+                                    </p>
+                                )}
+                            </div>
+
                             <div className="col-span-1 md:col-span-2">
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Full Address <span className="text-red-500">*</span></label>
+                                <label className="block text-sm font-bold text-gray-700 mb-2">Street Address <span className="text-red-500">*</span></label>
                                 <div className="relative">
                                     <MapPin className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
                                     <textarea

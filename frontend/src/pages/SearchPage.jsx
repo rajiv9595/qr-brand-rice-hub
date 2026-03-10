@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
-import { Search, Filter, SlidersHorizontal, MapPin, Tag, ArrowUpDown, Star, Scale, Info, Heart, XCircle, X } from 'lucide-react';
+import { Search, Filter, SlidersHorizontal, MapPin, Tag, ArrowUpDown, Star, Scale, Info, Heart, XCircle, X, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../context/AppContext';
 import { riceService, watchlistService } from '../services';
 import { authService } from '../services/authService';
+import ProfessionalAddressSearch from '../components/common/ProfessionalAddressSearch';
 
 const SearchPage = () => {
     const { t } = useTranslation();
@@ -13,6 +14,7 @@ const SearchPage = () => {
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showFilters, setShowFilters] = useState(false);
+    const [showLocationPicker, setShowLocationPicker] = useState(false);
     const [pagination, setPagination] = useState({ totalResults: 0, totalPages: 0 });
     const [watchlist, setWatchlist] = useState([]);
     const [searchTerm, setSearchTerm] = useState(searchParams.get('riceVariety') || '');
@@ -20,7 +22,7 @@ const SearchPage = () => {
     const user = React.useMemo(() => authService.getCurrentUser(), []);
     const userId = user?._id;
 
-    const { compareIds, toggleCompare } = useAppStore();
+    const { compareIds, toggleCompare, userLocation, setUserLocation } = useAppStore();
     const fetchResults = useCallback(async () => {
         setLoading(true);
         try {
@@ -85,6 +87,14 @@ const SearchPage = () => {
         setSearchParams(newParams);
     };
 
+    const clearLocation = () => {
+        setUserLocation(null);
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('lat');
+        newParams.delete('lng');
+        setSearchParams(newParams);
+    };
+
     useEffect(() => {
         const timer = setTimeout(() => {
             if (searchTerm !== (searchParams.get('riceVariety') || '')) {
@@ -134,10 +144,75 @@ const SearchPage = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 animate-in fade-in duration-500">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="text-left w-full">
-                    <h1 className="text-2xl md:text-3xl font-display font-black text-gray-900 tracking-tight">{t("Marketplace")}</h1>
-                    <p className="text-gray-500 mt-1 text-sm md:text-base">{t("Browse premium rice listings from verified mills")}</p>
+            <div className="text-left w-full flex flex-col gap-4 relative z-40">
+                {/* Location Selector (Swiggy Style) */}
+                <div className="relative">
+                    <button
+                        onClick={() => setShowLocationPicker(!showLocationPicker)}
+                        className="group flex flex-col items-start hover:bg-gray-50 p-2 -ml-2 rounded-2xl transition-all outline-none"
+                    >
+                        <div className="flex items-center gap-2">
+                            <MapPin className="w-7 h-7 text-primary-600 fill-primary-100 group-hover:scale-110 transition-transform" />
+                            <span className="text-2xl font-display font-black text-gray-900 group-hover:text-primary-600 transition-colors">
+                                {userLocation ? 'Delivery Location' : 'Set Your Location'}
+                            </span>
+                            <ChevronDown className={`w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-transform duration-300 ${showLocationPicker ? 'rotate-180' : ''}`} />
+                        </div>
+                        <div className="flex items-center gap-2 mt-1 pl-[36px]">
+                            <span className="text-sm font-bold text-gray-500 truncate max-w-[200px] md:max-w-md">
+                                {userLocation ? userLocation.name : 'Click here to fetch nearby rice suppliers'}
+                            </span>
+                            {userLocation && (
+                                <span className="text-[10px] bg-primary-100 text-primary-700 px-2.5 py-1 rounded-full font-black uppercase tracking-widest leading-none shadow-sm">
+                                    Within 50km
+                                </span>
+                            )}
+                        </div>
+                    </button>
+
+                    {/* Location Picker Dropdown */}
+                    {showLocationPicker && (
+                        <>
+                            {/* Backdrop across the whole screen to close when clicking outside */}
+                            <div className="fixed inset-0 z-40 bg-gray-900/10 backdrop-blur-[1px]" onClick={() => setShowLocationPicker(false)} />
+
+                            <div className="absolute top-full left-0 mt-4 w-full md:w-[450px] bg-white p-5 rounded-3xl shadow-2xl border border-gray-100 animate-in slide-in-from-top-4 fade-in duration-300 z-50">
+                                <div className="flex justify-between items-center mb-5 px-1">
+                                    <h3 className="font-display font-black text-xl text-gray-900 tracking-tight">Change Location</h3>
+                                    <button onClick={() => setShowLocationPicker(false)} className="p-2 hover:bg-gray-100 rounded-full text-gray-500 transition-colors">
+                                        <X className="w-5 h-5" />
+                                    </button>
+                                </div>
+
+                                <ProfessionalAddressSearch
+                                    onSelect={(loc) => {
+                                        setUserLocation(loc);
+                                        const newParams = new URLSearchParams(searchParams);
+                                        if (loc.lat && loc.lng) {
+                                            newParams.set('lat', loc.lat);
+                                            newParams.set('lng', loc.lng);
+                                        } else if (loc.state) {
+                                            newParams.set('state', loc.state);
+                                        }
+                                        setSearchParams(newParams);
+                                        setShowLocationPicker(false);
+                                    }}
+                                />
+
+                                {userLocation && (
+                                    <button
+                                        onClick={() => {
+                                            clearLocation();
+                                            setShowLocationPicker(false);
+                                        }}
+                                        className="mt-6 w-full flex items-center justify-center gap-2 text-xs font-black text-red-500 uppercase tracking-widest hover:bg-red-50 p-3.5 rounded-xl border border-red-100 transition-all shadow-sm"
+                                    >
+                                        <XCircle className="w-4 h-4" /> Clear & Show All India
+                                    </button>
+                                )}
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
             {/* Search Bar & Stats */}
