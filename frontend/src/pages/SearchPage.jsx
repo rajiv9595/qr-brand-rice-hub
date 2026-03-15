@@ -301,51 +301,63 @@ const SearchPage = () => {
 
             {/* Advanced Filters Drawer/Section */}
             {showFilters && (
-                <div className="card p-6 grid grid-cols-1 md:grid-cols-3 gap-6 animate-in slide-in-from-top-4 duration-300">
+                <div className="card p-6 grid grid-cols-1 md:grid-cols-4 gap-6 animate-in slide-in-from-top-4 duration-300">
                     <div>
-                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">{t("Category")}</label>
+                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">{t("Use Category")}</label>
                         <select
                             className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary-500 font-bold"
                             onChange={(e) => updateParam('usageCategory', e.target.value)}
                             value={searchParams.get('usageCategory') || ''}
                         >
                             <option value="">{t("All Uses")}</option>
-                            <option value="Daily Family Use">{t("Daily Family Use")}</option>
-                            <option value="Guests/Special Meal Use">{t("Guests / Special Meal")}</option>
-                            <option value="Function / Catering">{t("Function / Catering")}</option>
+                            <option value="Daily Cooking">{t("Daily Cooking")}</option>
+                            <option value="Function & Event">{t("Function & Event")}</option>
+                            <option value="Healthy Rice">{t("Healthy Rice")}</option>
                         </select>
                     </div>
                     <div>
-                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">{t("State")}</label>
-                        <input
-                            type="text"
-                            placeholder="e.g. Haryana"
+                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">{t("Rice Type")}</label>
+                        <select
                             className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary-500 font-bold"
-                            value={searchParams.get('state') || ''}
-                            onChange={(e) => updateParam('state', e.target.value)}
-                        />
+                            onChange={(e) => updateParam('riceType', e.target.value)}
+                            value={searchParams.get('riceType') || ''}
+                        >
+                            <option value="">{t("All Types")}</option>
+                            <option value="Raw">{t("Raw")}</option>
+                            <option value="Steam">{t("Steam")}</option>
+                            <option value="Boiled">{t("Boiled")}</option>
+                            <option value="Brown">{t("Brown")}</option>
+                        </select>
                     </div>
-                    <div className="flex gap-4">
-                        <div className="flex-1">
-                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">{t("Min Price")}</label>
-                            <input
-                                type="number"
-                                placeholder="₹"
-                                className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary-500 font-bold"
-                                value={searchParams.get('minPrice') || ''}
-                                onChange={(e) => updateParam('minPrice', e.target.value)}
-                            />
-                        </div>
-                        <div className="flex-1">
-                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">{t("Max Price")}</label>
-                            <input
-                                type="number"
-                                placeholder="₹"
-                                className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary-500 font-bold"
-                                value={searchParams.get('maxPrice') || ''}
-                                onChange={(e) => updateParam('maxPrice', e.target.value)}
-                            />
-                        </div>
+                    <div>
+                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">{t("Pack Size")}</label>
+                        <select
+                            className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary-500 font-bold"
+                            onChange={(e) => updateParam('packSize', e.target.value)}
+                            value={searchParams.get('packSize') || ''}
+                        >
+                            <option value="">{t("All Sizes")}</option>
+                            <option value="500gm">500gm</option>
+                            <option value="1kg">1kg</option>
+                            <option value="5kg">5kg</option>
+                            <option value="10kg">10kg</option>
+                            <option value="26kg">26kg</option>
+                            <option value="50kg">50kg</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">{t("Distance")}</label>
+                        <select
+                            className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary-500 font-bold"
+                            onChange={(e) => updateParam('distance', e.target.value)}
+                            value={searchParams.get('distance') || ''}
+                        >
+                            <option value="2">Within 2km</option>
+                            <option value="5">Within 5km</option>
+                            <option value="10">Within 10km</option>
+                            <option value="20">Within 20km</option>
+                            <option value="50">Within 50km</option>
+                        </select>
                     </div>
                 </div>
             )}

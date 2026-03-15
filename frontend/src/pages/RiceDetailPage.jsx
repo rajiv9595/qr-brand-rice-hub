@@ -28,7 +28,24 @@ const RiceDetailPage = () => {
 
     // Order State
     const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+    const [selectedPackSize, setSelectedPackSize] = useState(null);
     const [orderQuantity, setOrderQuantity] = useState(1);
+
+    useEffect(() => {
+        if (rice && rice.packPrices && rice.packPrices.length > 0) {
+            setSelectedPackSize(rice.packPrices[0]);
+        }
+    }, [rice]);
+
+    const getCurrentPrice = () => {
+        if (selectedPackSize) return selectedPackSize.price;
+        return rice?.pricePerBag;
+    };
+
+    const getCurrentWeight = () => {
+        if (selectedPackSize) return selectedPackSize.size;
+        return `${rice?.bagWeightKg}kg`;
+    };
 
     // Negotiation State
     const [isNegotiateModalOpen, setIsNegotiateModalOpen] = useState(false);
@@ -244,9 +261,27 @@ const RiceDetailPage = () => {
                             </div>
 
                             <div className="flex items-baseline gap-2 border-b border-gray-100 pb-6">
-                                <span className="text-4xl lg:text-5xl font-black text-field-700 tracking-tight">₹{rice.pricePerBag}</span>
-                                <span className="text-sm font-bold text-gray-400">/ {rice.bagWeightKg}kg Bag</span>
+                                <span className="text-4xl lg:text-5xl font-black text-field-700 tracking-tight">₹{getCurrentPrice()}</span>
+                                <span className="text-sm font-bold text-gray-400">/ {getCurrentWeight()} Pack</span>
                             </div>
+
+                            {/* Pack Size Selector */}
+                            {rice.packPrices && rice.packPrices.length > 0 && (
+                                <div className="space-y-3">
+                                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Select Pack Size</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {rice.packPrices.map((pack) => (
+                                            <button
+                                                key={pack.size}
+                                                onClick={() => setSelectedPackSize(pack)}
+                                                className={`px-4 py-2 rounded-xl text-xs font-black transition-all border ${selectedPackSize?.size === pack.size ? 'bg-field-700 text-white border-field-700 shadow-md' : 'bg-white text-gray-600 border-gray-200 hover:border-field-300'}`}
+                                            >
+                                                {pack.size}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-200">
@@ -587,7 +622,7 @@ const RiceDetailPage = () => {
                                         />
                                         <div className="text-right shrink-0">
                                             <p className="text-[9px] font-bold text-primary-300 uppercase">Total Price</p>
-                                            <p className="text-xl font-black text-primary-600">₹{(rice.pricePerBag * (parseInt(orderQuantity) || 0)).toLocaleString()}</p>
+                                            <p className="text-xl font-black text-primary-600">₹{(getCurrentPrice() * (parseInt(orderQuantity) || 0)).toLocaleString()}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -791,7 +826,7 @@ const RiceDetailPage = () => {
                                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                     ) : (
                                         <>
-                                            Confirm Order <span className="opacity-60 text-xs normal-case ml-1">(₹{(rice.pricePerBag * (parseInt(orderQuantity) || 0)).toLocaleString()})</span>
+                                            Confirm Order <span className="opacity-60 text-xs normal-case ml-1">(₹{(getCurrentPrice() * (parseInt(orderQuantity) || 0)).toLocaleString()})</span>
                                             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                         </>
                                     )}

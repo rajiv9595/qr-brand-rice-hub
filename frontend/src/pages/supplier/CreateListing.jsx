@@ -13,11 +13,14 @@ const CreateListing = () => {
     const [formData, setFormData] = useState({
         brandName: '',
         riceVariety: '',
+        riceType: '',
+        priceCategory: '',
         pricePerBag: '',
         stockAvailable: '',
         bagWeightKg: '',
         dispatchTimeline: '',
         usageCategory: '',
+        packPrices: [],
         specifications: {
             grainLength: 'Medium',
             riceAge: '6+ Months',
@@ -40,12 +43,25 @@ const CreateListing = () => {
 
     const [bagImage, setBagImage] = useState(null);
     const [grainImage, setGrainImage] = useState(null);
+    const [cookedRiceImage, setCookedRiceImage] = useState(null);
     const [bagImagePreview, setBagImagePreview] = useState('');
     const [grainImagePreview, setGrainImagePreview] = useState('');
+    const [cookedRiceImagePreview, setCookedRiceImagePreview] = useState('');
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
         setError('');
+    };
+
+    const handlePackPriceChange = (size, price) => {
+        const updatedPackPrices = [...formData.packPrices];
+        const index = updatedPackPrices.findIndex(p => p.size === size);
+        if (index > -1) {
+            updatedPackPrices[index].price = price;
+        } else {
+            updatedPackPrices.push({ size, price });
+        }
+        setFormData({ ...formData, packPrices: updatedPackPrices });
     };
 
     const handleImageChange = (e, type) => {
@@ -54,9 +70,12 @@ const CreateListing = () => {
             if (type === 'bag') {
                 setBagImage(file);
                 setBagImagePreview(URL.createObjectURL(file));
-            } else {
+            } else if (type === 'grain') {
                 setGrainImage(file);
                 setGrainImagePreview(URL.createObjectURL(file));
+            } else {
+                setCookedRiceImage(file);
+                setCookedRiceImagePreview(URL.createObjectURL(file));
             }
         }
     };
@@ -89,7 +108,7 @@ const CreateListing = () => {
         try {
             const data = new FormData();
             Object.keys(formData).forEach(key => {
-                if (key === 'specifications') {
+                if (key === 'specifications' || key === 'packPrices') {
                     data.append(key, JSON.stringify(formData[key]));
                 } else {
                     data.append(key, formData[key]);
@@ -97,6 +116,7 @@ const CreateListing = () => {
             });
             data.append('bagImage', bagImage);
             data.append('grainImage', grainImage);
+            if (cookedRiceImage) data.append('cookedRiceImage', cookedRiceImage);
 
             await supplierService.createListing(data);
             if (refreshStats) refreshStats();
@@ -171,20 +191,54 @@ const CreateListing = () => {
                                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all bg-white"
                             >
                                 <option value="">Select variety</option>
-                                <option value="Sona Masoori">Sona Masoori</option>
                                 <option value="Basmati">Basmati</option>
+                                <option value="Sona Masuri">Sona Masuri</option>
+                                <option value="BPT 5204">BPT 5204</option>
                                 <option value="HMT">HMT</option>
-                                <option value="BPT">BPT</option>
-                                <option value="Jeera Rice">Jeera Rice</option>
-                                <option value="Brown Rice">Brown Rice</option>
-                                <option value="Idli Rice">Idli Rice</option>
-                                <option value="Raw Rice">Raw Rice</option>
+                                <option value="RNR">RNR</option>
+                                <option value="Kolam">Kolam</option>
+                                <option value="Organic">Organic</option>
+                                <option value="Diabetic">Diabetic</option>
                             </select>
                         </div>
 
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-2">
-                                Price per Bag (₹) <span className="text-red-500">*</span>
+                                Rice Type <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                name="riceType"
+                                value={formData.riceType}
+                                onChange={handleChange}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all bg-white"
+                            >
+                                <option value="">Select type</option>
+                                <option value="Raw">Raw</option>
+                                <option value="Steam">Steam</option>
+                                <option value="Boiled">Boiled</option>
+                                <option value="Brown">Brown</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">
+                                Price Category <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                name="priceCategory"
+                                value={formData.priceCategory}
+                                onChange={handleChange}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all bg-white"
+                            >
+                                <option value="">Select category</option>
+                                <option value="Premium Rice">Premium Rice</option>
+                                <option value="Budget Friendly Rice">Budget Friendly Rice</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">
+                                Base Price per Bag (₹) <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="number"
@@ -253,13 +307,29 @@ const CreateListing = () => {
                             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                         >
                             <option value="">Select category</option>
-                            <option value="Daily Family Use">Daily Family Use</option>
-                            <option value="Function/Catering Use">Function/Catering Use</option>
-                            <option value="Guests/Special Meal Use">Guests/Special Meal Use</option>
-                            <option value="Healthy/Brown Rice">Healthy/Brown Rice</option>
-                            <option value="Biryani/Pulao Special">Biryani/Pulao Special</option>
-                            <option value="Hotel/Commercial Use">Hotel/Commercial Use</option>
+                            <option value="Daily Cooking">Daily Cooking</option>
+                            <option value="Function & Event">Function & Event</option>
+                            <option value="Healthy Rice">Healthy Rice</option>
                         </select>
+                    </div>
+
+                    {/* Pack Sizes and Prices */}
+                    <div className="mt-8 space-y-4">
+                        <h4 className="text-md font-bold text-gray-800">Pack Sizes & Prices</h4>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            {['500gm', '1kg', '5kg', '10kg', '26kg', '50kg'].map(size => (
+                                <div key={size} className="space-y-1">
+                                    <label className="text-xs font-bold text-gray-500 uppercase">{size} Price (₹)</label>
+                                    <input
+                                        type="number"
+                                        placeholder={`Price for ${size}`}
+                                        className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary-500 outline-none"
+                                        onChange={(e) => handlePackPriceChange(size, e.target.value)}
+                                        value={formData.packPrices.find(p => p.size === size)?.price || ''}
+                                    />
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
@@ -402,6 +472,35 @@ const CreateListing = () => {
                                         <div className="flex flex-col items-center justify-center h-full text-gray-400">
                                             <ImageIcon className="w-12 h-12 mb-2" />
                                             <p className="text-sm font-bold">Upload Grain Image</p>
+                                        </div>
+                                    )}
+                                </label>
+                            </div>
+                        </div>
+
+                        {/* Cooked Rice Image */}
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">
+                                Cooked Rice Image
+                            </label>
+                            <div className="relative">
+                                <input
+                                    type="file"
+                                    accept="image/*, .heic, .heif, .avif"
+                                    onChange={(e) => handleImageChange(e, 'cooked')}
+                                    className="hidden"
+                                    id="cookedImage"
+                                />
+                                <label
+                                    htmlFor="cookedImage"
+                                    className="block aspect-square bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl cursor-pointer hover:border-primary-500 transition-all overflow-hidden"
+                                >
+                                    {cookedRiceImagePreview ? (
+                                        <img src={cookedRiceImagePreview} alt="Cooked preview" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                                            <Upload className="w-12 h-12 mb-2" />
+                                            <p className="text-sm font-bold">Upload Cooked Rice Image</p>
                                         </div>
                                     )}
                                 </label>

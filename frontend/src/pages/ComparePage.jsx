@@ -246,6 +246,8 @@ const ComparePage = () => {
 
                         <div className="p-8 space-y-2 bg-white">
                             <SpecRow label="Current Price" field="pricePerBag" isPrice isLowestBetter icon={TrendingUp} />
+                            <SpecRow label="Price Category" field="priceCategory" icon={Tag} />
+                            <SpecRow label="Rice Type" field="riceType" icon={Box} />
                             <SpecRow label="Grain Length" field="specifications.grainLength" icon={Scale} />
                             <SpecRow label="Rice Purity" field="specifications.purityPercentage" suffix="%" icon={ShieldCheck} />
                             <SpecRow label="Broken Grains" field="specifications.brokenGrainPercentage" suffix="%" isLowestBetter icon={AlertCircle} />

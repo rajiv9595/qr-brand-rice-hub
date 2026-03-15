@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { encrypt, decrypt } = require('../utils/encryption');
+const { TRADER_TYPES } = require('../utils/constants');
 
 const supplierProfileSchema = new mongoose.Schema(
     {
@@ -11,8 +12,17 @@ const supplierProfileSchema = new mongoose.Schema(
         },
         millName: {
             type: String,
-            required: [true, 'Please add a mill name'],
+            required: [true, 'Please add a shop/mill name'],
             index: true,
+        },
+        traderType: {
+            type: String,
+            enum: Object.values(TRADER_TYPES),
+            default: TRADER_TYPES.RETAILER,
+            index: true,
+        },
+        shopPhotoUrl: {
+            type: String,
         },
         gstNumber: {
             type: String,

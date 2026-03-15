@@ -20,17 +20,56 @@ const APPROVAL_STATUS = {
 };
 
 const USAGE_CATEGORIES = [
-    'Daily Family Use',
-    'Function/Catering Use',
-    'Guests/Special Meal Use',
-    'Healthy/Brown Rice',
-    'Biryani/Pulao Special',
-    'Hotel/Commercial Use'
+    'Daily Cooking',
+    'Function & Event',
+    'Healthy Rice'
+];
+
+const RICE_TYPES = [
+    'Raw',
+    'Steam',
+    'Boiled',
+    'Brown'
+];
+
+const PACK_SIZES = [
+    '500gm',
+    '1kg',
+    '5kg',
+    '10kg',
+    '26kg',
+    '50kg'
+];
+
+const TRADER_TYPES = {
+    WHOLESALER: 'Wholesaler',
+    RETAILER: 'Retailer'
+};
+
+const PRICE_CATEGORIES = {
+    PREMIUM: 'Premium Rice',
+    BUDGET: 'Budget Friendly Rice'
+};
+
+const RICE_VARIETIES = [
+    'Basmati',
+    'Sona Masuri',
+    'BPT 5204',
+    'HMT',
+    'RNR',
+    'Kolam',
+    'Organic',
+    'Diabetic'
 ];
 
 module.exports = {
     ROLES,
     ORDER_STATUS,
     APPROVAL_STATUS,
-    USAGE_CATEGORIES
+    USAGE_CATEGORIES,
+    RICE_TYPES,
+    PACK_SIZES,
+    TRADER_TYPES,
+    PRICE_CATEGORIES,
+    RICE_VARIETIES
 };

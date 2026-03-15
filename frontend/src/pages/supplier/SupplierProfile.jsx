@@ -15,6 +15,7 @@ const SupplierProfile = () => {
 
     const [formData, setFormData] = useState({
         millName: '',
+        traderType: '',
         gstNumber: '',
         gstRegistrationYears: '',
         address: '',
@@ -30,8 +31,10 @@ const SupplierProfile = () => {
         },
         upiId: '',
         lat: null,
-        lng: null
+        lng: null,
+        shopPhoto: null
     });
+    const [shopPhotoPreview, setShopPhotoPreview] = useState('');
 
     const fetchProfile = async () => {
         try {
@@ -48,12 +51,13 @@ const SupplierProfile = () => {
                 }
 
                 const {
-                    millName, gstNumber, gstRegistrationYears,
+                    millName, traderType, shopPhotoUrl, gstNumber, gstRegistrationYears,
                     address, district, state, userId, bankDetails, upiId
                 } = res.data.data;
 
                 setFormData({
                     millName: millName || '',
+                    traderType: traderType || '',
                     gstNumber: gstNumber || '',
                     gstRegistrationYears: gstRegistrationYears || '',
                     address: address || '',
@@ -69,8 +73,10 @@ const SupplierProfile = () => {
                     },
                     upiId: upiId || '',
                     lat: res.data.data.location?.coordinates?.[1] || null,
-                    lng: res.data.data.location?.coordinates?.[0] || null
+                    lng: res.data.data.location?.coordinates?.[0] || null,
+                    shopPhoto: null
                 });
+                if (shopPhotoUrl) setShopPhotoPreview(shopPhotoUrl);
             }
         } catch (err) {
             if (err.response && err.response.status !== 404) {
@@ -119,7 +125,18 @@ const SupplierProfile = () => {
         setMessage({ type: '', text: '' });
 
         try {
-            await supplierService.updateProfile(formData);
+            const data = new FormData();
+            Object.keys(formData).forEach(key => {
+                if (key === 'bankDetails') {
+                    data.append(key, JSON.stringify(formData[key]));
+                } else if (key === 'shopPhoto') {
+                    if (formData[key]) data.append('shopPhoto', formData[key]);
+                } else {
+                    data.append(key, formData[key]);
+                }
+            });
+
+            await supplierService.updateProfile(data);
             setMessage({ type: 'success', text: 'Profile saved successfully!' });
             setIsEditing(false);
             fetchProfile(); // Refetch to update view
@@ -292,12 +309,52 @@ const SupplierProfile = () => {
                         {/* Form Sections (Reused Logic) */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="col-span-1 md:col-span-2">
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Mill / Company Name <span className="text-red-500">*</span></label>
+                                <label className="block text-sm font-bold text-gray-700 mb-2">Shop / Mill Name <span className="text-red-500">*</span></label>
                                 <div className="relative">
                                     <Building2 className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
                                     <input
                                         type="text" name="millName" value={formData.millName} onChange={handleChange} required
-                                        className="input-field pl-12" placeholder="e.g., Sri Ram Rice Mill"
+                                        className="input-field pl-12" placeholder="e.g., Sri Ram Rice Shop"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-2">Trader Type <span className="text-red-500">*</span></label>
+                                <select
+                                    name="traderType"
+                                    value={formData.traderType}
+                                    onChange={handleChange}
+                                    required
+                                    className="input-field"
+                                >
+                                    <option value="">Select Type</option>
+                                    <option value="Wholesaler">Wholesaler</option>
+                                    <option value="Retailer">Retailer</option>
+                                </select>
+                            </div>
+
+                            <div className="col-span-1 md:col-span-2">
+                                <label className="block text-sm font-bold text-gray-700 mb-2">Shop Photograph</label>
+                                <div className="flex items-center gap-6">
+                                    <div className="w-24 h-24 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden">
+                                        {shopPhotoPreview ? (
+                                            <img src={shopPhotoPreview} alt="Shop" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <Building2 className="w-8 h-8 text-gray-300" />
+                                        )}
+                                    </div>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => {
+                                            const file = e.target.files[0];
+                                            if (file) {
+                                                setFormData({ ...formData, shopPhoto: file });
+                                                setShopPhotoPreview(URL.createObjectURL(file));
+                                            }
+                                        }}
+                                        className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
                                     />
                                 </div>
                             </div>

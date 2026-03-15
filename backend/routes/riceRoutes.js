@@ -36,6 +36,7 @@ router.post(
     upload.fields([
         { name: 'bagImage', maxCount: 1 },
         { name: 'grainImage', maxCount: 1 },
+        { name: 'cookedRiceImage', maxCount: 1 },
     ]),
     createListing
 );
@@ -47,6 +48,7 @@ router.put(
     upload.fields([
         { name: 'bagImage', maxCount: 1 },
         { name: 'grainImage', maxCount: 1 },
+        { name: 'cookedRiceImage', maxCount: 1 },
     ]),
     updateListing
 );

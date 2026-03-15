@@ -2,25 +2,30 @@ const RiceListing = require('../models/RiceListing');
 const SupplierProfile = require('../models/SupplierProfile');
 const Joi = require('joi');
 const asyncHandler = require('../utils/asyncHandler');
-const { APPROVAL_STATUS, USAGE_CATEGORIES } = require('../utils/constants');
+const { APPROVAL_STATUS, USAGE_CATEGORIES, RICE_TYPES, PACK_SIZES, PRICE_CATEGORIES, RICE_VARIETIES } = require('../utils/constants');
 
 // @desc    Create a rice listing
 // @route   POST /api/rice
 // @access  Private (Supplier)
 exports.createListing = asyncHandler(async (req, res) => {
-    // Parse specifications if it's a string (from FormData)
+    // Parse JSON fields from FormData
     if (req.body.specifications && typeof req.body.specifications === 'string') {
-        try {
-            req.body.specifications = JSON.parse(req.body.specifications);
-        } catch (e) {
-            console.error("Failed to parse specifications:", e);
-        }
+        try { req.body.specifications = JSON.parse(req.body.specifications); } catch (e) {}
+    }
+    if (req.body.packPrices && typeof req.body.packPrices === 'string') {
+        try { req.body.packPrices = JSON.parse(req.body.packPrices); } catch (e) {}
     }
 
     const schema = Joi.object({
         brandName: Joi.string().required(),
-        riceVariety: Joi.string().required(),
+        riceVariety: Joi.string().valid(...RICE_VARIETIES).required(),
+        riceType: Joi.string().valid(...RICE_TYPES).required(),
+        priceCategory: Joi.string().valid(...Object.values(PRICE_CATEGORIES)).required(),
         pricePerBag: Joi.number().min(0).required(),
+        packPrices: Joi.array().items(Joi.object({
+            size: Joi.string().valid(...PACK_SIZES).required(),
+            price: Joi.number().min(0).required()
+        })).optional(),
         stockAvailable: Joi.number().min(0).required(),
         bagWeightKg: Joi.number().min(0).required(),
         dispatchTimeline: Joi.string().required(),
@@ -47,8 +52,6 @@ exports.createListing = asyncHandler(async (req, res) => {
         throw new Error('Please create a supplier profile first');
     }
 
-
-
     const listingData = {
         ...req.body,
         supplierId: supplierProfile._id,
@@ -56,6 +59,7 @@ exports.createListing = asyncHandler(async (req, res) => {
         isActive: false,
         bagImageUrl: req.files && req.files['bagImage'] ? req.files['bagImage'][0].path : null,
         grainImageUrl: req.files && req.files['grainImage'] ? req.files['grainImage'][0].path : null,
+        cookedRiceImageUrl: req.files && req.files['cookedRiceImage'] ? req.files['cookedRiceImage'][0].path : null,
     };
 
     const listing = await RiceListing.create(listingData);
@@ -171,6 +175,9 @@ exports.searchListings = asyncHandler(async (req, res) => {
     const {
         riceVariety,
         usageCategory,
+        riceType,
+        priceCategory,
+        packSize,
         minPrice,
         maxPrice,
         district,
@@ -178,6 +185,7 @@ exports.searchListings = asyncHandler(async (req, res) => {
         sortBy,
         lat,
         lng,
+        distance = 50, // Default 50km
         page = 1,
         limit = 20,
     } = req.query;
@@ -189,8 +197,11 @@ exports.searchListings = asyncHandler(async (req, res) => {
 
     if (riceVariety) query.riceVariety = { $regex: riceVariety, $options: 'i' };
     if (usageCategory) query.usageCategory = usageCategory;
-
-
+    if (riceType) query.riceType = riceType;
+    if (priceCategory) query.priceCategory = priceCategory;
+    if (packSize) {
+        query.packPrices = { $elemMatch: { size: packSize } };
+    }
 
     if (minPrice || maxPrice) {
         query.pricePerBag = {};
@@ -210,7 +221,7 @@ exports.searchListings = asyncHandler(async (req, res) => {
                         type: 'Point',
                         coordinates: [Number(lng), Number(lat)]
                     },
-                    $maxDistance: 50000 // 50km in meters
+                    $maxDistance: Number(distance) * 1000 // Convert km to meters
                 }
             };
         }

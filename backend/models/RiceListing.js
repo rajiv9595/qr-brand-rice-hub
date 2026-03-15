@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { APPROVAL_STATUS, USAGE_CATEGORIES } = require('../utils/constants');
+const { APPROVAL_STATUS, USAGE_CATEGORIES, RICE_TYPES, PACK_SIZES, PRICE_CATEGORIES, RICE_VARIETIES } = require('../utils/constants');
 
 const riceListingSchema = new mongoose.Schema(
     {
@@ -18,15 +18,40 @@ const riceListingSchema = new mongoose.Schema(
         riceVariety: {
             type: String,
             required: [true, 'Please add a rice variety'],
+            enum: RICE_VARIETIES,
             trim: true,
+            index: true,
+        },
+        riceType: {
+            type: String,
+            enum: RICE_TYPES,
+            required: true,
+            index: true,
+        },
+        priceCategory: {
+            type: String,
+            enum: Object.values(PRICE_CATEGORIES),
+            required: true,
             index: true,
         },
         pricePerBag: {
             type: Number,
-            required: [true, 'Please add a price per bag'],
+            required: [true, 'Please add a base price per bag'],
             min: 0,
             index: true,
         },
+        packPrices: [{
+            size: {
+                type: String,
+                enum: PACK_SIZES,
+                required: true
+            },
+            price: {
+                type: Number,
+                required: true,
+                min: 0
+            }
+        }],
         stockAvailable: {
             type: Number,
             default: 0,
@@ -49,6 +74,9 @@ const riceListingSchema = new mongoose.Schema(
             type: String,
         },
         grainImageUrl: {
+            type: String,
+        },
+        cookedRiceImageUrl: {
             type: String,
         },
         approvalStatus: {

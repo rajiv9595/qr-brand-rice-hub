@@ -2,7 +2,7 @@ const SupplierProfile = require('../models/SupplierProfile');
 const User = require('../models/User');
 const Joi = require('joi');
 const asyncHandler = require('../utils/asyncHandler');
-const { ROLES } = require('../utils/constants');
+const { ROLES, TRADER_TYPES } = require('../utils/constants');
 const { syncSupplierTrust } = require('../utils/trustScoreGenerator');
 
 // @desc    Create or update supplier profile
@@ -11,6 +11,7 @@ const { syncSupplierTrust } = require('../utils/trustScoreGenerator');
 exports.upsertProfile = asyncHandler(async (req, res) => {
     const schema = Joi.object({
         millName: Joi.string().required(),
+        traderType: Joi.string().valid(...Object.values(TRADER_TYPES)).optional(),
         gstNumber: Joi.string().allow('', null),
         gstRegistrationYears: Joi.number().min(0).allow(null),
         address: Joi.string().required(),
@@ -39,6 +40,11 @@ exports.upsertProfile = asyncHandler(async (req, res) => {
         userId: req.user._id,
         ...req.body,
     };
+
+    // Handle shop photo if uploaded
+    if (req.files && req.files['shopPhoto']) {
+        profileFields.shopPhotoUrl = req.files['shopPhoto'][0].path;
+    }
 
     // Make sure we correctly map lat and lng to location GeoJSON
     if (req.body.lat !== undefined && req.body.lng !== undefined && req.body.lat !== null && req.body.lng !== null) {
