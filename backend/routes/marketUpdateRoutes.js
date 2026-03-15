@@ -5,12 +5,14 @@ const {
     updateMarketUpdate,
     deleteMarketUpdate,
     getMarketUpdates,
+    getMarketSummary,
 } = require('../controllers/marketUpdateController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 const { upload } = require('../config/cloudinary');
 
-// Public route
+// Public routes
 router.get('/', getMarketUpdates);
+router.get('/summary', getMarketSummary);
 
 // Protected routes (Admin or Expert only)
 router.post('/', protect, authorize('admin', 'expert'), upload.single('image'), createUpdate);

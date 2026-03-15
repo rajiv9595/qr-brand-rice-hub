@@ -1,5 +1,7 @@
 const MarketUpdate = require('../models/MarketUpdate');
+const RiceListing = require('../models/RiceListing');
 const Joi = require('joi');
+const { APPROVAL_STATUS } = require('../utils/constants');
 
 // @desc    Create market update
 // @route   POST /api/market-updates
@@ -40,6 +42,80 @@ exports.createUpdate = async (req, res) => {
         const update = await MarketUpdate.create(updateData);
 
         res.status(201).json({ success: true, data: update });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @desc    Get all market updates with filters and pagination
+// @route   GET /api/market-updates
+// @access  Public
+exports.getMarketUpdates = async (req, res) => {
+    try {
+        const { category, district, state, page = 1, limit = 10 } = req.query;
+
+        let query = {};
+
+        if (category) query.category = category;
+        if (district) query.district = { $regex: district, $options: 'i' };
+        if (state) query.state = { $regex: state, $options: 'i' };
+
+        const skip = (Number(page) - 1) * Number(limit);
+
+        const totalResults = await MarketUpdate.countDocuments(query);
+        const updates = await MarketUpdate.find(query)
+            .sort({ priorityFlag: -1, createdAt: -1 })
+            .skip(skip)
+            .limit(Number(limit))
+            .populate('createdBy', 'name role');
+
+        res.json({
+            success: true,
+            totalResults,
+            currentPage: Number(page),
+            totalPages: Math.ceil(totalResults / Number(limit)),
+            data: updates,
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @desc    Get Market Price Summary
+// @route   GET /api/market-updates/summary
+// @access  Public
+exports.getMarketSummary = async (req, res) => {
+    try {
+        // Aggregate average prices per variety from approved listings
+        const summary = await RiceListing.aggregate([
+            {
+                $match: {
+                    approvalStatus: APPROVAL_STATUS.APPROVED,
+                    isActive: true
+                }
+            },
+            {
+                $group: {
+                    _id: "$riceVariety",
+                    avgPrice: { $avg: "$pricePerBag" },
+                    minPrice: { $min: "$pricePerBag" },
+                    maxPrice: { $max: "$pricePerBag" },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $project: {
+                    variety: "$_id",
+                    avgPrice: { $round: ["$avgPrice", 2] },
+                    minPrice: 1,
+                    maxPrice: 1,
+                    trend: { $literal: "stable" }
+                }
+            },
+            { $sort: { variety: 1 } }
+        ]);
+
+        res.json({ success: true, data: summary });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -96,40 +172,6 @@ exports.deleteMarketUpdate = async (req, res) => {
         await update.deleteOne();
 
         res.json({ success: true, message: 'Market update removed' });
-    } catch (err) {
-        res.status(500).json({ success: false, message: err.message });
-    }
-};
-
-// @desc    Get all market updates with filters and pagination
-// @route   GET /api/market-updates
-// @access  Public
-exports.getMarketUpdates = async (req, res) => {
-    try {
-        const { category, district, state, page = 1, limit = 10 } = req.query;
-
-        let query = {};
-
-        if (category) query.category = category;
-        if (district) query.district = { $regex: district, $options: 'i' };
-        if (state) query.state = { $regex: state, $options: 'i' };
-
-        const skip = (Number(page) - 1) * Number(limit);
-
-        const totalResults = await MarketUpdate.countDocuments(query);
-        const updates = await MarketUpdate.find(query)
-            .sort({ priorityFlag: -1, createdAt: -1 })
-            .skip(skip)
-            .limit(Number(limit))
-            .populate('createdBy', 'name');
-
-        res.json({
-            success: true,
-            totalResults,
-            currentPage: Number(page),
-            totalPages: Math.ceil(totalResults / Number(limit)),
-            updates,
-        });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }

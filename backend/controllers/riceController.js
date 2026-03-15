@@ -135,6 +135,7 @@ exports.updateListing = asyncHandler(async (req, res) => {
     if (req.files) {
         if (req.files['bagImage']) updatedData.bagImageUrl = req.files['bagImage'][0].path;
         if (req.files['grainImage']) updatedData.grainImageUrl = req.files['grainImage'][0].path;
+        if (req.files['cookedRiceImage']) updatedData.cookedRiceImageUrl = req.files['cookedRiceImage'][0].path;
     }
 
     listing = await RiceListing.findByIdAndUpdate(req.params.id, updatedData, { new: true });
@@ -236,7 +237,7 @@ exports.searchListings = asyncHandler(async (req, res) => {
                 currentPage: Number(page),
                 totalPages: 0,
                 results: [],
-                message: (lat && lng) ? "No suppliers found within 50km of your location." : undefined
+                message: (lat && lng) ? `No suppliers found within ${distance}km of your location.` : undefined
             });
         }
         query.supplierId = { $in: supplierIds };
@@ -248,7 +249,6 @@ exports.searchListings = asyncHandler(async (req, res) => {
     if (sortBy === 'newest') sort = { createdAt: -1 };
 
     const skip = (Number(page) - 1) * Number(limit);
-
     const totalResults = await RiceListing.countDocuments(query);
     const results = await RiceListing.find(query)
         .populate('supplierId', 'millName district state badges trustScore metrics')
@@ -264,6 +264,23 @@ exports.searchListings = asyncHandler(async (req, res) => {
         totalPages: Math.ceil(totalResults / Number(limit)),
         results,
     });
+});
+
+// @desc    Get Best Deals Today
+// @route   GET /api/rice/best-deals
+// @access  Public
+exports.getBestDeals = asyncHandler(async (req, res) => {
+    // Best deals are typically budget-friendly rice or listings with high ratings
+    const deals = await RiceListing.find({
+        approvalStatus: APPROVAL_STATUS.APPROVED,
+        isActive: true,
+        priceCategory: PRICE_CATEGORIES.BUDGET
+    })
+    .populate('supplierId', 'millName district state badges trustScore metrics')
+    .sort({ averageRating: -1, pricePerBag: 1 })
+    .limit(10);
+
+    res.json({ success: true, data: deals });
 });
 
 // @desc    Compare multiple rice listings
@@ -312,6 +329,13 @@ exports.compareListings = asyncHandler(async (req, res) => {
 // @route   GET /api/rice/:id
 // @access  Public
 exports.getListingById = asyncHandler(async (req, res) => {
+    // Safety guard: prevent crash if a non-ObjectId string reaches here
+    const mongoose = require('mongoose');
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        res.status(400);
+        throw new Error('Invalid listing ID format');
+    }
+
     const listing = await RiceListing.findById(req.params.id)
         .populate('supplierId', 'millName district state badges trustScore metrics');
 
@@ -411,6 +435,7 @@ exports.deleteListing = asyncHandler(async (req, res) => {
 
     await deleteImage(listing.bagImageUrl);
     await deleteImage(listing.grainImageUrl);
+    await deleteImage(listing.cookedRiceImageUrl);
 
     await RiceListing.findByIdAndDelete(req.params.id);
 

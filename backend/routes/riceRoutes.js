@@ -11,6 +11,7 @@ const {
     activateListing,
     deactivateListing,
     deleteListing,
+    getBestDeals,
 } = require('../controllers/riceController');
 const { getListingRatings, getListingReviews } = require('../controllers/reviewController');
 const { getListingExpertReview } = require('../controllers/expertReviewController');
@@ -19,16 +20,19 @@ const { trackSearch } = require('../controllers/insightsController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 const { upload } = require('../config/cloudinary');
 
-// Public routes
-router.get('/', trackSearch, getPublicListings);
+// ============================================================
+// STATIC NAMED ROUTES FIRST (before any /:id param routes)
+// This prevents Express from treating "best-deals" as an ObjectId
+// ============================================================
+router.get('/best-deals', getBestDeals);
 router.get('/search', trackSearch, searchListings);
+router.get('/my-listings', protect, authorize('supplier'), getMyListings);
 router.post('/compare', compareListings);
-router.get('/:id/ratings', getListingRatings);
-router.get('/:id/reviews', getListingReviews);
-router.get('/:id/expert-review', getListingExpertReview);
-router.get('/:id/cooking-tips', getListingCookingTips);
 
-// Protected routes (Supplier)
+// Public listing (all approved)
+router.get('/', trackSearch, getPublicListings);
+
+// Protected routes (Supplier) - Create / Update
 router.post(
     '/',
     protect,
@@ -53,7 +57,13 @@ router.put(
     updateListing
 );
 
-router.get('/my-listings', protect, authorize('supplier'), getMyListings);
+// ============================================================
+// PARAMETERIZED /:id ROUTES LAST
+// ============================================================
+router.get('/:id/ratings', getListingRatings);
+router.get('/:id/reviews', getListingReviews);
+router.get('/:id/expert-review', getListingExpertReview);
+router.get('/:id/cooking-tips', getListingCookingTips);
 router.get('/:id', getListingById);
 router.patch('/:id/activate', protect, authorize('supplier'), activateListing);
 router.patch('/:id/deactivate', protect, authorize('supplier'), deactivateListing);
