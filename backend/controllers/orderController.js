@@ -1,6 +1,7 @@
 const Order = require('../models/Order');
 const RiceListing = require('../models/RiceListing');
 const SupplierProfile = require('../models/SupplierProfile');
+const Counter = require('../models/Counter'); // Added Counter model for unique IDs
 
 const notificationService = require('../utils/notificationService');
 const emailService = require('../utils/emailService');
@@ -18,30 +19,45 @@ exports.createOrder = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Rice listing not found' });
         }
 
-        // 2. Check stock availability
-        if (listing.stockAvailable < quantity) {
-            return res.status(400).json({ success: false, message: `Insufficient stock. Only ${listing.stockAvailable} bags available.` });
+        // 2. Atomic Stock Check and Update
+        // This ensures that even if two requests come at the same time, stock won't go negative.
+        const updatedListing = await RiceListing.findOneAndUpdate(
+            { _id: listingId, stockAvailable: { $gte: quantity } },
+            { $inc: { stockAvailable: -quantity } },
+            { new: true }
+        );
+
+        if (!updatedListing) {
+            return res.status(400).json({ 
+                success: false, 
+                message: `Insufficient stock or listing changed. Available: ${listing.stockAvailable} bags.` 
+            });
         }
 
         // 3. Calculate total price
         const totalPrice = listing.pricePerBag * quantity;
 
-        // 3a. Generate Running Order ID
-        let nextId = 1001;
+        // 3a. Generate Robust Running Order ID using Counter collection
+        let orderId;
         try {
-            const lastOrder = await Order.findOne({}, { orderId: 1 }).sort({ createdAt: -1 });
-            if (lastOrder && lastOrder.orderId && lastOrder.orderId.includes('-')) {
-                const lastIdNum = parseInt(lastOrder.orderId.split('-')[1]);
-                if (!isNaN(lastIdNum)) {
-                    nextId = lastIdNum + 1;
-                }
+            const counter = await Counter.findOneAndUpdate(
+                { id: 'orderId' },
+                { $inc: { seq: 1 } },
+                { new: true, upsert: true, setDefaultsOnInsert: true }
+            );
+            
+            // If it's a new counter, start from 1001 as previously established
+            if (counter.seq < 1001) {
+                counter.seq = 1001;
+                await counter.save();
             }
+            
+            orderId = `ORD-${counter.seq}`;
         } catch (idErr) {
             console.error('Order ID Gen Error:', idErr);
-            // Fallback to timestamp if counter fails
-            nextId = Date.now().toString().slice(-6);
+            // Fallback to timestamp if counter fails to ensure order creation doesn't break
+            orderId = `ORD-${Date.now().toString().slice(-6)}`;
         }
-        const orderId = `ORD-${nextId}`;
 
         // 3b. Validate Required Fields (Early check to avoid DB error)
         if (!shippingAddress || !shippingAddress.phone) {
@@ -63,11 +79,7 @@ exports.createOrder = async (req, res) => {
         // 5. Save Order
         await order.save();
 
-        // 6. Update Listing Stock (Atomically decrement)
-        listing.stockAvailable -= quantity;
-        await listing.save();
-
-        // 7. Send Notification (Async/Fire-and-Forget to prevent lag)
+        // 6. Send Notification (Async/Fire-and-Forget to prevent lag)
         console.log('[OrderController] Processing Notification for Order:', order.orderId);
         console.log('[OrderController] Shipping Phone:', shippingAddress?.phone);
 
@@ -180,13 +192,11 @@ exports.updateOrderStatus = async (req, res) => {
             return res.json({ success: true, data: order, message: 'Status is already ' + status });
         }
 
-        // If cancelling, restore stock
+        // If cancelling, restore stock atomically
         if (status === 'Cancelled' && order.status !== 'Cancelled') {
-            const listing = await RiceListing.findById(order.listingId);
-            if (listing) {
-                listing.stockAvailable += order.quantity;
-                await listing.save();
-            }
+            await RiceListing.findByIdAndUpdate(order.listingId, {
+                $inc: { stockAvailable: order.quantity }
+            });
         }
 
         order.status = status;

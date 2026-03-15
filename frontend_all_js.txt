@@ -1,0 +1,819 @@
+
+
+--- C:\Users\RAJIV MEDAPATI\Documents\projects\qr barnd rice hub\frontend\src\i18n.js ---
+
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
+
+const resources = {
+    en: {
+        translation: {
+            "app_name": "QR BRAND'S",
+            "Login": "Login",
+            "Register": "Register / Sign Up",
+            "Welcome Back": "Welcome Back",
+            "Create Account": "Create Account",
+            "I am a": "I am a",
+            "customer": "Customer (Buyer)",
+            "supplier": "Supplier (Seller)",
+            "expert": "Expert",
+            "Full Name": "Full Name",
+            "Your full name": "Your full name",
+            "Email": "Email Address",
+            "Phone": "Phone Number",
+            "Password": "Password",
+            "Enter your password": "Enter your password",
+            "Create a password": "Create a password",
+            "Remember me": "Remember me",
+            "Forgot password?": "Forgot password?",
+            "Processing...": "Processing...",
+            "Sign In": "Sign In",
+            "Or Continue With": "Or Continue With",
+            "Sign in with Google": "Sign in with Google",
+            "Sign up with Google": "Sign up with Google",
+            "Back to Home": "Back to Home",
+            "Terms of Service": "Terms of Service",
+            "Privacy Policy": "Privacy Policy",
+            "By continuing, you agree to our": "By continuing, you agree to our",
+            "Home": "Home",
+            "Rice Listings": "Rice Listings",
+            "Compare": "Compare",
+            "Knowledge Hub": "Knowledge Hub",
+            "Supplier Panel": "Supplier Panel",
+            "My Dashboard": "My Dashboard",
+            "Admin Panel": "Admin Panel",
+            "Logout": "Logout",
+            "Clear": "Clear",
+            "Selected": "Selected",
+            "Analysis": "Analysis",
+
+            "Trusted Rice Intelligence Platform": "Trusted Rice Intelligence Platform",
+            "Right Rice": "Right Rice",
+            "Right Price": "Right Price",
+            "Compare rice brands, read expert reviews, get cooking tips — all verified and transparent. Your trusted guide for rice selection.": "Compare rice brands, read expert reviews, get cooking tips — all verified and transparent. Your trusted guide for rice selection.",
+            "Start Searching": "Start Searching",
+            "Help on WhatsApp": "Help on WhatsApp",
+            "Daily Family Use": "Daily Family Use",
+            "Function / Catering": "Function / Catering",
+            "Guests / Special Meal": "Guests / Special Meal",
+            "Healthy / Brown Rice": "Healthy / Brown Rice",
+            "How to use QR Brand's?": "How to use QR Brand's?",
+            "Simple 3-Step Process for Everyone": "Simple 3-Step Process for Everyone",
+            "Find Your Village": "Find Your Village",
+            "Type your village name or Pincode to see what rice is available near you.": "Type your village name or Pincode to see what rice is available near you.",
+            "Compare & Select": "Compare & Select",
+            "Check prices and expert reviews to pick the best rice for your family.": "Check prices and expert reviews to pick the best rice for your family.",
+            "Order for Home": "Order for Home",
+            "Place your order in 30 seconds. We deliver directly to your village address.": "Place your order in 30 seconds. We deliver directly to your village address.",
+            "Start Searching Now": "Start Searching Now",
+            "No English knowledge needed — Just type your village name": "No English knowledge needed — Just type your village name",
+            "Featured Rice": "Featured Rice",
+            "View All": "View All",
+            "Market Intelligence": "Market Intelligence",
+            "Latest rice market updates and knowledge": "Latest rice market updates and knowledge",
+            "All Updates": "All Updates",
+            "Are You a Rice Supplier?": "Are You a Rice Supplier?",
+            "List your rice brands on QR Brand's Rice Hub. Reach customers across Telugu states with verified, trusted listings.": "List your rice brands on QR Brand's Rice Hub. Reach customers across Telugu states with verified, trusted listings.",
+            "Register as Supplier": "Register as Supplier",
+
+            "Marketplace": "Marketplace",
+            "Browse premium rice listings from verified mills": "Browse premium rice listings from verified mills",
+            "All Products": "All Products",
+            "Budget Friendly": "Budget Friendly",
+            "Premium": "Premium",
+            "Search variety, brand...": "Search variety, brand...",
+            "Comparison Mode": "Comparison Mode",
+            "Analyze Selected": "Analyze Selected",
+            "Found": "Found",
+            "varieties": "varieties",
+            "Filters": "Filters",
+            "Sort By": "Sort By",
+            "Price: Low": "Price: Low",
+            "Price: High": "Price: High",
+            "Latest": "Latest",
+            "Category": "Category",
+            "All Uses": "All Uses",
+            "State": "State",
+            "Min Price": "Min Price",
+            "Max Price": "Max Price",
+            "No rice matches your filters.": "No rice matches your filters.",
+            "Try adjusting your category or search terms.": "Try adjusting your category or search terms.",
+            "Clear all filters": "Clear all filters",
+
+            "Welcome back": "Welcome back",
+            "Overview": "Overview",
+            "My Orders": "My Orders",
+            "Negotiations": "Negotiations",
+            "Profile": "Profile",
+            "Settings": "Settings",
+            "Customer": "Customer",
+            "Browse Market": "Browse Market",
+            "View All Orders": "View All Orders",
+            "Recent Purchases": "Recent Purchases",
+            "No orders yet": "No orders yet",
+            "Start exploring fresh rice from verified mills.": "Start exploring fresh rice from verified mills.",
+            "Start Shopping": "Start Shopping",
+            "My Account": "My Account"
+        }
+    },
+    te: {
+        translation: {
+            "app_name": "QR BRAND'S",
+            "Login": "లాగిన్ (Login)",
+            "Register": "నమోదు (Register/Signup)",
+            "Welcome Back": "మళ్ళీ స్వాగతం",
+            "Create Account": "కొత్త ఖాతా సృష్టించండి",
+            "I am a": "నేను ఒక",
+            "customer": "కొనుగోలుదారు (Buyer)",
+            "supplier": "సరఫరాదారు / రైతు (Seller)",
+            "expert": "నిపుణుడు (Expert)",
+            "Full Name": "పూర్తి పేరు",
+            "Your full name": "మీ పూర్తి పేరు నమోదు చేయండి",
+            "Email": "ఇమెయిల్ (Email)",
+            "Phone": "ఫోన్ నంబర్",
+            "Password": "పాస్‌వర్డ్ (Password)",
+            "Enter your password": "మీ పాస్‌వర్డ్ నమోదు చేయండి",
+            "Create a password": "కొత్త పాస్‌వర్డ్ సృష్టించండి",
+            "Remember me": "నన్ను గుర్తుంచుకో",
+            "Forgot password?": "పాస్‌వర్డ్ మర్చిపోయారా?",
+            "Processing...": "ప్రాసెస్ చేయబడుతోంది...",
+            "Sign In": "లాగిన్ అవ్వండి",
+            "Or Continue With": "లేదా దీని ద్వారా కొనసాగండి",
+            "Sign in with Google": "గూగుల్‌తో లాగిన్ అవ్వండి",
+            "Sign up with Google": "గూగుల్‌తో ఖాతా తెరవండి",
+            "Back to Home": "హోమ్‌కి తిరిగి వెళ్ళు",
+            "Terms of Service": "సేవా నిబంధనలు",
+            "Privacy Policy": "గోప్యతా విధానం",
+            "By continuing, you agree to our": "కొనసాగించడం ద్వారా మీరు అంగీకరిస్తున్నారు, మా",
+            "Home": "హోమ్",
+            "Rice Listings": "బియ్యం జాబితాలు",
+            "Compare": "పోల్చండి",
+            "Knowledge Hub": "విజ్ఞాన కేంద్రం",
+            "Supplier Panel": "సరఫరాదారు ప్యానెల్",
+            "My Dashboard": "నా డాష్‌బోర్డ్",
+            "Admin Panel": "అడ్మిన్ ప్యానెల్",
+            "Logout": "లాగ్ అవుట్",
+            "Clear": "క్లియర్",
+            "Selected": "ఎంచుకోబడింది",
+            "Analysis": "విశ్లేషణ",
+
+            "Trusted Rice Intelligence Platform": "నమ్మకమైన బియ్యం ఇంటెలిజెన్స్ ప్లాట్‌ఫారమ్",
+            "Right Rice": "సరియైన బియ్యం",
+            "Right Price": "సరైన ధర",
+            "Compare rice brands, read expert reviews, get cooking tips — all verified and transparent. Your trusted guide for rice selection.": "బియ్యం బ్రాండ్‌లను పోల్చండి, నిపుణుల సమీక్షలు చదవండి, వంట చిట్కాలను పొందండి — అన్ని ధృవీకరించబడినవి మరియు పారదర్శకమైనవి. బియ్యం ఎంపిక కోసం మీ నమ్మకమైన మార్గదర్శి.",
+            "Start Searching": "శోధన ప్రారంభించండి",
+            "Help on WhatsApp": "WhatsApp లో సహాయం",
+            "Daily Family Use": "రోజువారీ కుటుంబ వినియోగం",
+            "Function / Catering": "ఫంక్షన్ / క్యాటరింగ్",
+            "Guests / Special Meal": "అతిథులు / ప్రత్యేక భోజనం",
+            "Healthy / Brown Rice": "ఆరోగ్యకరమైన / బ్రౌన్ రైస్",
+            "How to use QR Brand's?": "QR Brand's ను ఎలా ఉపయోగించాలి?",
+            "Simple 3-Step Process for Everyone": "అందరికీ సులభమైన 3-దశల ప్రక్రియ",
+            "Find Your Village": "మీ గ్రామాన్ని కనుగొనండి",
+            "Type your village name or Pincode to see what rice is available near you.": "మీకు సమీపంలోని బియ్యం అందుబాటులో ఉన్నాయో లేదో చూడటానికి మీ గ్రామ పేరు లేదా పిన్‌కోడ్‌ని టైప్ చేయండి.",
+            "Compare & Select": "పోల్చండి మరియు ఎంచుకోండి",
+            "Check prices and expert reviews to pick the best rice for your family.": "మీ కుటుంబానికి ఉత్తమమైన బియ్యాన్ని ఎంచుకోవడానికి ధరలు మరియు నిపుణుల సమీక్షలను తనిఖీ చేయండి.",
+            "Order for Home": "ఇంటికి ఆర్డర్ చేయండి",
+            "Place your order in 30 seconds. We deliver directly to your village address.": "30 సెకన్లలో మీ ఆర్డర్‌ను చేయండి. మేము మీ గ్రామ చిరునామాకు నేరుగా డెలివరీ చేస్తాము.",
+            "Start Searching Now": "ఇప్పుడే శోధన ప్రారంభించండి",
+            "No English knowledge needed — Just type your village name": "ఆంగ్ల పరిజ్ఞానం అవసరం లేదు — నేరుగా మీ గ్రామ పేరు టైప్ చేయండి",
+            "Featured Rice": "ముఖ్యమైన బియ్యం రకాలు",
+            "View All": "అన్ని చూడండి",
+            "Market Intelligence": "మార్కెట్ ఇంటెలిజెన్స్",
+            "Latest rice market updates and knowledge": "తాజా బియ్యం మార్కెట్ నవీకరణలు మరియు జ్ఞానం",
+            "All Updates": "అన్ని నవీకరణలు",
+            "Are You a Rice Supplier?": "మీరు బియ్యం సరఫరాదారులా?",
+            "List your rice brands on QR Brand's Rice Hub. Reach customers across Telugu states with verified, trusted listings.": "QR బ్రాండ్స్ రైస్ హబ్‌లో మీ బియ్యం బ్రాండ్‌లను జాబితా చేయండి. నమ్మకమైన జాబితాలతో తెలుగు రాష్ట్రాల వ్యాప్తంగా కస్టమర్‌లను చేరుకోండి.",
+            "Register as Supplier": "సరఫరాదారుగా నమోదు చేయండి",
+
+            "Marketplace": "మార్కెట్ ప్లేస్",
+            "Browse premium rice listings from verified mills": "ధృవీకరించబడిన మిల్లుల నుండి ప్రీమియం బియ్యం జాబితాలను అన్వేషించండి",
+            "All Products": "అన్ని ఉత్పత్తులు",
+            "Budget Friendly": "బడ్జెట్ ఫ్రెండ్లీ (చవకైనవి)",
+            "Premium": "ప్రీమియం",
+            "Search variety, brand...": "రకం, బ్రాండ్ కోసం శోధించండి...",
+            "Comparison Mode": "పోలిక మోడ్",
+            "Analyze Selected": "ఎంచుకున్నవి విశ్లేషించండి",
+            "Found": "కనుగొనబడినవి",
+            "varieties": "రకాలు",
+            "Filters": "ఫిల్టర్లు",
+            "Sort By": "క్రమబద్ధీకరించు",
+            "Price: Low": "ధర: తక్కువ",
+            "Price: High": "ధర: ఎక్కువ",
+            "Latest": "తాజా",
+            "Category": "కేటగిరీ",
+            "All Uses": "అన్ని ఉపయోగాలు",
+            "State": "రాష్ట్రం",
+            "Min Price": "కనిష్ట ధర",
+            "Max Price": "గరిష్ట ధర",
+            "No rice matches your filters.": "మీ ఫిల్టర్‌లకు సరిపోయే బియ్యం లేవు.",
+            "Try adjusting your category or search terms.": "మీ కేటగిరీ లేదా శోధన పదాలను సర్దుబాటు చేసి మళ్ళీ ప్రయత్నించండి.",
+            "Clear all filters": "అన్ని ఫిల్టర్‌లను తొలగించు",
+
+            "Welcome back": "మళ్ళీ స్వాగతం",
+            "Overview": "అవలోకనం",
+            "My Orders": "నా ఆర్డర్లు",
+            "Negotiations": "చర్చలు",
+            "Profile": "ప్రొఫైల్",
+            "Settings": "సెట్టింగులు",
+            "Customer": "కస్టమర్",
+            "Browse Market": "మార్కెట్ అన్వేషించండి",
+            "View All Orders": "అన్ని ఆర్డర్‌లను చూడండి",
+            "Recent Purchases": "ఇటీవలి కొనుగోళ్లు",
+            "No orders yet": "ఇప్పటివరకు ఆర్డర్‌లు లేవు",
+            "Start exploring fresh rice from verified mills.": "ధృవీకరించబడిన మిల్లుల నుండి తాజా బియ్యం అన్వేషించండి.",
+            "Start Shopping": "షాపింగ్ ప్రారంభించండి",
+            "My Account": "నా ఖాతా"
+        }
+    },
+    hi: {
+        translation: {
+            "app_name": "QR BRAND'S",
+            "Login": "लॉग इन (Login)",
+            "Register": "पंजीकरण (Register/Signup)",
+            "Welcome Back": "वापसी पर स्वागत है",
+            "Create Account": "नया खाता बनाएँ",
+            "I am a": "मैं एक हूँ",
+            "customer": "ग्राहक / खरीदार",
+            "supplier": "आपूर्तिकर्ता / किसान",
+            "expert": "विशेषज्ञ",
+            "Full Name": "पूरा नाम",
+            "Your full name": "अपना पूरा नाम दर्ज करें",
+            "Email": "ईमेल (Email)",
+            "Phone": "फ़ोन नंबर",
+            "Password": "पासवर्ड (Password)",
+            "Enter your password": "अपना पासवर्ड दर्ज करें",
+            "Create a password": "नया पासवर्ड बनाएँ",
+            "Remember me": "मुझे याद रखें",
+            "Forgot password?": "पासवर्ड भूल गए?",
+            "Processing...": "प्रसंस्करण...",
+            "Sign In": "लॉग इन करें",
+            "Or Continue With": "या इसके साथ जारी रखें",
+            "Sign in with Google": "Google के साथ लॉग इन करें",
+            "Sign up with Google": "Google के साथ नया खाता बनाएँ",
+            "Back to Home": "होम पर वापस जाएँ",
+            "Terms of Service": "सेवा की शर्तें",
+            "Privacy Policy": "गोपनीयता नीति",
+            "By continuing, you agree to our": "जारी रखकर, आप सहमत हैं हमारे",
+            "Home": "होम",
+            "Rice Listings": "चावल सूची",
+            "Compare": "तुलना करें",
+            "Knowledge Hub": "ज्ञान केंद्र",
+            "Supplier Panel": "आपूर्तिकर्ता पैनल",
+            "My Dashboard": "मेरा डैशबोर्ड",
+            "Admin Panel": "एडमिन पैनल",
+            "Logout": "लॉग आउट",
+            "Clear": "साफ़ करें",
+            "Selected": "चयनित",
+            "Analysis": "विश्लेषण",
+
+            "Trusted Rice Intelligence Platform": "विश्वसनीय चावल इंटेलिजेंस प्लेटफॉर्म",
+            "Right Rice": "सही चावल",
+            "Right Price": "सही कीमत",
+            "Compare rice brands, read expert reviews, get cooking tips — all verified and transparent. Your trusted guide for rice selection.": "चावल ब्रांडों की तुलना करें, विशेषज्ञ समीक्षाएँ पढ़ें, खाना पकाने के सुझाव प्राप्त करें — सभी सत्यापित और पारदर्शी। चावल चयन के लिए आपका विश्वसनीय मार्गदर्शक।",
+            "Start Searching": "खोजना शुरू करें",
+            "Help on WhatsApp": "WhatsApp पर सहायता",
+            "Daily Family Use": "दैनिक पारिवारिक उपयोग",
+            "Function / Catering": "समारोह / खानपान",
+            "Guests / Special Meal": "अतिथि / विशेष भोजन",
+            "Healthy / Brown Rice": "स्वस्थ / ब्राउन राइस",
+            "How to use QR Brand's?": "QR Brand's का उपयोग कैसे करें?",
+            "Simple 3-Step Process for Everyone": "सभी के लिए सरल 3-चरणीय प्रक्रिया",
+            "Find Your Village": "अपना गाँव खोजें",
+            "Type your village name or Pincode to see what rice is available near you.": "अपने आस-पास उपलब्ध चावल देखने के लिए अपने गांव का नाम या पिनकोड टाइप करें।",
+            "Compare & Select": "तुलना करें और चुनें",
+            "Check prices and expert reviews to pick the best rice for your family.": "अपने परिवार के लिए सबसे अच्छा चावल चुनने के लिए कीमतों और विशेषज्ञ समीक्षाओं की जांच करें।",
+            "Order for Home": "घर के लिए ऑर्डर करें",
+            "Place your order in 30 seconds. We deliver directly to your village address.": "30 सेकंड में अपना ऑर्डर दें। हम सीधे आपके गाँव के पते पर डिलीवरी करते हैं।",
+            "Start Searching Now": "अभी खोजना शुरू करें",
+            "No English knowledge needed — Just type your village name": "अंग्रेजी ज्ञान की आवश्यकता नहीं — बस अपने गांव का नाम टाइप करें",
+            "Featured Rice": "चुनिंदा चावल",
+            "View All": "सभी देखें",
+            "Market Intelligence": "मार्केट इंटेलिजेंस",
+            "Latest rice market updates and knowledge": "नवीनतम चावल बाज़ार अपडेट और ज्ञान",
+            "All Updates": "सभी अपडेट",
+            "Are You a Rice Supplier?": "क्या आप चावल आपूर्तिकर्ता हैं?",
+            "List your rice brands on QR Brand's Rice Hub. Reach customers across Telugu states with verified, trusted listings.": "QR Brand's Rice Hub पर अपने चावल के ब्रांड सूचीबद्ध करें। सत्यापित सूचियों के साथ तेलुगु राज्यों के ग्राहकों तक पहुंचें।",
+            "Register as Supplier": "आपूर्तिकर्ता के रूप में पंजीकरण करें",
+
+            "Marketplace": "मार्केटप्लेस",
+            "Browse premium rice listings from verified mills": "सत्यापित मिलों से प्रीमियम चावल सूची ब्राउज़ करें",
+            "All Products": "सभी उत्पाद",
+            "Budget Friendly": "बजट फ्रेंडली",
+            "Premium": "प्रीमियम",
+            "Search variety, brand...": "किस्म, ब्रांड खोजें...",
+            "Comparison Mode": "तुलना मोड",
+            "Analyze Selected": "चयनित का विश्लेषण करें",
+            "Found": "मिला",
+            "varieties": "किस्में",
+            "Filters": "फ़िल्टर",
+            "Sort By": "क्रमबद्ध करें",
+            "Price: Low": "कीमत: कम",
+            "Price: High": "कीमत: अधिक",
+            "Latest": "नवीनतम",
+            "Category": "श्रेणी",
+            "All Uses": "सभी उपयोग",
+            "State": "राज्य",
+            "Min Price": "न्यूनतम कीमत",
+            "Max Price": "अधिकतम कीमत",
+            "No rice matches your filters.": "कोई चावल आपके फ़िल्टर से मेल नहीं खाता।",
+            "Try adjusting your category or search terms.": "अपनी श्रेणी या खोज शब्दों को समायोजित करने का प्रयास करें।",
+            "Clear all filters": "सभी फ़िल्टर साफ़ करें",
+
+            "Welcome back": "वापसी पर स्वागत है",
+            "Overview": "अवलोकन",
+            "My Orders": "मेरे ऑर्डर",
+            "Negotiations": "बातचीत",
+            "Profile": "प्रोफ़ाइल",
+            "Settings": "सेटिंग्स",
+            "Customer": "ग्राहक",
+            "Browse Market": "बाजार ब्राउज़ करें",
+            "View All Orders": "सभी ऑर्डर देखें",
+            "Recent Purchases": "हाल की खरीदारी",
+            "No orders yet": "अभी तक कोई ऑर्डर नहीं",
+            "Start exploring fresh rice from verified mills.": "सत्यापित मिलों से ताजे चावल की खोज शुरू करें।",
+            "Start Shopping": "खरीदारी शुरू करें",
+            "My Account": "मेरा खाता"
+        }
+    }
+};
+
+i18n
+    .use(LanguageDetector)
+    .use(initReactI18next)
+    .init({
+        resources,
+        fallbackLng: 'en',
+        interpolation: {
+            escapeValue: false
+        }
+    });
+
+export default i18n;
+
+
+
+--- C:\Users\RAJIV MEDAPATI\Documents\projects\qr barnd rice hub\frontend\src\data\indianStates.js ---
+
+export const indianStatesAndDistricts = {
+    "Andhra Pradesh": ["Alluri Sitharama Raju", "Anakapalli", "Anantapur", "Annamayya", "Bapatla", "Chittoor", "Dr. B.R. Ambedkar Konaseema", "East Godavari", "Eluru", "Guntur", "Kakinada", "Krishna", "Kurnool", "Nandyal", "NTR", "Palnadu", "Parvathipuram Manyam", "Prakasam", "Sri Potti Sriramulu Nellore", "Sri Sathya Sai", "Srikakulam", "Tirupati", "Visakhapatnam", "Vizianagaram", "West Godavari", "YSR Kadapa"],
+    "Arunachal Pradesh": ["Anjaw", "Changlang", "Dibang Valley", "East Kameng", "East Siang", "Kamle", "Kra Daadi", "Kurung Kumey", "Lepa Rada", "Lohit", "Longding", "Lower Dibang Valley", "Lower Siang", "Lower Subansiri", "Namsai", "Pakke Kessang", "Papum Pare", "Shi Yomi", "Siang", "Tawang", "Tirap", "Upper Siang", "Upper Subansiri", "West Kameng", "West Siang"],
+    "Assam": ["Bajali", "Baksa", "Barpeta", "Biswanath", "Bongaigaon", "Cachar", "Charaideo", "Chirang", "Darrang", "Dhemaji", "Dhubri", "Dibrugarh", "Dima Hasao", "Goalpara", "Golaghat", "Hailakandi", "Hojai", "Jorhat", "Kamrup", "Kamrup Metropolitan", "Karbi Anglong", "Karimganj", "Kokrajhar", "Lakhimpur", "Majuli", "Morigaon", "Nagaon", "Nalbari", "Sivasagar", "Sonitpur", "South Salmara-Mankachar", "Tamulpur", "Tinsukia", "Udalguri", "West Karbi Anglong"],
+    "Bihar": ["Araria", "Arwal", "Aurangabad", "Banka", "Begusarai", "Bhagalpur", "Bhojpur", "Buxar", "Darbhanga", "East Champaran", "Gaya", "Gopalganj", "Jamui", "Jehanabad", "Kaimur", "Katihar", "Khagaria", "Kishanganj", "Lakhisarai", "Madhepura", "Madhubani", "Munger", "Muzaffarpur", "Nalanda", "Nawada", "Patna", "Purnia", "Rohtas", "Saharsa", "Samastipur", "Saran", "Sheikhpura", "Sheohar", "Sitamarhi", "Siwan", "Supaul", "Vaishali", "West Champaran"],
+    "Chhattisgarh": ["Balod", "Baloda Bazar", "Balrampur", "Bastar", "Bemetara", "Bijapur", "Bilaspur", "Dantewada", "Dhamtari", "Durg", "Gariaband", "Gaurela-Pendra-Marwahi", "Janjgir-Champa", "Jashpur", "Kabirdham", "Kanker", "Khairagarh-Chhuikhadan-Gandai", "Kondagaon", "Korba", "Koriya", "Mahasamund", "Manendragarh-Chirmiri-Bharatpur", "Mohla-Manpur-Ambagarh Chowki", "Mungeli", "Narayanpur", "Raigarh", "Raipur", "Rajnandgaon", "Sakti", "Sarangarh-Bilaigarh", "Sukma", "Surajpur", "Surguja"],
+    "Goa": ["North Goa", "South Goa"],
+    "Gujarat": ["Ahmedabad", "Amreli", "Anand", "Aravalli", "Banaskantha", "Bharuch", "Bhavnagar", "Botad", "Chhota Udaipur", "Dahod", "Dang", "Devbhoomi Dwarka", "Gandhinagar", "Gir Somnath", "Jamnagar", "Junagadh", "Kheda", "Kutch", "Mahisagar", "Mehsana", "Morbi", "Narmada", "Navsari", "Panchmahal", "Patan", "Porbandar", "Rajkot", "Sabarkantha", "Surat", "Surendranagar", "Tapi", "Vadodara", "Valsad"],
+    "Haryana": ["Ambala", "Bhiwani", "Charkhi Dadri", "Faridabad", "Fatehabad", "Gurugram", "Hisar", "Jhajjar", "Jind", "Kaithal", "Karnal", "Kurukshetra", "Mahendragarh", "Nuh", "Palwal", "Panchkula", "Panipat", "Rewari", "Rohtak", "Sirsa", "Sonipat", "Yamunanagar"],
+    "Himachal Pradesh": ["Bilaspur", "Chamba", "Hamirpur", "Kangra", "Kinnaur", "Kullu", "Lahaul and Spiti", "Mandi", "Shimla", "Sirmaur", "Solan", "Una"],
+    "Jharkhand": ["Bokaro", "Chatra", "Deoghar", "Dhanbad", "Dumka", "East Singhbhum", "Garhwa", "Giridih", "Godda", "Gumla", "Hazaribagh", "Jamtara", "Khunti", "Koderma", "Latehar", "Lohardaga", "Pakur", "Palamu", "Ramgarh", "Ranchi", "Sahibganj", "Seraikela Kharsawan", "Simdega", "West Singhbhum"],
+    "Karnataka": ["Bagalkot", "Ballari", "Belagavi", "Bengaluru Rural", "Bengaluru Urban", "Bidar", "Chamarajanagar", "Chikkaballapur", "Chikkamagaluru", "Chitradurga", "Dakshina Kannada", "Davangere", "Dharwad", "Gadag", "Hassan", "Haveri", "Kalaburagi", "Kodagu", "Kolar", "Koppal", "Mandya", "Mysuru", "Raichur", "Ramanagara", "Shivamogga", "Tumakuru", "Udupi", "Uttara Kannada", "Vijayanagara", "Vijayapura", "Yadgir"],
+    "Kerala": ["Alappuzha", "Ernakulam", "Idukki", "Kannur", "Kasaragod", "Kollam", "Kottayam", "Kozhikode", "Malappuram", "Palakkad", "Pathanamthitta", "Thiruvananthapuram", "Thrissur", "Wayanad"],
+    "Madhya Pradesh": ["Agar Malwa", "Alirajpur", "Anuppur", "Ashoknagar", "Balaghat", "Barwani", "Betul", "Bhind", "Bhopal", "Burhanpur", "Chhatarpur", "Chhindwara", "Damoh", "Datia", "Dewas", "Dhar", "Dindori", "Guna", "Gwalior", "Harda", "Hoshangabad", "Indore", "Jabalpur", "Jhabua", "Katni", "Khandwa", "Khargone", "Maihar", "Mandla", "Mandsaur", "Mauganj", "Morena", "Narsinghpur", "Neemuch", "Pandhurna", "Panna", "Raisen", "Rajgarh", "Ratlam", "Rewa", "Sagar", "Satna", "Sehore", "Seoni", "Shahdol", "Shajapur", "Sheopur", "Shivpuri", "Sidhi", "Singrauli", "Tikamgarh", "Ujjain", "Umaria", "Vidisha"],
+    "Maharashtra": ["Ahmednagar", "Akola", "Amravati", "Aurangabad", "Beed", "Bhandara", "Buldhana", "Chandrapur", "Dhule", "Gadchiroli", "Gondia", "Hingoli", "Jalgaon", "Jalna", "Kolhapur", "Latur", "Mumbai City", "Mumbai Suburban", "Nagpur", "Nanded", "Nandurbar", "Nashik", "Osmanabad", "Palghar", "Parbhani", "Pune", "Raigad", "Ratnagiri", "Sangli", "Satara", "Sindhudurg", "Solapur", "Thane", "Wardha", "Washim", "Yavatmal"],
+    "Manipur": ["Bishnupur", "Chandel", "Churachandpur", "Imphal East", "Imphal West", "Jiribam", "Kakching", "Kamjong", "Kangpokpi", "Noney", "Pherzawl", "Senapati", "Tamenglong", "Tengnoupal", "Thoubal", "Ukhrul"],
+    "Meghalaya": ["East Garo Hills", "East Jaintia Hills", "East Khasi Hills", "Eastern West Khasi Hills", "North Garo Hills", "Ri Bhoi", "South Garo Hills", "South West Garo Hills", "South West Khasi Hills", "West Garo Hills", "West Jaintia Hills", "West Khasi Hills"],
+    "Mizoram": ["Aizawl", "Champhai", "Hnahthial", "Khawzawl", "Kolasib", "Lawngtlai", "Lunglei", "Mamit", "Saiha", "Saitual", "Serchhip"],
+    "Nagaland": ["Chumoukedima", "Dimapur", "Kiphire", "Kohima", "Longleng", "Mokokchung", "Mon", "Niuland", "Noklak", "Peren", "Phek", "Shamator", "Tseminyu", "Tuensang", "Wokha", "Zunheboto"],
+    "Odisha": ["Angul", "Balangir", "Balasore", "Bargarh", "Bhadrak", "Boudh", "Cuttack", "Deogarh", "Dhenkanal", "Gajapati", "Ganjam", "Jagatsinghpur", "Jajpur", "Jharsuguda", "Kalahandi", "Kandhamal", "Kendrapara", "Kendujhar", "Khordha", "Koraput", "Malkangiri", "Mayurbhanj", "Nabarangpur", "Nayagarh", "Nuapada", "Puri", "Rayagada", "Sambalpur", "Subarnapur", "Sundargarh"],
+    "Punjab": ["Amritsar", "Barnala", "Bathinda", "Faridkot", "Fatehgarh Sahib", "Fazilka", "Ferozepur", "Gurdaspur", "Hoshiarpur", "Jalandhar", "Kapurthala", "Ludhiana", "Malerkotla", "Mansa", "Moga", "Muktsar", "Nawanshahr", "Pathankot", "Patiala", "Rupnagar", "Sahibzada Ajit Singh Nagar", "Sangrur", "Tarn Taran"],
+    "Rajasthan": ["Ajmer", "Alwar", "Anupgarh", "Balotra", "Banswara", "Baran", "Barmer", "Beawar", "Bharatpur", "Bhilwara", "Bikaner", "Bundi", "Chittorgarh", "Churu", "Dausa", "Deeg", "Dholpur", "Didwana-Kuchaman", "Dudu", "Dungarpur", "Gangapur City", "Hanumangarh", "Jaipur", "Jaipur Rural", "Jaisalmer", "Jalore", "Jhalawar", "Jhunjhunu", "Jodhpur", "Jodhpur Rural", "Karauli", "Kekri", "Khairthal-Tijara", "Kota", "Kotputli-Behror", "Nagaur", "Neem Ka Thana", "Pali", "Phalodi", "Pratapgarh", "Rajsamand", "Salumbar", "Sanchore", "Sawai Madhopur", "Shahpura", "Sikar", "Sirohi", "Sri Ganganagar", "Tonk", "Udaipur"],
+    "Sikkim": ["Gangtok", "Geyzing", "Mangan", "Namchi", "Pakyong", "Soreng"],
+    "Tamil Nadu": ["Ariyalur", "Chengalpattu", "Chennai", "Coimbatore", "Cuddalore", "Dharmapuri", "Dindigul", "Erode", "Kallakurichi", "Kanchipuram", "Kanyakumari", "Karur", "Krishnagiri", "Madurai", "Mayiladuthurai", "Nagapattinam", "Namakkal", "Nilgiris", "Perambalur", "Pudukkottai", "Ramanathapuram", "Ranipet", "Salem", "Sivaganga", "Tenkasi", "Thanjavur", "Theni", "Thoothukudi", "Tiruchirappalli", "Tirunelveli", "Tirupattur", "Tiruppur", "Tiruvallur", "Tiruvannamalai", "Tiruvarur", "Vellore", "Viluppuram", "Virudhunagar"],
+    "Telangana": ["Adilabad", "Bhadradri Kothagudem", "Hanamkonda", "Hyderabad", "Jagtial", "Jangaon", "Jayashankar Bhupalpally", "Jogulamba Gadwal", "Kamareddy", "Karimnagar", "Khammam", "Komaram Bheem", "Mahabubabad", "Mahabubnagar", "Mancherial", "Medak", "Medchal-Malkajgiri", "Mulugu", "Nagarkurnool", "Nalgonda", "Narayanpet", "Nirmal", "Nizamabad", "Peddapalli", "Rajanna Sircilla", "Rangareddy", "Sangareddy", "Siddipet", "Suryapet", "Vikarabad", "Wanaparthy", "Warangal", "Yadadri Bhuvanagiri"],
+    "Tripura": ["Dhalai", "Gomati", "Khowai", "North Tripura", "Sepahijala", "South Tripura", "Unakoti", "West Tripura"],
+    "Uttar Pradesh": ["Agra", "Aligarh", "Ambedkar Nagar", "Amethi", "Amroha", "Auraiya", "Ayodhya", "Azamgarh", "Baghpat", "Bahraich", "Ballia", "Balrampur", "Banda", "Barabanki", "Bareilly", "Basti", "Bhadohi", "Bijnor", "Budaun", "Bulandshahr", "Chandauli", "Chitrakoot", "Deoria", "Etah", "Etawah", "Farrukhabad", "Fatehpur", "Firozabad", "Gautam Buddha Nagar", "Ghaziabad", "Ghazipur", "Gonda", "Gorakhpur", "Hamirpur", "Hapur", "Hardoi", "Hathras", "Jalaun", "Jaunpur", "Jhansi", "Kannauj", "Kanpur Dehat", "Kanpur Nagar", "Kasganj", "Kaushambi", "Kheri", "Kushinagar", "Lalitpur", "Lucknow", "Maharajganj", "Mahoba", "Mainpuri", "Mathura", "Mau", "Meerut", "Mirzapur", "Moradabad", "Muzaffarnagar", "Pilibhit", "Pratapgarh", "Prayagraj", "Raebareli", "Rampur", "Saharanpur", "Sambhal", "Sant Kabir Nagar", "Shahjahanpur", "Shamli", "Shravasti", "Siddharthnagar", "Sitapur", "Sonbhadra", "Sultanpur", "Unnao", "Varanasi"],
+    "Uttarakhand": ["Almora", "Bageshwar", "Chamoli", "Champawat", "Dehradun", "Haridwar", "Nainital", "Pauri Garhwal", "Pithoragarh", "Rudraprayag", "Tehri Garhwal", "Udham Singh Nagar", "Uttarkashi"],
+    "West Bengal": ["Alipurduar", "Bankura", "Birbhum", "Cooch Behar", "Dakshin Dinajpur", "Darjeeling", "Hooghly", "Howrah", "Jalpaiguri", "Jhargram", "Kalimpong", "Kolkata", "Malda", "Murshidabad", "Nadia", "North 24 Parganas", "Paschim Bardhaman", "Paschim Medinipur", "Purba Bardhaman", "Purba Medinipur", "Purulia", "South 24 Parganas", "Uttar Dinajpur"],
+    "Andaman and Nicobar Islands": ["Nicobar", "North and Middle Andaman", "South Andaman"],
+    "Chandigarh": ["Chandigarh"],
+    "Dadra and Nagar Haveli and Daman and Diu": ["Dadra and Nagar Haveli", "Daman", "Diu"],
+    "Delhi": ["Central Delhi", "East Delhi", "New Delhi", "North Delhi", "North East Delhi", "North West Delhi", "Shahdara", "South Delhi", "South East Delhi", "South West Delhi", "West Delhi"],
+    "Jammu and Kashmir": ["Anantnag", "Bandipora", "Baramulla", "Budgam", "Doda", "Ganderbal", "Jammu", "Kathua", "Kishtwar", "Kulgam", "Kupwara", "Poonch", "Pulwama", "Rajouri", "Ramban", "Reasi", "Samba", "Shopian", "Srinagar", "Udhampur"],
+    "Ladakh": ["Kargil", "Leh"],
+    "Lakshadweep": ["Lakshadweep"],
+    "Puducherry": ["Karaikal", "Mahe", "Puducherry", "Yanam"]
+};
+
+
+
+--- C:\Users\RAJIV MEDAPATI\Documents\projects\qr barnd rice hub\frontend\src\services\adminService.js ---
+
+import api from './api';
+
+export const adminService = {
+    // Dashboard Stats
+    getDashboardStats: () => api.get('/admin/dashboard/stats'),
+    getPlatformAnalytics: (params) => api.get('/admin/analytics/platform', { params }),
+
+    // Listing Management
+    getAllListings: (params) => api.get('/admin/listings', { params }),
+    approveListing: (id) => api.patch(`/admin/listings/${id}/approve`),
+    rejectListing: (id, feedback) => api.patch(`/admin/listings/${id}/reject`, { reason: feedback }),
+    deactivateListing: (id) => api.patch(`/admin/listings/${id}/deactivate`),
+    deleteListing: (id) => api.delete(`/admin/listings/${id}`),
+    activateListing: (id) => api.patch(`/admin/listings/${id}/approve`), // Re-use approve for activation since it sets isActive: true
+
+    // Supplier Management
+    getAllSuppliers: (params) => api.get('/admin/suppliers', { params }),
+    getSupplierById: (id) => api.get(`/admin/suppliers/${id}`),
+    deactivateSupplier: (id) => api.patch(`/admin/suppliers/${id}/deactivate`),
+    verifySupplierGST: (id) => api.post(`/admin/suppliers/${id}/verify-gst`),
+
+    // Review Moderation
+    getAllReviews: (params) => api.get('/admin/reviews', { params }),
+    deleteReview: (id) => api.delete(`/admin/reviews/${id}`),
+    flagReview: (id) => api.patch(`/admin/reviews/${id}/flag`),
+
+    // Expert Review Management
+    getAllExpertReviews: (params) => api.get('/expert-review', { params }),
+    createExpertReview: (data) => api.post('/expert-review', data),
+    updateExpertReview: (id, data) => api.put(`/expert-review/${id}`, data),
+    deleteExpertReview: (id) => api.delete(`/expert-review/${id}`),
+
+    // Cooking Tips Management
+    // Cooking Tips Management
+    getAllCookingTips: (params) => api.get('/cooking-tips', { params }),
+    createCookingTip: (data) => api.post('/cooking-tips', data),
+    updateCookingTip: (id, data) => api.put(`/cooking-tips/${id}`, data),
+    deleteCookingTip: (id) => api.delete(`/cooking-tips/${id}`),
+
+    // Market Updates Management
+    getAllMarketUpdates: (params) => api.get('/market-updates', { params }),
+    createMarketUpdate: (data) => api.post('/market-updates', data, { headers: { 'Content-Type': 'multipart/form-data' } }),
+    updateMarketUpdate: (id, data) => api.put(`/market-updates/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } }),
+    deleteMarketUpdate: (id) => api.delete(`/market-updates/${id}`),
+    // User Management
+    getAllUsers: (params) => api.get('/admin/users', { params }),
+    updateUserStatus: (id, status) => api.patch(`/admin/users/${id}/status`, { status }),
+
+    // Support Management
+    getAllSupportTickets: (params) => api.get('/admin/support', { params }),
+    updateTicketStatus: (id, status) => api.patch(`/admin/support/${id}`, { status }),
+    replyToTicket: (id, text) => api.post(`/admin/support/${id}/reply`, { text }),
+
+    // Top Suppliers
+    getTopSuppliers: () => api.get('/admin/dashboard/top-suppliers'),
+
+    togglePriority: (id) => api.patch(`/admin/market-updates/${id}/toggle-priority`),
+
+    // Platform Settings
+    getSettings: () => api.get('/admin/settings'),
+    updateSettings: (data) => api.put('/admin/settings', data),
+
+    // System Actions
+    triggerBackup: () => api.post('/admin/system/backup'),
+    clearCache: () => api.post('/admin/system/clear-cache')
+};
+
+
+
+--- C:\Users\RAJIV MEDAPATI\Documents\projects\qr barnd rice hub\frontend\src\services\api.js ---
+
+import axios from 'axios';
+
+const api = axios.create({
+    baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+
+// Add request interceptor for JWT
+api.interceptors.request.use(
+    (config) => {
+        const token = sessionStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
+// Add response interceptor for global error handling
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            // Token expired or invalid
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('user');
+
+            // Don't redirect if we're already on a login page or it's an auth request
+            const isLoginPage = window.location.pathname.includes('login');
+            const isAuthRequest = error.config.url.includes('/auth/login');
+
+            if (!isLoginPage && !isAuthRequest) {
+                window.location.href = '/login';
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
+export default api;
+
+
+
+--- C:\Users\RAJIV MEDAPATI\Documents\projects\qr barnd rice hub\frontend\src\services\authService.js ---
+
+import api from './api';
+
+export const authService = {
+    login: async (email, password) => {
+        const res = await api.post('/auth/login', { email, password });
+        if (res.data.success && res.data.data) {
+            const { token, ...user } = res.data.data;
+            sessionStorage.setItem('token', token);
+            sessionStorage.setItem('user', JSON.stringify(user));
+        }
+        return res.data;
+    },
+
+    googleAuth: async (idToken, role) => {
+        const res = await api.post('/auth/google', { idToken, role });
+        if (res.data.success && res.data.data) {
+            const { token, ...user } = res.data.data;
+            sessionStorage.setItem('token', token);
+            sessionStorage.setItem('user', JSON.stringify(user));
+        }
+        return res.data;
+    },
+
+    verifyMFA: async (userId, code) => {
+        const res = await api.post('/auth/verify-mfa', { userId, code });
+        if (res.data.success) {
+            const { token, ...user } = res.data.data;
+            sessionStorage.setItem('token', token);
+            sessionStorage.setItem('user', JSON.stringify(user));
+        }
+        return res.data;
+    },
+
+    register: async (userData) => {
+        const res = await api.post('/auth/register', userData);
+        if (res.data.success) {
+            const { token, ...user } = res.data.data;
+            sessionStorage.setItem('token', token);
+            sessionStorage.setItem('user', JSON.stringify(user));
+        }
+        return res.data;
+    },
+
+    logout: () => {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+    },
+
+    getCurrentUser: () => {
+        const userStr = sessionStorage.getItem('user');
+        return userStr ? JSON.parse(userStr) : null;
+    },
+
+    getToken: () => {
+        return sessionStorage.getItem('token');
+    },
+
+    isAuthenticated: () => {
+        return !!sessionStorage.getItem('token');
+    },
+
+    hasRole: (role) => {
+        const user = authService.getCurrentUser();
+        return user && user.role === role;
+    },
+
+    getProfile: async () => {
+        const res = await api.get('/auth/profile');
+        if (res.data.success) {
+            const user = res.data.data;
+            // Update session storage with fresh data, keeping the token
+            const token = sessionStorage.getItem('token');
+            sessionStorage.setItem('user', JSON.stringify(user));
+        }
+        return res.data;
+    },
+
+    updateProfile: async (userData) => {
+        const res = await api.put('/auth/profile', userData);
+        if (res.data.success) {
+            const { token, ...user } = res.data.data;
+            if (token) sessionStorage.setItem('token', token);
+            sessionStorage.setItem('user', JSON.stringify(user));
+        }
+        return res.data;
+    },
+
+    deleteAccount: async () => {
+        const res = await api.delete('/auth/profile');
+        if (res.data.success) {
+            authService.logout();
+        }
+        return res.data;
+    },
+
+    forgotPassword: async (email) => {
+        const res = await api.post('/auth/forgotpassword', { email });
+        return res.data;
+    },
+
+    resetPassword: async (token, password) => {
+        const res = await api.put(`/auth/resetpassword/${token}`, { password });
+        if (res.data.success && res.data.token) {
+            // Optional: Auto log in by setting token, but for now we won't 
+            // since getProfile is requested later, let user login manually or just set it.
+        }
+        return res.data;
+    }
+};
+
+
+
+--- C:\Users\RAJIV MEDAPATI\Documents\projects\qr barnd rice hub\frontend\src\services\index.js ---
+
+import api from './api';
+
+export const riceService = {
+    getPublicListings: (params) => api.get('/rice', { params }),
+    searchListings: (params) => api.get('/rice/search', { params }),
+    getRiceById: (id) => api.get(`/rice/${id}`),
+    compareListings: (listingIds) => api.post('/rice/compare', { listingIds }),
+};
+
+export const reviewService = {
+    getListingRatings: (id) => api.get(`/rice/${id}/ratings`),
+    getListingReviews: (id) => api.get(`/rice/${id}/reviews`),
+    submitReview: (data) => api.post('/reviews', data),
+};
+
+export const expertService = {
+    getListingExpertReview: (id) => api.get(`/rice/${id}/expert-review`),
+};
+
+export const cookingService = {
+    getListingCookingTips: (id) => api.get(`/rice/${id}/cooking-tips`),
+};
+
+export const marketService = {
+    getMarketUpdates: (params) => api.get('/market-updates', { params }),
+};
+
+export { authService } from './authService';
+export { supplierService } from './supplierService';
+export { adminService } from './adminService';
+export { watchlistService } from './watchlistService';
+export { negotiationService } from './negotiationService';
+
+
+
+--- C:\Users\RAJIV MEDAPATI\Documents\projects\qr barnd rice hub\frontend\src\services\negotiationService.js ---
+
+import api from './api';
+
+export const negotiationService = {
+    createNegotiation: (data) => api.post('/negotiations', data),
+    getMyNegotiations: () => api.get('/negotiations'),
+    getNegotiation: (id) => api.get(`/negotiations/${id}`),
+    addMessage: (id, data) => api.post(`/negotiations/${id}/messages`, data),
+    acceptNegotiation: (id) => api.put(`/negotiations/${id}/accept`),
+    rejectNegotiation: (id) => api.put(`/negotiations/${id}/reject`),
+};
+
+
+
+--- C:\Users\RAJIV MEDAPATI\Documents\projects\qr barnd rice hub\frontend\src\services\orderService.js ---
+
+import api from './api';
+
+export const orderService = {
+    createOrder: (data) => api.post('/orders', data),
+    getMyOrders: () => api.get('/orders/my-orders'),
+    getSupplierOrders: () => api.get('/orders/supplier-orders'),
+    updateStatus: (id, status) => api.put(`/orders/${id}/status`, { status }),
+    getAdminStats: () => api.get('/orders/admin/stats')
+};
+
+
+
+--- C:\Users\RAJIV MEDAPATI\Documents\projects\qr barnd rice hub\frontend\src\services\riceService.js ---
+
+import api from './api';
+
+export const riceService = {
+    // Public: Get all listings (paginated, filtered)
+    getPublicListings: (params) => api.get('/rice', { params }),
+
+    // Public: Search listings
+    searchListings: (params) => api.get('/rice/search', { params }),
+
+    // Public: Get single listing details
+    getListing: (id) => api.get(`/rice/${id}`),
+
+    // Public: Compare listings
+    compareListings: (ids) => api.post('/rice/compare', { ids }),
+
+    // Public: Get related data
+    getRatings: (id) => api.get(`/rice/${id}/ratings`),
+    getExpertReview: (id) => api.get(`/rice/${id}/expert-review`),
+    getCookingTips: (id) => api.get(`/rice/${id}/cooking-tips`),
+};
+
+
+--- C:\Users\RAJIV MEDAPATI\Documents\projects\qr barnd rice hub\frontend\src\services\supplierService.js ---
+
+import api from './api';
+
+export const supplierService = {
+    // Get supplier profile
+    getProfile: () => api.get('/supplier/profile'),
+
+    // Create supplier profile
+    createProfile: (data) => api.post('/supplier/profile', data),
+
+    // Update supplier profile (uses same endpoint as create)
+    updateProfile: (data) => api.post('/supplier/profile', data),
+
+    // Get supplier's rice listings
+    getMyListings: () => api.get('/rice/my-listings'),
+
+    // Create new rice listing
+    createListing: (formData) => api.post('/rice', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+
+    // Update rice listing stock
+    updateStock: (id, stockAvailable) => api.put(`/rice/${id}`, { stockAvailable }),
+
+    // Update rice listing full (Multipart)
+    updateListing: (id, formData) => api.put(`/rice/${id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+
+    // Deactivate listing
+    deactivateListing: (id) => api.patch(`/rice/${id}/deactivate`),
+
+    // Activate listing
+    activateListing: (id) => api.patch(`/rice/${id}/activate`),
+
+    // Delete listing
+    deleteListing: (id) => api.delete(`/rice/${id}`),
+
+    // Get dashboard stats
+    getDashboardStats: async () => {
+        const res = await api.get('/rice/my-listings');
+        const listings = res.data.data || [];
+
+        return {
+            total: listings.length,
+            approved: listings.filter(l => l.approvalStatus === 'approved').length,
+            pending: listings.filter(l => l.approvalStatus === 'pending').length,
+            rejected: listings.filter(l => l.approvalStatus === 'rejected').length,
+        };
+    },
+
+    // Get supplier reviews
+    getReviews: () => api.get('/supplier/reviews'),
+};
+
+
+
+--- C:\Users\RAJIV MEDAPATI\Documents\projects\qr barnd rice hub\frontend\src\services\supportService.js ---
+
+
+import api from './api';
+
+export const supportService = {
+    createTicket: (data) => api.post('/support', data),
+    getMyTickets: () => api.get('/support/my-tickets'),
+    addMessage: (id, text) => api.post(`/support/${id}/message`, { text })
+};
+
+
+
+--- C:\Users\RAJIV MEDAPATI\Documents\projects\qr barnd rice hub\frontend\src\services\watchlistService.js ---
+
+import api from './api';
+
+export const watchlistService = {
+    addToWatchlist: (data) => api.post('/watchlist', data),
+    getMyWatchlist: () => api.get('/watchlist'),
+    removeFromWatchlist: (id) => api.delete(`/watchlist/${id}`)
+};
+
+
+
+--- C:\Users\RAJIV MEDAPATI\Documents\projects\qr barnd rice hub\frontend\src\utils\imageOptimizer.js ---
+
+/**
+ * Cloudinary image optimization utility
+ * Automatically injects transformations for better performance
+ */
+export const optimizeImage = (url, width = 600) => {
+    if (!url || !url.includes('cloudinary.com')) return url;
+
+    // Injects f_auto (auto format) and q_auto (auto quality) and w_... (width)
+    // Assumes URL format: https://res.cloudinary.com/[cloud_name]/image/upload/v[version]/[id].[ext]
+    return url.replace('/upload/', `/upload/f_auto,q_auto,w_${width}/`);
+};
+
