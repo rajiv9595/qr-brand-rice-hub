@@ -14,10 +14,10 @@ import { StatusBar } from '@capacitor/status-bar';
 import { useTranslation } from 'react-i18next';
 import { Globe } from 'lucide-react';
 
-try {
-  StatusBar.setOverlaysWebView({ overlay: false });
-} catch (e) {
-  // Ignore error if running on web
+import { Capacitor } from '@capacitor/core';
+
+if (Capacitor.isNativePlatform()) {
+  StatusBar.setOverlaysWebView({ overlay: false }).catch(() => {});
 }
 
 // Helper function to handle ChunkLoadError during new deployments
@@ -99,9 +99,9 @@ const Layout = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { t, i18n } = useTranslation();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     const isAdmin = authService.getCurrentUser()?.role === 'admin';
-    authService.logout();
+    await authService.logout();
     navigate(isAdmin ? '/admin/login' : '/login');
     window.location.reload();
   };

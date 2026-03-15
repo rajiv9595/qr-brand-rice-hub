@@ -5,6 +5,7 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
+const cookieParser = require('cookie-parser');
 
 const connectDB = require('./config/db');
 
@@ -19,12 +20,19 @@ const app = express();
 // Trust proxy for Render/Vercel
 app.set('trust proxy', 1);
 
-// Enable CORS
-app.use(cors());
+// Enable CORS with credentials for refresh token cookies
+app.use(cors({
+    origin: process.env.FRONTEND_URL || true,
+    credentials: true,
+}));
+
+// Parse cookies (for refresh tokens)
+app.use(cookieParser());
 
 // Set security headers
 app.use(helmet({
     crossOriginResourcePolicy: false, // allow images from external domains
+    crossOriginOpenerPolicy: false // explicitly disable COOP or set it to 'same-origin-allow-popups' to fix Google Sign-In
 }));
 
 // Rate limiting (High limit to prevent 429 during normal development but still restrict DoS)

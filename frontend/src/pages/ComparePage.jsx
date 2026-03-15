@@ -7,6 +7,7 @@ import {
     Activity, CheckCircle2, AlertCircle
 } from 'lucide-react';
 import { riceService } from '../services';
+import { optimizeImage } from '../utils/imageOptimizer';
 
 const ComparePage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -167,7 +168,7 @@ const ComparePage = () => {
                                     <div className="relative aspect-[4/5] bg-rice-50 rounded-[2.5rem] p-8 flex items-center justify-center overflow-hidden mb-8">
                                         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-white/40 to-transparent" />
                                         <img
-                                            src={item.bagImageUrl || 'https://placehold.co/400x500?text=Rice'}
+                                            src={optimizeImage(item.bagImageUrl, 500) || 'https://placehold.co/400x500?text=Rice'}
                                             alt={item.brandName}
                                             className="w-full h-full object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.2)] group-hover:scale-110 transition-transform duration-700 relative z-10"
                                         />

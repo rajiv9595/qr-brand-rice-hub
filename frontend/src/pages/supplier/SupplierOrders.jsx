@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { orderService } from '../../services/orderService';
 import { Package, Truck, CheckCircle, Clock, XCircle, AlertCircle } from 'lucide-react';
+import { optimizeImage } from '../../utils/imageOptimizer';
 
 const SupplierOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -81,7 +82,7 @@ const SupplierOrders = () => {
                                 <div className="flex items-start gap-4">
                                     <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 shadow-inner border border-gray-100">
                                         <img
-                                            src={order.listingId?.bagImageUrl || `https://placehold.co/100x100?text=Rice`}
+                                            src={optimizeImage(order.listingId?.bagImageUrl, 100) || `https://placehold.co/100x100?text=Rice`}
                                             alt={order.listingId?.brandName || 'Product'}
                                             className="w-full h-full object-cover"
                                             onError={(e) => {

@@ -92,7 +92,13 @@ const riceListingSchema = new mongoose.Schema(
     }
 );
 
-// Compound index for efficient searching
+// Compound index for public listing queries (most common query pattern)
 riceListingSchema.index({ approvalStatus: 1, isActive: 1 });
+
+// Compound index for supplier-specific lookups
+riceListingSchema.index({ supplierId: 1, approvalStatus: 1 });
+
+// Text index for efficient text search on brand and variety
+riceListingSchema.index({ brandName: 'text', riceVariety: 'text' });
 
 module.exports = mongoose.model('RiceListing', riceListingSchema);

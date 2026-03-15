@@ -3,6 +3,7 @@ import { orderService } from '../../services/orderService';
 import { reviewService } from '../../services';
 import { Package, Truck, CheckCircle, XCircle, Search, Filter, ShoppingBag, Star, X, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { optimizeImage } from '../../utils/imageOptimizer';
 
 const MyOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -132,7 +133,7 @@ const MyOrders = () => {
                                 {/* Image / Thumbnail */}
                                 <div className="w-full md:w-32 aspect-square bg-gray-50 rounded-2xl overflow-hidden shadow-inner border border-gray-100 shrink-0">
                                     <img
-                                        src={order.listingId?.bagImageUrl || `https://placehold.co/150x150?text=Rice`}
+                                        src={optimizeImage(order.listingId?.bagImageUrl, 200) || `https://placehold.co/150x150?text=Rice`}
                                         alt={order.listingId?.brandName || 'Product'}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                         onError={(e) => {

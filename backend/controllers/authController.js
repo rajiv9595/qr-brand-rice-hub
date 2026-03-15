@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const generateToken = require('../utils/generateToken');
+const { generateAccessToken, generateRefreshToken, setRefreshCookie, clearRefreshCookie } = require('../utils/generateToken');
 const Joi = require('joi');
 const asyncHandler = require('../utils/asyncHandler');
 const { ROLES } = require('../utils/constants');
@@ -47,6 +47,10 @@ exports.register = asyncHandler(async (req, res) => {
     });
 
     if (user) {
+        const accessToken = generateAccessToken(user._id);
+        const refreshToken = generateRefreshToken(user._id);
+        setRefreshCookie(res, refreshToken);
+
         res.status(201).json({
             success: true,
             data: {
@@ -55,7 +59,7 @@ exports.register = asyncHandler(async (req, res) => {
                 email: user.email,
                 role: user.role,
                 address: user.address,
-                token: generateToken(user._id),
+                token: accessToken,
             },
         });
     } else {
@@ -148,6 +152,10 @@ exports.login = asyncHandler(async (req, res) => {
 
         await user.save();
 
+        const accessToken = generateAccessToken(user._id);
+        const refreshToken = generateRefreshToken(user._id);
+        setRefreshCookie(res, refreshToken);
+
         res.json({
             success: true,
             data: {
@@ -156,7 +164,7 @@ exports.login = asyncHandler(async (req, res) => {
                 email: user.email,
                 role: user.role,
                 address: user.address,
-                token: generateToken(user._id),
+                token: accessToken,
             },
         });
     } else {
@@ -252,6 +260,10 @@ exports.googleAuth = asyncHandler(async (req, res) => {
         }
 
         // Return standard login payload
+        const accessToken = generateAccessToken(user._id);
+        const refreshToken = generateRefreshToken(user._id);
+        setRefreshCookie(res, refreshToken);
+
         res.json({
             success: true,
             data: {
@@ -260,7 +272,7 @@ exports.googleAuth = asyncHandler(async (req, res) => {
                 email: user.email,
                 role: user.role,
                 address: user.address,
-                token: generateToken(user._id),
+                token: accessToken,
             },
         });
 
@@ -342,6 +354,10 @@ exports.updateProfile = asyncHandler(async (req, res) => {
 
     const updatedUser = await user.save();
 
+    const accessToken = generateAccessToken(updatedUser._id);
+    const refreshToken = generateRefreshToken(updatedUser._id);
+    setRefreshCookie(res, refreshToken);
+
     res.json({
         success: true,
         data: {
@@ -352,7 +368,7 @@ exports.updateProfile = asyncHandler(async (req, res) => {
             address: updatedUser.address,
             role: updatedUser.role,
             isVerified: updatedUser.isVerified,
-            token: generateToken(updatedUser._id),
+            token: accessToken,
         },
     });
 });
@@ -421,6 +437,10 @@ exports.verifyMFA = asyncHandler(async (req, res) => {
     user.mfaExpires = undefined;
     await user.save();
 
+    const accessToken = generateAccessToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
+    setRefreshCookie(res, refreshToken);
+
     res.json({
         success: true,
         data: {
@@ -429,7 +449,7 @@ exports.verifyMFA = asyncHandler(async (req, res) => {
             email: user.email,
             role: user.role,
             address: user.address,
-            token: generateToken(user._id),
+            token: accessToken,
         },
     });
 });
@@ -497,7 +517,7 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({
         success: true,
-        token: generateToken(user._id),
+        token: generateAccessToken(user._id),
     });
 });
 
@@ -600,6 +620,10 @@ exports.verifyOtp = asyncHandler(async (req, res) => {
 
     await user.save();
 
+    const accessToken = generateAccessToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
+    setRefreshCookie(res, refreshToken);
+
     res.json({
         success: true,
         data: {
@@ -609,7 +633,56 @@ exports.verifyOtp = asyncHandler(async (req, res) => {
             role: user.role,
             address: user.address,
             isVerified: user.isVerified,
-            token: generateToken(user._id),
+            token: accessToken,
         },
     });
+});
+
+// @desc    Refresh access token using refresh token cookie
+// @route   POST /api/auth/refresh-token
+// @access  Public (requires valid refresh cookie)
+exports.refreshToken = asyncHandler(async (req, res) => {
+    const token = req.cookies?.refreshToken;
+
+    if (!token) {
+        res.status(401);
+        throw new Error('No refresh token provided');
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id);
+
+        if (!user) {
+            res.status(401);
+            throw new Error('User not found');
+        }
+
+        // Issue new access token
+        const newAccessToken = generateAccessToken(user._id);
+
+        res.json({
+            success: true,
+            data: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                address: user.address,
+                token: newAccessToken,
+            },
+        });
+    } catch (error) {
+        clearRefreshCookie(res);
+        res.status(401);
+        throw new Error('Refresh token expired or invalid. Please login again.');
+    }
+});
+
+// @desc    Logout - clear refresh token cookie
+// @route   POST /api/auth/logout
+// @access  Public
+exports.logout = asyncHandler(async (req, res) => {
+    clearRefreshCookie(res);
+    res.json({ success: true, message: 'Logged out successfully' });
 });

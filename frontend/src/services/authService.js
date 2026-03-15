@@ -41,7 +41,12 @@ export const authService = {
         return res.data;
     },
 
-    logout: () => {
+    logout: async () => {
+        try {
+            await api.post('/auth/logout'); // Clears the httpOnly refresh token cookie
+        } catch (e) {
+            // Ignore errors during logout (e.g. if already logged out)
+        }
         sessionStorage.removeItem('token');
         sessionStorage.removeItem('user');
     },

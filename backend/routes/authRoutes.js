@@ -11,7 +11,9 @@ const {
     resetPassword,
     googleAuth,
     sendOtp,
-    verifyOtp
+    verifyOtp,
+    refreshToken,
+    logout
 } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -28,5 +30,7 @@ router.route('/profile')
 
 router.post('/forgotpassword', forgotPassword);
 router.put('/resetpassword/:resettoken', resetPassword);
+router.post('/refresh-token', refreshToken);
+router.post('/logout', logout);
 
 module.exports = router;

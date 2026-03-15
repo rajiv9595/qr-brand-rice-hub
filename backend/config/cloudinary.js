@@ -13,9 +13,21 @@ const storage = new CloudinaryStorage({
     params: {
         folder: 'rice_hub',
         allowed_formats: ['jpg', 'png', 'jpeg', 'webp', 'avif', 'heic', 'heif', 'bmp', 'tiff'],
+        // Automatic optimization on upload
+        quality: 'auto',       // Cloudinary chooses optimal compression
+        format: 'auto',        // Serves WebP/AVIF to supported browsers
+        transformation: [
+            { width: 1200, height: 1200, crop: 'limit' }  // Cap resolution to 1200px max
+        ],
     },
 });
 
-const upload = multer({ storage: storage });
+// 5MB file size limit to reject oversized images before Cloudinary upload
+const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB max per file
+    },
+});
 
 module.exports = { cloudinary, upload };

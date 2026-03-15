@@ -71,12 +71,10 @@ const supplierProfileSchema = new mongoose.Schema(
         location: {
             type: {
                 type: String,
-                enum: ['Point'],
-                default: 'Point'
+                enum: ['Point']
             },
             coordinates: {
-                type: [Number],
-                default: [0, 0] // [longitude, latitude]
+                type: [Number]  // [longitude, latitude] — no default to avoid Null Island pollution
             }
         }
     },
@@ -89,5 +87,8 @@ const supplierProfileSchema = new mongoose.Schema(
 
 // Geospatial index for 50km radius search
 supplierProfileSchema.index({ location: '2dsphere' });
+
+// Compound index for district + state text-based filtering
+supplierProfileSchema.index({ district: 1, state: 1 });
 
 module.exports = mongoose.model('SupplierProfile', supplierProfileSchema);

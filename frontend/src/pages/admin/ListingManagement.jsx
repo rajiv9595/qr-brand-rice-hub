@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, CheckCircle, XCircle, Eye, EyeOff, AlertCircle, Trash2, AlertTriangle } from 'lucide-react';
 import { adminService } from '../../services/adminService';
+import { optimizeImage } from '../../utils/imageOptimizer';
 
 const ListingManagement = () => {
     const [activeTab, setActiveTab] = useState('pending');
@@ -166,7 +167,7 @@ const ListingManagement = () => {
                                 {/* Image */}
                                 <div className="w-full lg:w-32 h-32 bg-gray-100 rounded-2xl overflow-hidden shrink-0">
                                     <img
-                                        src={listing.bagImageUrl || 'https://via.placeholder.com/200?text=Rice'}
+                                        src={optimizeImage(listing.bagImageUrl, 200) || 'https://via.placeholder.com/200?text=Rice'}
                                         alt={listing.brandName}
                                         className="w-full h-full object-cover"
                                     />
@@ -375,12 +376,12 @@ const ListingManagement = () => {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <img
-                                    src={detailModal.listing.bagImageUrl}
+                                    src={optimizeImage(detailModal.listing.bagImageUrl, 400)}
                                     alt="Bag"
                                     className="w-full h-48 object-cover rounded-xl"
                                 />
                                 <img
-                                    src={detailModal.listing.grainImageUrl}
+                                    src={optimizeImage(detailModal.listing.grainImageUrl, 400)}
                                     alt="Grain"
                                     className="w-full h-48 object-cover rounded-xl"
                                 />

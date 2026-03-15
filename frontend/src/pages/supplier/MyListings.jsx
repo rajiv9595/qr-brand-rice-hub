@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Edit, Eye, EyeOff, Package, AlertCircle, Pencil, Check, X, Trash2 } from 'lucide-react';
 import { supplierService } from '../../services/supplierService';
+import { optimizeImage } from '../../utils/imageOptimizer';
 
 const MyListings = () => {
     const [listings, setListings] = useState([]);
@@ -160,7 +161,7 @@ const MyListings = () => {
                                 {/* Image */}
                                 <div className="w-full md:w-32 h-32 bg-gray-100 rounded-2xl overflow-hidden shrink-0">
                                     <img
-                                        src={listing.bagImageUrl || 'https://via.placeholder.com/200?text=Rice'}
+                                        src={optimizeImage(listing.bagImageUrl, 200) || 'https://via.placeholder.com/200?text=Rice'}
                                         alt={listing.brandName}
                                         className="w-full h-full object-cover"
                                     />

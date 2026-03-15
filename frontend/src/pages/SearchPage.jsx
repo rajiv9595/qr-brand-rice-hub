@@ -6,6 +6,7 @@ import { useAppStore } from '../context/AppContext';
 import { riceService, watchlistService } from '../services';
 import { authService } from '../services/authService';
 import ProfessionalAddressSearch from '../components/common/ProfessionalAddressSearch';
+import { optimizeImage } from '../utils/imageOptimizer';
 
 const SearchPage = () => {
     const { t } = useTranslation();
@@ -362,7 +363,7 @@ const SearchPage = () => {
                             {/* Image Container with Consistent Aspect Ratio */}
                             <div className="aspect-[3/4] p-4 bg-rice-50 relative flex items-center justify-center overflow-hidden">
                                 <img
-                                    src={item.bagImageUrl || 'https://via.placeholder.com/400x300?text=Rice+Bag'}
+                                    src={optimizeImage(item.bagImageUrl, 400) || 'https://via.placeholder.com/400x300?text=Rice+Bag'}
                                     alt={item.brandName}
                                     className="w-full h-full object-contain drop-shadow-xl group-hover:scale-105 transition-transform duration-500"
                                 />

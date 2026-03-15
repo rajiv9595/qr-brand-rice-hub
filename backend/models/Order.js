@@ -72,4 +72,8 @@ const orderSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+// Compound indexes for common query patterns
+orderSchema.index({ buyerId: 1, status: 1, orderDate: -1 });     // Buyer order history
+orderSchema.index({ supplierId: 1, status: 1, orderDate: -1 });  // Supplier order management
+
 module.exports = mongoose.model('Order', orderSchema);
