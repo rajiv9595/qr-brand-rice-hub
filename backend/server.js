@@ -32,7 +32,7 @@ app.use(cookieParser());
 // Set security headers
 app.use(helmet({
     crossOriginResourcePolicy: false, // allow images from external domains
-    crossOriginOpenerPolicy: false // explicitly disable COOP or set it to 'same-origin-allow-popups' to fix Google Sign-In
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' } // Recommended for Google Sign-In/Popups
 }));
 
 // Rate limiting (High limit to prevent 429 during normal development but still restrict DoS)
