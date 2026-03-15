@@ -3,6 +3,9 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpBackend from 'i18next-http-backend';
 
+// Suppress the i18next Locize promotional console message
+window.__locize_promo_suppressed = true;
+
 i18n
     .use(HttpBackend)          // Load translations from /locales/{lng}/translation.json
     .use(LanguageDetector)     // Auto-detect browser language
@@ -10,6 +13,7 @@ i18n
     .init({
         fallbackLng: 'en',
         supportedLngs: ['en', 'te', 'hi'],
+        debug: false,
         interpolation: {
             escapeValue: false
         },
