@@ -270,15 +270,14 @@ exports.searchListings = asyncHandler(async (req, res) => {
 // @route   GET /api/rice/best-deals
 // @access  Public
 exports.getBestDeals = asyncHandler(async (req, res) => {
-    // Best deals are typically budget-friendly rice or listings with high ratings
+    // Return top high-rated active listings to show variety on home screen
     const deals = await RiceListing.find({
         approvalStatus: APPROVAL_STATUS.APPROVED,
         isActive: true,
-        priceCategory: PRICE_CATEGORIES.BUDGET
     })
     .populate('supplierId', 'millName district state badges trustScore metrics')
-    .sort({ averageRating: -1, pricePerBag: 1 })
-    .limit(10);
+    .sort({ averageRating: -1, createdAt: -1 })
+    .limit(20);
 
     res.json({ success: true, data: deals });
 });
