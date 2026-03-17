@@ -9,12 +9,17 @@ const { syncSupplierTrust } = require('../utils/trustScoreGenerator');
 // @route   POST /api/supplier/profile
 // @access  Private (Supplier)
 exports.upsertProfile = asyncHandler(async (req, res) => {
-    // Allow client to send bankDetails as a JSON string inside multipart/form-data
+    // Normalize bankDetails for multipart/form-data / string formats
+    if (req.body.bankDetails === '') {
+        req.body.bankDetails = null;
+    }
+
     if (req.body.bankDetails && typeof req.body.bankDetails === 'string') {
         try {
             req.body.bankDetails = JSON.parse(req.body.bankDetails);
         } catch (e) {
-            // ignore parsing errors; Joi will validate the type
+            // Failed to parse: treat it as absent so schema validation doesn't fail
+            req.body.bankDetails = null;
         }
     }
 
