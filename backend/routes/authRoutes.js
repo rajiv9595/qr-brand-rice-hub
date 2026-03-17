@@ -13,7 +13,8 @@ const {
     sendOtp,
     verifyOtp,
     refreshToken,
-    logout
+    logout,
+    phoneLogin
 } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -23,6 +24,7 @@ router.post('/google', googleAuth);
 router.post('/verify-mfa', verifyMFA);
 router.post('/send-otp', sendOtp);
 router.post('/verify-otp', verifyOtp);
+router.post('/phone-login', phoneLogin);
 router.route('/profile')
     .get(protect, getProfile)
     .put(protect, updateProfile)
@@ -34,3 +36,4 @@ router.post('/refresh-token', refreshToken);
 router.post('/logout', logout);
 
 module.exports = router;
+

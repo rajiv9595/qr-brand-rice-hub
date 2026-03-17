@@ -9,8 +9,9 @@ const userSchema = new mongoose.Schema(
         },
         email: {
             type: String,
-            required: [true, 'Please add an email'],
+            required: false,
             unique: true,
+            sparse: true,
             lowercase: true,
             trim: true,
             match: [
@@ -33,9 +34,9 @@ const userSchema = new mongoose.Schema(
         },
         password: {
             type: String,
-            required: [true, 'Please add a password'],
+            required: false,
             minlength: 6,
-            select: false, // Don't return password by default
+            select: false,
         },
         role: {
             type: String,

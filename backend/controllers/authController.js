@@ -12,12 +12,12 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || 'dummy_client_id
 // @route   POST /api/auth/register
 // @access  Public
 exports.register = asyncHandler(async (req, res) => {
-    // Validation Schema
+    // Validation Schema: Email and Password are optional if Phone is provided (Mobile App flow)
     const schema = Joi.object({
         name: Joi.string().required(),
-        email: Joi.string().email().required(),
-        password: Joi.string().min(6).required(),
-        phone: Joi.string().allow('', null),
+        email: Joi.string().email().optional(),
+        password: Joi.string().min(6).optional(),
+        phone: Joi.string().allow('', null).optional(),
         role: Joi.string().valid(...Object.values(ROLES)),
     });
 
@@ -29,22 +29,44 @@ exports.register = asyncHandler(async (req, res) => {
 
     const { name, email, password, phone, role } = req.body;
 
-    // Check if user exists
-    const userExists = await User.findOne({ email });
+    // Strict validation for non-phone registration
+    if (!phone && (!email || !password)) {
+        res.status(400);
+        throw new Error('Please provide email and password for registration');
+    }
+
+    // Check if user exists (by email or phone)
+    let userExists = null;
+    if (email) {
+        userExists = await User.findOne({ email });
+    }
+    if (!userExists && phone) {
+        // Strip +91 for searching
+        const normalizedPhone = phone.replace(/^\+91/, '').trim();
+        userExists = await User.findOne({ 
+            $or: [
+                { phone: phone },
+                { phone: normalizedPhone },
+                { phone: `+91${normalizedPhone}` }
+            ]
+        });
+    }
 
     if (userExists) {
         res.status(400);
-        throw new Error('User already exists');
+        throw new Error('User already exists with this email or phone number');
     }
 
     // Create user
-    const user = await User.create({
+    const userData = {
         name,
-        email,
-        password,
-        phone,
         role: role || ROLES.CUSTOMER,
-    });
+    };
+    if (email) userData.email = email;
+    if (password) userData.password = password;
+    if (phone) userData.phone = phone;
+
+    const user = await User.create(userData);
 
     if (user) {
         const accessToken = generateAccessToken(user._id);
@@ -702,4 +724,52 @@ exports.refreshToken = asyncHandler(async (req, res) => {
 exports.logout = asyncHandler(async (req, res) => {
     clearRefreshCookie(res);
     res.json({ success: true, message: 'Logged out successfully' });
+});
+
+// @desc    Phone Login (Mobile App) — lookup user by phone after Firebase OTP
+// @route   POST /api/auth/phone-login
+// @access  Public
+exports.phoneLogin = asyncHandler(async (req, res) => {
+    const { phone } = req.body;
+
+    if (!phone) {
+        res.status(400);
+        throw new Error('Phone number is required');
+    }
+
+    // Normalize phone: strip +91 prefix if present
+    const normalizedPhone = phone.replace(/^\+91/, '').trim();
+
+    // Search with multiple formats
+    const user = await User.findOne({
+        $or: [
+            { phone: normalizedPhone },
+            { phone: `+91${normalizedPhone}` },
+            { phone: phone },
+        ]
+    });
+
+    if (!user) {
+        res.status(404);
+        throw new Error('User not found. Please register.');
+    }
+
+    const accessToken = generateAccessToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
+    setRefreshCookie(res, refreshToken);
+
+    res.json({
+        success: true,
+        data: {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            phone: user.phone,
+            role: user.role,
+            address: user.address,
+            shopName: user.shopName,
+            isVerified: user.isVerified,
+            token: accessToken,
+        },
+    });
 });
