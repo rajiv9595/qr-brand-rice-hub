@@ -147,8 +147,7 @@ exports.getProfile = asyncHandler(async (req, res) => {
         .populate('userId', 'name email phone isVerified role autoActivateAt');
 
     if (!profile) {
-        res.status(404);
-        throw new Error('Supplier profile not found');
+        return res.status(404).json({ success: false, message: 'Supplier profile not found' });
     }
 
     // Force sync the latest trust indicators

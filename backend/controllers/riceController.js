@@ -154,8 +154,7 @@ exports.updateListing = asyncHandler(async (req, res) => {
 exports.getMyListings = asyncHandler(async (req, res) => {
     const supplierProfile = await SupplierProfile.findOne({ userId: req.user._id });
     if (!supplierProfile) {
-        res.status(404);
-        throw new Error('Supplier profile not found');
+        return res.status(404).json({ success: false, message: 'Supplier profile not found' });
     }
 
     const listings = await RiceListing.find({ supplierId: supplierProfile._id });

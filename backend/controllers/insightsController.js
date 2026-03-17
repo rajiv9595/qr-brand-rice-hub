@@ -8,8 +8,7 @@ const asyncHandler = require('../utils/asyncHandler');
 exports.getSupplierBenchmarking = asyncHandler(async (req, res) => {
     const profile = await SupplierProfile.findOne({ userId: req.user._id });
     if (!profile) {
-        res.status(404);
-        throw new Error('Supplier profile not found');
+        return res.status(404).json({ success: false, message: 'Supplier profile not found' });
     }
 
     // 1. Get all active listings for this supplier
