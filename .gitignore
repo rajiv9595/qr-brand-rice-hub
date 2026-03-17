@@ -23,6 +23,8 @@ RiceApp/
 backend/.env
 frontend/.env
 frontend/dist/
+
+# Logs
 *.log
 .npm/
 .expo/
