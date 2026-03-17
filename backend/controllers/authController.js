@@ -713,8 +713,10 @@ exports.refreshToken = asyncHandler(async (req, res) => {
         });
     } catch (error) {
         clearRefreshCookie(res);
-        res.status(401);
-        throw new Error('Refresh token expired or invalid. Please login again.');
+        return res.status(401).json({
+            success: false,
+            message: 'Refresh token expired or invalid. Please login again.',
+        });
     }
 });
 
