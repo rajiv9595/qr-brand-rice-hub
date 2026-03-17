@@ -52,6 +52,11 @@ exports.createListing = asyncHandler(async (req, res) => {
         throw new Error('Please create a supplier profile first');
     }
 
+    if (!supplierProfile.gstNumber || supplierProfile.gstNumber.trim() === '') {
+        res.status(400);
+        throw new Error('Please complete your profile (GST number required) before creating a listing');
+    }
+
     const listingData = {
         ...req.body,
         supplierId: supplierProfile._id,
