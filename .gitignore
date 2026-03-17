@@ -11,8 +11,15 @@ node_modules/
 backend/node_modules/
 frontend/node_modules/
 
-# Mobile App (Completely Ignored for GitHub)
-RiceApp/
+# Mobile App (Enabling tracking but ignoring heavy folders)
+# RiceApp/
+RiceApp/node_modules/
+RiceApp/android/build/
+RiceApp/ios/build/
+RiceApp/android/.gradle/
+RiceApp/android/.idea/
+RiceApp/.expo/
+RiceApp/error.log
 
 # Environment / Build
 .env
