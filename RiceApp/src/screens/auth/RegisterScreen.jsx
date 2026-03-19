@@ -1,4 +1,4 @@
-// RiceApp/src/screens/auth/RegisterScreen.jsx
+// RiceSelect/src/screens/auth/RegisterScreen.jsx
 // Premium Registration Flow for RiceHub
 // Upgraded with role selection cards, Material Icons, and branded LoadingSpinner
 
@@ -6,7 +6,7 @@ import React, { useState, useContext } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
   StyleSheet, StatusBar, KeyboardAvoidingView,
-  Platform, ActivityIndicator, Alert, ScrollView,
+  Platform, ActivityIndicator, Alert, ScrollView, Image,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -134,9 +134,7 @@ const RegisterScreen = () => {
             <TouchableOpacity style={styles.backBtn} onPress={() => step === 'select' ? navigation.goBack() : setStep('select')}>
               <Icon name="arrow-left" size={24} color={Colors.textPrimary} />
             </TouchableOpacity>
-            <View style={styles.logoBox}>
-               <Icon name="account-plus" size={32} color={Colors.primary} />
-            </View>
+            <Image source={require('../../assets/logo.png')} style={styles.logoImage} />
           </View>
 
           {step === 'select' ? renderSelection() : (
@@ -249,7 +247,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFF' },
   header: { paddingHorizontal: 24, paddingBottom: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   backBtn: { position: 'absolute', left: 24, top: 50, padding: 8 },
-  logoBox: { width: 56, height: 56, borderRadius: 16, backgroundColor: Colors.primaryLight, alignItems: 'center', justifyContent: 'center', marginTop: 30 },
+  logoImage: { width: 56, height: 56, borderRadius: 16, marginTop: 30, resizeMode: 'contain' },
   
   selectionView: { padding: 30, alignItems: 'center', flex: 1, justifyContent: 'center' },
   selectionTitle: { fontSize: 24, fontWeight: '900', color: Colors.textPrimary, marginBottom: 8 },

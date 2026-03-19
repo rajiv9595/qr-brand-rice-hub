@@ -5,7 +5,7 @@
 import React, { useState, useContext } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet,
-  StatusBar, ActivityIndicator, Alert, ScrollView,
+  StatusBar, ActivityIndicator, Alert, ScrollView, Image,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -80,9 +80,7 @@ const RoleSelectScreen = () => {
       <LoadingSpinner visible={loading} fullScreen message="Setting up your account..." />
 
       <View style={[styles.header, { paddingTop: insets.top + 30 }]}>
-         <View style={styles.logoBox}>
-            <Icon name="account-group" size={32} color="#FFF" />
-         </View>
+         <Image source={require('../../assets/logo.png')} style={styles.logoImage} />
          <Text style={styles.title}>{lang === 'te' ? 'మీరు ఎవరు?' : 'Who are you?'}</Text>
          <Text style={styles.subtitle}>{lang === 'te' ? 'మీ పాత్రను ఎంచుకోండి' : 'Select your primary role'}</Text>
       </View>
@@ -133,16 +131,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  logoBox: {
-    width: 64,
-    height: 64,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  logoImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 18,
     marginBottom: 20,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.3)',
+    resizeMode: 'contain',
   },
   title: { fontSize: 28, fontWeight: '900', color: '#FFF' },
   subtitle: { fontSize: 16, color: 'rgba(255,255,255,0.85)', marginTop: 4, fontWeight: '600' },

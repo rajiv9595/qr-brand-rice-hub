@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
   StyleSheet, StatusBar, KeyboardAvoidingView,
-  Platform, ActivityIndicator, Alert, ScrollView,
+  Platform, ActivityIndicator, Alert, ScrollView, Image,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -98,9 +98,7 @@ const LoginScreen = () => {
 
       {/* Header with App Branding */}
       <View style={styles.topSection}>
-        <View style={styles.logoBox}>
-          <Text style={styles.logoText}>QR</Text>
-        </View>
+        <Image source={require('../../assets/logo.png')} style={styles.logoImage} />
         <Text style={styles.appName}>{t('greeting')}</Text>
         <Text style={styles.tagline}>{t('greetingSub')}</Text>
       </View>
@@ -214,19 +212,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 40,
   },
-  logoBox: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  logoImage: {
+    width: 90,
+    height: 90,
+    borderRadius: 22,
     marginBottom: 16,
-  },
-  logoText: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#fff',
+    resizeMode: 'contain',
   },
   appName: {
     fontSize: 30,

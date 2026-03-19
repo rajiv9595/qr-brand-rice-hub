@@ -1,5 +1,5 @@
 // AppHeader.jsx
-// Standard header for all screens in the RiceApp.
+// Standard header for all screens in RiceSelect.
 // Supports Back button, Screen Title, and Subtitle (Bilingual).
 
 import React from 'react';

@@ -1,11 +1,11 @@
-// RiceApp/src/screens/auth/OTPScreen.jsx
+// RiceSelect/src/screens/auth/OTPScreen.jsx
 // Premium OTP Verification for RiceHub
 // Upgraded with focused input cards, branded Glass-header, and strict token logic
 
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, StatusBar, ActivityIndicator, Alert, ScrollView,
+  StyleSheet, StatusBar, ActivityIndicator, Alert, ScrollView, Image,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -128,9 +128,7 @@ const OTPScreen = () => {
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
             <Icon name="arrow-left" size={24} color="#FFF" />
         </TouchableOpacity>
-        <View style={styles.logoGlass}>
-            <Icon name="shield-lock" size={32} color="#FFF" />
-        </View>
+        <Image source={require('../../assets/logo.png')} style={styles.logoImage} />
         <Text style={styles.title}>{t.title}</Text>
         <Text style={styles.titleEn}>{t.titleEn}</Text>
       </View>
@@ -199,16 +197,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  logoGlass: {
+  logoImage: {
     width: 64,
     height: 64,
     borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.22)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.3)',
     marginBottom: 16,
+    resizeMode: 'contain',
   },
   title: { fontSize: 26, fontWeight: '900', color: '#FFF' },
   titleEn: { fontSize: 14, color: 'rgba(255,255,255,0.85)', marginTop: 4, fontWeight: '600' },
