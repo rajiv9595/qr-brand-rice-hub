@@ -14,6 +14,7 @@ import { AuthContext, AuthProvider }  from './src/context/AuthContext';
 import { LangProvider }               from './src/context/LangContext';
 import { LocationProvider }           from './src/context/LocationContext';
 import RootNavigator                  from './src/navigation/RootNavigator';
+import ErrorBoundary                  from './src/components/common/ErrorBoundary';
 
 // API base URL for wake-up
 const API_BASE_URL = process.env.API_BASE_URL || 'https://qr-brand-rice-hub-api.onrender.com/api';
@@ -46,15 +47,17 @@ const App = () => {
 
   return (
     <SafeAreaProvider style={{ flex: 1 }}>
-      <LangProvider>
-        <AuthProvider>
-          <LocationProvider>
-            <NavigationContainer>
-              <RootNavigator />
-            </NavigationContainer>
-          </LocationProvider>
-        </AuthProvider>
-      </LangProvider>
+      <ErrorBoundary>
+        <LangProvider>
+          <AuthProvider>
+            <LocationProvider>
+              <NavigationContainer>
+                <RootNavigator />
+              </NavigationContainer>
+            </LocationProvider>
+          </AuthProvider>
+        </LangProvider>
+      </ErrorBoundary>
     </SafeAreaProvider>
   );
 };

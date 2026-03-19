@@ -19,6 +19,7 @@ import { useDeals }           from '../../hooks/useDeals';
 import { formatCurrency }     from '../../utils/formatCurrency';
 import { formatDistance }     from '../../utils/formatDistance';
 import { openWhatsApp }       from '../../utils/openWhatsApp';
+import SkeletonCard          from '../../components/common/SkeletonCard';
 
 // ─── Sub-component: Language Toggle Pill ─────────────────────────────────────
 const LangToggle = () => {
@@ -287,10 +288,9 @@ const HomeScreen = () => {
           </TouchableOpacity>
         </View>
         {loading && deals.length === 0 ? (
-          <View style={{ padding: 40, alignItems: 'center' }}>
-            <ActivityIndicator size="large" color={Colors.primary} />
-            <Text style={{ marginTop: 10, color: Colors.textSecondary }}>Loading from server...</Text>
-          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.dealsList}>
+            {[1, 2, 3].map(i => <SkeletonCard key={i} />)}
+          </ScrollView>
         ) : filteredDeals.length === 0 ? (
           <View style={{ padding: 30, alignItems: 'center' }}>
             <Text style={{ fontSize: 40 }}>📭</Text>
@@ -310,6 +310,9 @@ const HomeScreen = () => {
               <DealCard item={item} onPress={() => navigation.navigate('ListingDetail', { id: item._id })} />
             )}
             contentContainerStyle={styles.dealsList}
+            initialNumToRender={5}
+            windowSize={5}
+            maxToRenderPerBatch={5}
           />
         )}
 

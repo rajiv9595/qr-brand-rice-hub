@@ -1,6 +1,6 @@
 // screens/trader/TraderProfile.jsx
-import React, { useContext, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, StatusBar, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import React, { useContext, useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, StatusBar, ScrollView, Alert, ActivityIndicator, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { useNavigation } from '@react-navigation/native';
@@ -12,15 +12,24 @@ import AppHeader from '../../components/common/AppHeader';
 
 const TraderProfile = () => {
   const navigation = useNavigation();
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout, syncUser } = useContext(AuthContext);
   const insets = useSafeAreaInsets();
   const { t } = useLang();
   const { getCurrentLocation, locLoading } = useLocation();
   const [loading, setLoading] = useState(false);
 
+  // Force Sync on Mount to ensure latest "Green Signal" from server 🛡️
+  useEffect(() => {
+    syncUser();
+  }, []);
+
   // Address logic
   const address = user?.address;
-  const hasAddress = address && Object.keys(address).length > 0 && (address.street || address.village || address.city);
+  // Handle both string and object address formats from backend
+  const hasAddress = address && (
+    (typeof address === 'object' && (address.street || address.village || address.city)) ||
+    (typeof address === 'string' && address.length > 5)
+  );
 
   const handleUpdateLocation = async () => {
     setLoading(true);
@@ -35,7 +44,7 @@ const TraderProfile = () => {
   };
 
   const renderMenuItem = (icon, title, sub, onPress, color = Colors.primary) => (
-    <TouchableOpacity style={styles.menuItem} onPress={onPress}>
+    <TouchableOpacity style={styles.menuItem} onPress={onPress} activeOpacity={0.7}>
        <View style={[styles.menuIconBox, { backgroundColor: color + '15' }]}>
           <Icon name={icon} size={18} color={color} />
        </View>
@@ -46,6 +55,18 @@ const TraderProfile = () => {
        <Icon name="chevron-right" size={14} color="#CCC" />
     </TouchableOpacity>
   );
+
+  // Professional Verification Mapping
+  const isVerified = user?.isVerified === true;
+  const isAutoVerifyTimerActive = user?.autoActivateAt && new Date(user.autoActivateAt) > new Date();
+
+  const getStatusInfo = () => {
+    if (isVerified) return { text: 'VERIFIED SELLER', bg: '#DEF7EC', border: '#10B981', textColor: '#03543F' };
+    if (isAutoVerifyTimerActive) return { text: 'ACTIVATING AUTOMATICALLY...', bg: '#E3F2FD', border: '#1E88E5', textColor: '#1565C0' };
+    return { text: 'PENDING VERIFICATION', bg: '#FFFBEB', border: '#FED7AA', textColor: '#D97706' };
+  };
+
+  const status = getStatusInfo();
 
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom }]}>
@@ -65,18 +86,23 @@ const TraderProfile = () => {
             <View style={styles.nameContainer}>
                <Text style={styles.millNameText}>{user?.millName || 'Rice Mill'}</Text>
                <Text style={styles.ownerNameText}>{user?.name || t('noName')}</Text>
+               
                <View style={styles.badgeRow}>
-                 <View style={[styles.badge, { backgroundColor: user?.isVerified ? '#DEF7EC' : '#FDE8E8' }]}>
-                    <Text style={[styles.badgeText, { color: user?.isVerified ? '#03543F' : '#9B1C1C' }]}>
-                      {user?.isVerified ? 'VERIFIED SELLER' : 'PENDING VERIFICATION'}
-                    </Text>
-                 </View>
-                 {user?.trustScore > 0 && (
-                    <View style={styles.scoreBadge}>
-                       <Icon name="shield-alt" size={10} color="#059669" />
-                       <Text style={styles.scoreText}>{user.trustScore}</Text>
-                    </View>
-                 )}
+                  <View style={[styles.badge, { 
+                    backgroundColor: status.bg, 
+                    borderWidth: 1, 
+                    borderColor: status.border 
+                  }]}>
+                     <Text style={[styles.badgeText, { color: status.textColor }]}>
+                       {status.text}
+                     </Text>
+                  </View>
+                  {user?.trustScore > 0 && (
+                     <View style={styles.scoreBadge}>
+                        <Icon name="shield-alt" size={10} color="#059669" />
+                        <Text style={styles.scoreText}>{user.trustScore}</Text>
+                     </View>
+                  )}
                </View>
             </View>
           </View>
@@ -84,11 +110,11 @@ const TraderProfile = () => {
           <View style={styles.detailsList}>
             <View style={styles.detailRow}>
               <View style={styles.iconBox}><Icon name="id-card" size={12} color={Colors.primary} /></View>
-              <Text style={styles.detailText}>GST: {user?.gstNumber || 'Not Provided'}</Text>
+              <Text style={styles.detailText}>GST: {user?.gstNumber || 'Updating...'}</Text>
             </View>
             <View style={styles.detailRow}>
               <View style={styles.iconBox}><Icon name="map-marker-alt" size={12} color={Colors.primary} /></View>
-              <Text style={styles.detailText}>{user?.district}, {user?.state}</Text>
+              <Text style={styles.detailText}>{user?.district || 'AP'}, {user?.state || 'India'}</Text>
             </View>
           </View>
 
@@ -125,9 +151,15 @@ const TraderProfile = () => {
           
           {hasAddress ? (
             <View style={styles.addressDetails}>
-              <Text style={styles.addressText}>{address.street}</Text>
-              <Text style={styles.addressText}>{address.village}{address.village && ', '}{address.city}</Text>
-              <Text style={styles.addressText}>{address.state} - {address.zipCode}</Text>
+              {typeof address === 'object' ? (
+                <>
+                  <Text style={styles.addressText}>{address.street || ''}</Text>
+                  <Text style={styles.addressText}>{address.village}{address.village && ', '}{address.city}</Text>
+                  <Text style={styles.addressText}>{address.state} - {address.zipCode}</Text>
+                </>
+              ) : (
+                <Text style={styles.addressText}>{address}</Text>
+              )}
               <View style={styles.addrActions}>
                  <TouchableOpacity onPress={() => navigation.navigate('EditProfile')}>
                     <Text style={styles.addrActionText}>Update Address</Text>

@@ -96,6 +96,8 @@ export default function RiceDetail() {
   };
 
   const supplier = listing.supplierId || {};
+  // The backend now populates supplierId.userId to include isVerified 🛡️
+  const isSupplierVerified = supplier.userId?.isVerified === true;
 
   return (
     <View style={styles.container}>
@@ -139,7 +141,12 @@ export default function RiceDetail() {
               <Text style={styles.shopLoc}>📍 {supplier.district}, {supplier.state}</Text>
               <View style={styles.tagRow}>
                  <Text style={styles.tag}>{supplier.traderType}</Text>
-                 <Text style={styles.tag}>Verified</Text>
+                 <View style={[styles.tag, { flexDirection: 'row', alignItems: 'center', backgroundColor: isSupplierVerified ? '#ECFDF5' : '#FFF7ED', borderColor: isSupplierVerified ? '#10B981' : '#FED7AA', borderWidth: 1 }]}>
+                     <Icon name={isSupplierVerified ? "check-circle" : "clock"} size={10} color={isSupplierVerified ? "#059669" : "#D97706"} style={{ marginRight: 4 }} />
+                     <Text style={{ fontSize: 10, fontWeight: 'bold', color: isSupplierVerified ? '#059669' : '#D97706' }}>
+                       {isSupplierVerified ? 'Verified Seller' : 'Verification Pending'}
+                     </Text>
+                 </View>
               </View>
            </View>
         </View>

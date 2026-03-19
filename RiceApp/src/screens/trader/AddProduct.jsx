@@ -139,14 +139,47 @@ const AddProduct = () => {
     }
   };
 
+  React.useEffect(() => {
+    const unsub = navigation.addListener('beforeRemove', (e) => {
+      // If form is empty, just go back
+      if (!formData.brandName && !formData.pricePerBag && !images.bag) return;
+      
+      e.preventDefault();
+      Alert.alert(
+        'Discard Changes?',
+        'You have unsaved changes. Are you sure you want to go back?',
+        [
+          { text: 'Keep Editing', style: 'cancel', onPress: () => {} },
+          { text: 'Discard', style: 'destructive', onPress: () => navigation.dispatch(e.data.action) },
+        ]
+      );
+    });
+    return unsub;
+  }, [navigation, formData, images]);
+
   const handleSubmit = async () => {
     if (!profileComplete) {
       return Alert.alert('Error', 'Please complete your profile (GST required) before adding products.');
     }
+
     const error = validate();
     if (error) {
       Alert.alert(t('Error'), error);
       return;
+    }
+
+    // STRICT VALIDATION: Robust Bounds for 1 Lakh Users
+    const price = Number(formData.pricePerBag);
+    if (isNaN(price) || price < 500 || price > 15000) {
+        return Alert.alert('Invalid Price', 'Bag price must be between ₹500 and ₹15,000 for standard listings.');
+    }
+    const stock = Number(formData.stockAvailable);
+    if (isNaN(stock) || stock < 1) {
+        return Alert.alert('Invalid Stock', 'Please enter a valid stock quantity (Minimum 1).');
+    }
+    const weight = Number(formData.bagWeightKg);
+    if (isNaN(weight) || weight < 1 || weight > 50) {
+        return Alert.alert('Invalid Weight', 'Bag weight must be between 1kg and 50kg.');
     }
 
     setLoading(true);

@@ -10,7 +10,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Colors } from '../../theme/colors';
 import { AuthContext } from '../../context/AuthContext';
 import { traderService } from '../../api/traderService';
-import { useLocation } from '../../context/LocationContext';
+import { useLocation, AP_DISTRICTS } from '../../context/LocationContext';
 import { useLang } from '../../context/LangContext';
 import AppHeader from '../../components/common/AppHeader';
 
@@ -118,9 +118,50 @@ const TraderEditProfile = () => {
     }
   };
 
+  const handleManualDistrict = (districtName) => {
+    const distData = AP_DISTRICTS.find(d => d.name === districtName);
+    if (distData) {
+      setFormData(v => ({ 
+        ...v, 
+        lat: distData.lat, 
+        lng: distData.lng,
+        district: distData.name,
+        state: 'Andhra Pradesh'
+      }));
+      Alert.alert('Manual Mode', `Coordinates applied for ${districtName}. You can now save your profile.`);
+    }
+  };
+
   const handleSave = async () => {
-    if (!formData.millName || !formData.district || !formData.state) {
-      return Alert.alert('Error', 'Mill Name, District and State are required');
+    // --- IRON-CLAD VALIDATION: 100CR STANDARD ---
+    if (!formData.millName?.trim()) { return Alert.alert('Error', 'Shop / Mill Name is mandatory'); }
+    
+    // GST Guard
+    const gst = formData.gstNumber?.trim().toUpperCase();
+    if (!gst || gst.length !== 15) {
+      return Alert.alert('Invalid GST', 'Please enter a valid 15-character GST number.');
+    }
+    if (!formData.gstRegistrationYears?.trim()) {
+      return Alert.alert('Error', 'Please enter how many years you have been registered with GST.');
+    }
+
+    // Location Guard
+    if (!formData.district || !formData.state || !formData.lat) {
+      return Alert.alert('Location Required', 'Please update your location using the GPS button.');
+    }
+
+    // Payment Guard
+    if (!formData.upiId?.trim()) {
+      return Alert.alert('Error', 'UPI ID is mandatory for receiving payments.');
+    }
+    
+    // Bank Guard
+    const bank = formData.bankDetails;
+    if (!bank.accountNumber?.trim() || !bank.ifscCode?.trim()) {
+      return Alert.alert('Bank Details Missing', 'Account Number and IFSC Code are strictly mandatory for professional traders.');
+    }
+    if (bank.ifscCode.trim().length !== 11) {
+       return Alert.alert('Invalid IFSC', 'IFSC Code must be exactly 11 characters (e.g. SBIN0001234).');
     }
 
     setLoading(true);
@@ -241,23 +282,24 @@ const TraderEditProfile = () => {
 
             <View style={styles.row}>
               <View style={{ flex: 1.5, marginRight: 10 }}>
-                <Text style={styles.label}>GST Number</Text>
+                <Text style={styles.label}>GST Number *</Text>
                 <TextInput 
                    style={styles.input} 
                    value={formData.gstNumber} 
                    onChangeText={v => handleInputChange('gstNumber', v)}
-                   placeholder="e.g., 29ABCDE1234F1Z"
+                   placeholder="15-digit GSTIN"
                    placeholderTextColor={Colors.textMuted}
                    autoCapitalize="characters"
+                   maxLength={15}
                 />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.label}>GST Years</Text>
+                <Text style={styles.label}>GST Years *</Text>
                 <TextInput 
                    style={styles.input} 
                    value={formData.gstRegistrationYears} 
                    onChangeText={v => handleInputChange('gstRegistrationYears', v)}
-                   placeholder="e.g., 5"
+                   placeholder="e.g. 10"
                    placeholderTextColor={Colors.textMuted}
                    keyboardType="numeric"
                 />
@@ -276,6 +318,21 @@ const TraderEditProfile = () => {
             </View>
 
             <Text style={styles.label}>Set Location Coordinates *</Text>
+            <View style={{ marginBottom: 12 }}>
+                <Text style={{ fontSize: 10, color: Colors.textMuted, marginBottom: 8 }}>OR SELECT YOUR NEAREST DISTRICT CENTER:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexDirection: 'row' }}>
+                    {AP_DISTRICTS.map((d, idx) => (
+                        <TouchableOpacity 
+                          key={idx} 
+                          onPress={() => handleManualDistrict(d.name)}
+                          style={[styles.districtPill, formData.district === d.name && { backgroundColor: Colors.primaryLight, borderColor: Colors.primary }]}
+                        >
+                            <Text style={[styles.districtPillTxt, formData.district === d.name && { color: Colors.primary }]}>{d.name}</Text>
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
+            </View>
+
             <TouchableOpacity 
               style={[styles.locBtn, formData.lat && styles.locBtnSet]} 
               onPress={handleGetLocation}
@@ -297,42 +354,49 @@ const TraderEditProfile = () => {
                <Text style={styles.sectionTitle}>Bank & Payment Verification</Text>
             </View>
             
-            <Text style={styles.label}>Account Holder Name</Text>
+            <Text style={styles.label}>Account Holder Name *</Text>
             <TextInput 
               style={styles.input} 
               value={formData.bankDetails.accountHolderName} 
               onChangeText={v => handleBankChange('accountHolderName', v)}
-              placeholder="Proper name as per bank"
+              placeholder="Name as per bank record"
               placeholderTextColor={Colors.textMuted}
             />
 
-            <Text style={styles.label}>Bank Account Number</Text>
+            <Text style={styles.label}>Bank Account Number *</Text>
             <TextInput 
               style={styles.input} 
               value={formData.bankDetails.accountNumber} 
               onChangeText={v => handleBankChange('accountNumber', v)}
-              placeholder="e.g., 50100012345678"
+              placeholder="Full Account Number"
               placeholderTextColor={Colors.textMuted}
               keyboardType="numeric"
             />
 
             <View style={styles.row}>
               <View style={{ flex: 1, marginRight: 10 }}>
-                 <Text style={styles.label}>Bank Name</Text>
-                 <TextInput style={styles.input} value={formData.bankDetails.bankName} onChangeText={v => handleBankChange('bankName', v)} placeholder="HDFC Bank" />
+                 <Text style={styles.label}>Bank Name *</Text>
+                 <TextInput style={styles.input} value={formData.bankDetails.bankName} onChangeText={v => handleBankChange('bankName', v)} placeholder="SBI, HDFC, etc." />
               </View>
               <View style={{ flex: 1 }}>
-                 <Text style={styles.label}>IFSC Code</Text>
-                 <TextInput style={styles.input} value={formData.bankDetails.ifscCode} onChangeText={v => handleBankChange('ifscCode', v)} placeholder="HDFC0001" autoCapitalize="characters" />
+                 <Text style={styles.label}>IFSC Code *</Text>
+                 <TextInput 
+                    style={styles.input} 
+                    value={formData.bankDetails.ifscCode} 
+                    onChangeText={v => handleBankChange('ifscCode', v)} 
+                    placeholder="11-digit IFSC" 
+                    autoCapitalize="characters" 
+                    maxLength={11}
+                 />
               </View>
             </View>
 
-            <Text style={styles.label}>UPI ID for Payments</Text>
+            <Text style={styles.label}>UPI ID for Payments *</Text>
             <TextInput 
               style={[styles.input, { borderColor: Colors.primary }]} 
               value={formData.upiId} 
               onChangeText={v => handleInputChange('upiId', v)}
-              placeholder="mobile-number@upi"
+              placeholder="mobile@upi or name@bank"
               placeholderTextColor={Colors.textMuted}
             />
             <Text style={styles.note}>Note: These details will be shown to buyers after order confirmation.</Text>
@@ -414,6 +478,17 @@ const styles = StyleSheet.create({
   },
   locBtnSet: { backgroundColor: Colors.primary },
   locBtnTxt: { color: '#fff', fontSize: 13, fontWeight: 'bold' },
+  districtPill: { 
+    paddingHorizontal: 12, 
+    paddingVertical: 6, 
+    borderRadius: 12, 
+    borderWidth: 1, 
+    borderColor: '#E5E7EB', 
+    backgroundColor: '#F9FAFB', 
+    marginRight: 8,
+    marginBottom: 4
+  },
+  districtPillTxt: { fontSize: 11, fontWeight: 'bold', color: Colors.textSecondary },
   note: { fontSize: 11, color: Colors.textMuted, marginTop: 5, fontStyle: 'italic' },
   saveBtn: { 
     backgroundColor: Colors.primary, 

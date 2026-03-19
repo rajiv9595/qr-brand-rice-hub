@@ -58,6 +58,38 @@ export const authService = {
     }
   },
 
+  // Email/Password Registration
+  emailRegister: async (userData) => {
+    try {
+      const res = await client.post('/auth/register', userData);
+      if (res.data.success && res.data.data?.token) {
+        const { token, ...data } = res.data.data;
+        await AsyncStorage.setItem('token', token);
+        await AsyncStorage.setItem('user', JSON.stringify(data));
+      }
+      return res;
+    } catch (error) {
+       console.error('Email Register Error:', error);
+       throw error;
+    }
+  },
+
+  // Email/Password Login
+  emailLogin: async (email, password) => {
+    try {
+      const res = await client.post('/auth/login', { email, password });
+      if (res.data.success && res.data.data?.token) {
+        const { token, ...data } = res.data.data;
+        await AsyncStorage.setItem('token', token);
+        await AsyncStorage.setItem('user', JSON.stringify(data));
+      }
+      return res;
+    } catch (error) {
+       console.error('Email Login Error:', error);
+       throw error;
+    }
+  },
+
   // Sign out
   googleSignOut: async () => {
     try {
