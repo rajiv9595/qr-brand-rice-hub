@@ -279,7 +279,7 @@ exports.getBestDeals = asyncHandler(async (req, res) => {
         approvalStatus: APPROVAL_STATUS.APPROVED,
         isActive: true,
     })
-    .populate('supplierId', 'millName district state badges trustScore metrics')
+    .populate('supplierId', 'millName district state badges trustScore metrics location')
     .sort({ averageRating: -1, createdAt: -1 })
     .limit(20);
 
@@ -340,7 +340,11 @@ exports.getListingById = asyncHandler(async (req, res) => {
     }
 
     const listing = await RiceListing.findById(req.params.id)
-        .populate('supplierId', 'millName district state badges trustScore metrics');
+        .populate({
+            path: 'supplierId',
+            select: 'millName district state badges trustScore metrics location userId',
+            populate: { path: 'userId', select: 'isVerified' }
+        });
 
     if (!listing) {
         res.status(404);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import {
     Star, MapPin, Tag, Box, Info,
     ChefHat, Award, ShoppingBag, ShieldCheck, Sparkles,
@@ -114,11 +114,42 @@ const RiceDetailPage = () => {
         fetchData();
     }, [id]);
 
+    const { state } = useLocation();
+    const isDeal = state?.isDeal;
+
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+        const R = 6371; // km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    };
+
     const handleBuyNow = () => {
         if (!user) {
             navigate('/login');
             return;
         }
+
+        // Distance Check for High-Value/Featured Deals
+        if (isDeal && rice?.supplierId?.location?.coordinates) {
+            const [shopLng, shopLat] = rice.supplierId.location.coordinates;
+            // Get user location from profile if possible, or fallback 
+            const userLat = user.address?.lat;
+            const userLng = user.address?.lng;
+
+            if (userLat && userLng) {
+                const dist = calculateDistance(userLat, userLng, shopLat, shopLng);
+                if (dist > 50) {
+                    alert(`SERVICE AREA LIMIT: Sincere apologies, but this special Featured Deal is limited to customers within 50km of the mill to maintain freshness and pricing. Since you are located further away, we cannot fulfill this specific direct mill deal.`);
+                    return;
+                }
+            }
+        }
+
         setIsOrderModalOpen(true);
     };
 

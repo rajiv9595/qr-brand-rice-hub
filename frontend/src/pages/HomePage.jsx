@@ -208,7 +208,7 @@ export default function HomePage() {
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {loading
                         ? [1, 2, 3].map(i => <div key={i} className="h-96 bg-gray-100 rounded-2xl animate-pulse" />)
-                        : featured.map(r => <RiceCard key={r._id || r.id} rice={r} />)
+                        : featured.map(r => <RiceCard key={r._id || r.id} rice={r} isDeal={true} />)
                     }
                 </div>
             </section>
