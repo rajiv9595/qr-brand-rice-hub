@@ -57,7 +57,12 @@ export const authService = {
       }
       return res.data.data;
     } catch (error) {
-      console.error('Google Sign In Error:', error);
+      console.error('Google Sign In Error Detail:', {
+        message: error.message,
+        config: error.config?.url,
+        response: error.response?.data,
+        status: error.response?.status
+      });
       if (error.message?.includes('12500') || error.message?.includes('DEVELOPER_ERROR')) {
         throw new Error('DEVELOPER_ERROR: SHA-1 signing key mismatch - Follow setup guide');
       }
@@ -134,7 +139,20 @@ export const authService = {
     return user ? JSON.parse(user) : null;
   },
 
-  // Update user profile (role selection, etc.)
-  updateProfile: (data) =>
-    client.put('/auth/profile', data),
+  // Update User Profile (Syncs with website)
+  updateProfile: async (data) => {
+    try {
+      const res = await client.put('/auth/profile', data);
+      if (res.data.success && res.data.data) {
+        await AsyncStorage.setItem('user', JSON.stringify(res.data.data));
+      }
+      return res.data;
+    } catch (error) {
+       console.error('Update Profile Error:', error);
+       throw error;
+    }
+  },
+
 };
+
+export default authService;

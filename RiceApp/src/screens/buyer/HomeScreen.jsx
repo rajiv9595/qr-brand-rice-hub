@@ -207,7 +207,12 @@ const HomeScreen = () => {
   const navigation       = useNavigation();
   const { t }            = useLang();
   const { location }     = useLocation();
+  const { syncUser }     = React.useContext(require('../../context/AuthContext').AuthContext);
   const { deals, marketPrices, loading, refetch } = useDeals(location);
+
+  const onRefresh = async () => {
+    await Promise.all([refetch(), syncUser()]);
+  };
 
   const [activeCat, setActiveCat] = useState('all');
 
@@ -241,7 +246,7 @@ const HomeScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={refetch} tintColor={Colors.primary} />
+          <RefreshControl refreshing={loading} onRefresh={onRefresh} tintColor={Colors.primary} />
         }
       >
         {/* ─── Search ─── */}
@@ -307,7 +312,7 @@ const HomeScreen = () => {
             showsHorizontalScrollIndicator={false}
             keyExtractor={(item) => item._id}
             renderItem={({ item }) => (
-              <DealCard item={item} onPress={() => navigation.navigate('ListingDetail', { id: item._id })} />
+              <DealCard item={item} onPress={() => navigation.navigate('ListingDetail', { id: item._id, isDeal: true })} />
             )}
             contentContainerStyle={styles.dealsList}
             initialNumToRender={5}

@@ -38,7 +38,7 @@ client.interceptors.response.use(
   (res) => res,
   async (error) => {
     const orig = error.config;
-    const isAuthRoute = orig.url?.includes('/auth/');
+    const isAuthRoute = orig.url?.includes('/auth/') && !orig.url?.includes('/auth/profile');
 
     if (error.response?.status === 401 && !orig._retry && !isAuthRoute) {
       if (isRefreshing) {

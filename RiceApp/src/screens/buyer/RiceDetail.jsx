@@ -14,16 +14,18 @@ import AppHeader from '../../components/common/AppHeader';
 import BigButton from '../../components/common/BigButton';
 import { riceService } from '../../api/riceService';
 import { negotiationService } from '../../api/negotiationService';
+import { useLocation } from '../../context/LocationContext';
 import { formatCurrency } from '../../utils/formatCurrency';
 
 export default function RiceDetail() {
   const route = useRoute();
   const navigation = useNavigation();
   const { user } = useContext(AuthContext);
-  const { id } = route.params || {};
+  const { id, isDeal } = route.params || {};
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
   const [negotiating, setNegotiating] = useState(false);
+  const { location: userLoc } = useLocation();
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -40,23 +42,38 @@ export default function RiceDetail() {
     if (id) fetchDetail();
   }, [id]);
 
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={Colors.primary} />
-      </View>
-    );
-  }
-
-  if (!listing) {
-    return (
-      <View style={styles.center}>
-        <Text>Listing not found.</Text>
-      </View>
-    );
-  }
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
 
   const handleOrder = () => {
+    // Distance check for Best Deals
+    if (isDeal && listing?.supplierId?.location?.coordinates) {
+      const [shopLng, shopLat] = listing.supplierId.location.coordinates;
+      const userLat = userLoc?.lat || user?.address?.lat;
+      const userLng = userLoc?.lng || user?.address?.lng;
+
+      if (userLat && userLng) {
+        const dist = calculateDistance(userLat, userLng, shopLat, shopLng);
+        if (dist > 50) {
+          Alert.alert(
+            "Service Area Limit",
+            "Sincere apologies, but this special Best Deal is limited to customers within 50km of the mill. Since you are located further away, we cannot fulfill this specific direct mill deal at this price.",
+            [{ text: "OK" }]
+          );
+          return;
+        }
+      }
+    }
+
+    if (loading || !listing) return;
     navigation.navigate('OrderConfirm', { 
       shop: listing,
       variety: listing.riceVariety,

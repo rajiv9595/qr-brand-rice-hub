@@ -3,16 +3,23 @@ import React, { useContext, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, StatusBar, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { AuthContext } from '../../context/AuthContext';
 import { Colors } from '../../theme/colors';
 import { useLang } from '../../context/LangContext';
 import { useLocation } from '../../context/LocationContext';
 import AppHeader from '../../components/common/AppHeader';
-
+import client from '../../api/client';
 const BuyerProfile = () => {
   const navigation = useNavigation();
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout, syncUser } = useContext(AuthContext);
+
+  // Sync profile when screen is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      syncUser();
+    }, [])
+  );
   const insets = useSafeAreaInsets();
   const { t } = useLang();
   const { getCurrentLocation, locLoading } = useLocation();
@@ -25,11 +32,31 @@ const BuyerProfile = () => {
   const handleUpdateLocation = async () => {
     setLoading(true);
     const loc = await getCurrentLocation();
+    
     if (loc) {
-      Alert.alert(
-        t('Success'), 
-        `${loc.name}, ${loc.district}, ${loc.state} (${loc.pincode || 'Pincode Auto-set'})\nLocation detected successfully!`
-      );
+      // Map detected GPS data to backend Address schema 🛡️
+      const addrData = {
+        address: {
+          village: loc.name || '',
+          city:    loc.district || '',
+          state:   loc.state || '',
+          zipCode: loc.pincode || '',
+          street:  '', // Placeholder or keep current
+        }
+      };
+
+      try {
+        const res = await syncUser(); // Refresh first
+        // Call backend API to save this as the default address
+        const updateRes = await client.put('/auth/profile', addrData);
+        if (updateRes.data.success) {
+           await syncUser(); // Sync again to refresh UI with state from DB
+           Alert.alert(t('Success'), `${loc.name}, ${loc.district}\n${t('locationUpdated') || 'Location updated successfully!'}`);
+        }
+      } catch (err) {
+        console.error('Save location error:', err);
+        Alert.alert(t('Error'), 'Failed to save location to profile.');
+      }
     }
     setLoading(false);
   };

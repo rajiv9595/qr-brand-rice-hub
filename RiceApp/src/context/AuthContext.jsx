@@ -48,6 +48,10 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (e) {
       console.warn('syncUser error:', e.message);
+      // Auto-logout if session is dead (401) 🛡️
+      if (e.response?.status === 401 || e.message?.includes('401')) {
+         await logout();
+      }
     }
   };
 

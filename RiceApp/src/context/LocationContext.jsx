@@ -4,6 +4,7 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { Platform, PermissionsAndroid, Alert } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
+import { AuthContext } from './AuthContext';
 
 const LocationContext = createContext();
 
@@ -28,9 +29,55 @@ export const AP_DISTRICTS = [
 ];
 
 export const LocationProvider = ({ children }) => {
+  const { user } = useContext(AuthContext);
   const [location, setLocation] = useState(null); // { lat, lng, name, district, state, isManual }
   const [locLoading, setLocLoading] = useState(false);
   const [isManual, setIsManual] = useState(false);
+
+  // Sync with user's profile address if available
+  useEffect(() => {
+    if (user?.address && !location && !isManual) {
+      const { village, city, district, state } = user.address;
+      // If we have a district, we can at least show something nearby
+      const target = district || city || village;
+      if (target) {
+        const fallbackDist = AP_DISTRICTS.find(d => 
+          d.name.toLowerCase().includes(target.toLowerCase())
+        );
+        if (fallbackDist) {
+          setLocation({
+            lat: fallbackDist.lat,
+            lng: fallbackDist.lng,
+            name: target,
+            district: fallbackDist.name,
+            state: state || 'Andhra Pradesh',
+            isManual: false
+          });
+        }
+      }
+    }
+  }, [user, location, isManual]);
+
+  const geocode = async (query) => {
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`, {
+        headers: { 'User-Agent': 'RiceApp-Expert-Agent' }
+      });
+      const data = await res.json();
+      if (data && data.length > 0) {
+        const item = data[0];
+        return {
+          lat: parseFloat(item.lat),
+          lng: parseFloat(item.lon),
+          name: item.display_name,
+        };
+      }
+      return null;
+    } catch (err) {
+      console.warn('Geocode error:', err);
+      return null;
+    }
+  };
 
   const setManualLocation = (districtName) => {
     const dist = AP_DISTRICTS.find(d => d.name === districtName);
@@ -126,7 +173,8 @@ export const LocationProvider = ({ children }) => {
       requestLocation, 
       getCurrentLocation, 
       setManualLocation, 
-      isManual 
+      isManual,
+      geocode
     }}>
       {children}
     </LocationContext.Provider>
