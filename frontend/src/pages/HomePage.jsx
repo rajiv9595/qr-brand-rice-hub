@@ -82,7 +82,8 @@ export default function HomePage() {
                     setFeatured(riceRes.value.data.data?.slice(0, 3) || []);
                 }
                 if (marketRes.status === 'fulfilled') {
-                    setMarketUpdates(marketRes.value.data.updates || []);
+                    // Backend returns results in 'data' property
+                    setMarketUpdates(marketRes.value.data.data || []);
                 }
             } catch (err) {
                 console.error('Failed to load home data', err);
