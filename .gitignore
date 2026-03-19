@@ -11,15 +11,25 @@ node_modules/
 backend/node_modules/
 frontend/node_modules/
 
-# Mobile App (Enabling tracking but ignoring heavy folders)
-# RiceApp/
+# Mobile App - Exclude ALL heavy build/cache artifacts
 RiceApp/node_modules/
 RiceApp/android/build/
-RiceApp/ios/build/
 RiceApp/android/.gradle/
 RiceApp/android/.idea/
+RiceApp/android/app/build/
+RiceApp/android/app/.gradle/
+RiceApp/android/local.properties
+RiceApp/ios/
 RiceApp/.expo/
 RiceApp/error.log
+RiceApp/metro.log
+RiceApp/package-lock.json
+RiceApp/keytool.txt
+RiceApp/signingReport.txt
+RiceApp/*.log
+
+# Personal backup (never push)
+RiceApp_BACKUP_STABLE_MARCH18/
 
 # Environment / Build
 .env
