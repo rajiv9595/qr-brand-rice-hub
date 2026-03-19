@@ -15,7 +15,7 @@ const ReviewModeration = () => {
         setLoading(true);
         try {
             const res = await adminService.getAllReviews({ filter });
-            setReviews(res.data.reviews || []);
+            setReviews(res.data.data || []);
         } catch (err) {
             console.error(err);
         } finally {
@@ -92,7 +92,7 @@ const ReviewModeration = () => {
                                         )}
                                     </div>
                                     <p className="text-sm text-gray-600 mb-2">
-                                        Listing: <span className="font-bold">{review.listingId?.brandName}</span>
+                                        Listing: <span className="font-bold">{review.riceListingId?.brandName || review.riceListingId?.name}</span>
                                     </p>
                                     <p className="text-gray-700">{review.reviewText}</p>
                                 </div>

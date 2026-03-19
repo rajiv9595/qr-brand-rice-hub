@@ -15,7 +15,8 @@ const MarketUpdateManagement = () => {
         setLoading(true);
         try {
             const res = await adminService.getAllMarketUpdates();
-            setUpdates(res.data.updates || []);
+            // Backend returns data in 'data' property
+            setUpdates(res.data.data || []);
         } catch (err) {
             console.error(err);
         } finally {

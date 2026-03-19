@@ -41,6 +41,10 @@ const reviewSchema = new mongoose.Schema(
             trim: true,
             maxlength: 500,
         },
+        orderId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Order',
+        },
         isFlagged: {
             type: Boolean,
             default: false,
@@ -51,8 +55,8 @@ const reviewSchema = new mongoose.Schema(
     }
 );
 
-// Prevent user from submitting more than one review per rice listing
-reviewSchema.index({ userId: 1, riceListingId: 1 }, { unique: true });
+// Prevent user from submitting more than one review per order for a rice listing
+reviewSchema.index({ userId: 1, riceListingId: 1, orderId: 1 }, { unique: true });
 
 // Static method to get avg rating and save
 reviewSchema.statics.getAverageRating = async function (riceListingId) {

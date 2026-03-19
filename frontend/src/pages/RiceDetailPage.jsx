@@ -104,7 +104,7 @@ const RiceDetailPage = () => {
                 if (expertRes.status === 'fulfilled') setExpertReview(expertRes.value.data.data);
                 if (cookingRes.status === 'fulfilled') setCookingTips(cookingRes.value.data.data);
                 if (ratingsRes.status === 'fulfilled') setRatings(ratingsRes.value.data.data);
-                if (reviewsRes.status === 'fulfilled') setReviews(reviewsRes.value.data.reviews);
+                if (reviewsRes.status === 'fulfilled') setReviews(reviewsRes.value.data.data);
             } catch (err) {
                 console.error(err);
             } finally {
@@ -126,14 +126,14 @@ const RiceDetailPage = () => {
         e.preventDefault();
         try {
             await reviewService.submitReview({
-                listingId: id,
+                riceListingId: id,
                 ...reviewForm
             });
             alert('Thank you for your review!');
             setIsReviewModalOpen(false);
             // Refresh reviews
             const revRes = await reviewService.getListingReviews(id);
-            setReviews(revRes.data.reviews);
+            setReviews(revRes.data.data);
         } catch (err) {
             alert(err.response?.data?.message || 'Failed to submit review');
         }

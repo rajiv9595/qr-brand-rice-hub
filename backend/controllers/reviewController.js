@@ -10,6 +10,7 @@ exports.submitReview = async (req, res) => {
     try {
         const schema = Joi.object({
             riceListingId: Joi.string().required(),
+            orderId: Joi.string().allow('', null),
             grainQuality: Joi.number().min(1).max(5).required(),
             cookingResult: Joi.number().min(1).max(5).required(),
             taste: Joi.number().min(1).max(5).required(),
@@ -22,22 +23,17 @@ exports.submitReview = async (req, res) => {
             return res.status(400).json({ success: false, message: error.details[0].message });
         }
 
-        const { riceListingId } = req.body;
-
-        // Check if listing exists and is approved
-        const listing = await RiceListing.findById(riceListingId);
-        if (!listing || listing.approvalStatus !== 'approved') {
-            return res.status(404).json({ success: false, message: 'Valid approved listing not found' });
-        }
-
-        // Check for duplicate review
+        const { riceListingId, orderId } = req.body;
+        
+        // Check for duplicate review for THIS specific order
         const existingReview = await Review.findOne({
             userId: req.user._id,
             riceListingId,
+            orderId: orderId || null
         });
 
         if (existingReview) {
-            return res.status(400).json({ success: false, message: 'You have already reviewed this product' });
+            return res.status(400).json({ success: false, message: 'You have already reviewed this product for this order' });
         }
 
         const review = await Review.create({
@@ -160,7 +156,7 @@ exports.getAllReviews = async (req, res) => {
             .populate('riceListingId', 'name')
             .sort({ createdAt: -1 });
 
-        res.json({ success: true, reviews });
+        res.json({ success: true, data: reviews });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -205,7 +201,7 @@ exports.getSupplierReviews = async (req, res) => {
             .populate('riceListingId', 'brandName riceVariety')
             .sort({ createdAt: -1 });
 
-        res.json({ success: true, reviews });
+        res.json({ success: true, data: reviews });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -220,7 +216,7 @@ exports.getListingReviews = async (req, res) => {
             .populate('userId', 'name')
             .sort({ createdAt: -1 });
 
-        res.json({ success: true, reviews });
+        res.json({ success: true, data: reviews });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }

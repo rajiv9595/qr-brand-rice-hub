@@ -16,7 +16,8 @@ const ExpertReviewManagement = () => {
         setLoading(true);
         try {
             const res = await adminService.getAllExpertReviews();
-            setReviews(res.data.reviews || []);
+            // Standardized to 'data' property
+            setReviews(res.data.data || []);
         } catch (err) {
             console.error(err);
         } finally {
