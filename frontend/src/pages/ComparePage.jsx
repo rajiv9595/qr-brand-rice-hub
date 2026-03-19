@@ -4,7 +4,7 @@ import {
     BarChart2, Plus, X, ArrowRight, ShoppingBag,
     Star, ShieldCheck, MapPin, Scale, ChevronRight,
     TrendingUp, Award, Box, Zap, Timer, Droplets,
-    Activity, CheckCircle2, AlertCircle
+    Activity, CheckCircle2, AlertCircle, Tag
 } from 'lucide-react';
 import { riceService } from '../services';
 import { optimizeImage } from '../utils/imageOptimizer';

@@ -65,7 +65,7 @@ const MarketPage = () => {
             setLoading(true);
             try {
                 const res = await marketService.getMarketUpdates(filters);
-                setUpdates(res.data.updates || []);
+                setUpdates(res.data.data || []);
             } catch (err) {
                 console.error('Market Updates Fetch Error:', err);
                 setUpdates([]);

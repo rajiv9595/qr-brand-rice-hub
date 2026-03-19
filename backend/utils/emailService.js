@@ -1,6 +1,11 @@
 const { Resend } = require('resend');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resend;
+if (process.env.RESEND_API_KEY) {
+    resend = new Resend(process.env.RESEND_API_KEY);
+} else {
+    console.warn('[EmailService] Warning: RESEND_API_KEY is missing. Emails will not be sent.');
+}
 
 /**
  * Sends a professional HTML email notification using Resend
