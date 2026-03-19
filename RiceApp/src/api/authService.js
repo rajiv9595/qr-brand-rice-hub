@@ -27,6 +27,13 @@ export const authService = {
         throw new Error('Google Play Services not available on this device');
       }
       
+      // Force account selection every time so it doesn't auto-pick the first email
+      try {
+        await GoogleSignin.signOut();
+      } catch (e) {
+        // Ignore "not signed in" errors
+      }
+      
       // Sign in with Google
       const data = await GoogleSignin.signIn();
       // Handle different SDK versions (newer SDKs put everything in data.data)
