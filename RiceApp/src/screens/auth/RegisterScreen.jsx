@@ -89,8 +89,8 @@ const RegisterScreen = () => {
 
   const renderSelection = () => (
     <View style={styles.selectionView}>
-      <Text style={styles.selectionTitle}>{lang === 'te' ? 'నమోదు చేసుకోండి' : 'Register Account'}</Text>
-      <Text style={styles.selectionSub}>{lang === 'te' ? 'ప్రారంభించడానికి ఒక పద్ధతిని ఎంచుకోండి' : 'Choose a method to get started'}</Text>
+      <Text style={styles.selectionTitle}>{lang === 'te' ? 'నమోదు చేసుకోండి' : lang === 'hi' ? 'अकाउंट बनाएं' : 'Register Account'}</Text>
+      <Text style={styles.selectionSub}>{lang === 'te' ? 'ప్రారంభించడానికి ఒక పద్ధతిని ఎంచుకోండి' : lang === 'hi' ? 'शुरू करने के लिए एक तरीका चुनें' : 'Choose a method to get started'}</Text>
       
       <TouchableOpacity 
         style={[styles.methodCard, { borderColor: Colors.primary }]} 
@@ -100,8 +100,8 @@ const RegisterScreen = () => {
           <Icon name="phone" size={24} color={Colors.primary} />
         </View>
         <View style={styles.methodTextContent}>
-          <Text style={styles.methodLabel}>{lang === 'te' ? 'ఫోన్ నంబర్' : 'Phone Number'}</Text>
-          <Text style={styles.methodDesc}>{lang === 'te' ? 'OTP ద్వారా నమోదు' : 'Safe & Fast via OTP'}</Text>
+          <Text style={styles.methodLabel}>{lang === 'te' ? 'ఫోన్ నంబర్' : lang === 'hi' ? 'फ़ोन नंबर' : 'Phone Number'}</Text>
+          <Text style={styles.methodDesc}>{lang === 'te' ? 'OTP ద్వారా నమోదు' : lang === 'hi' ? 'OTP द्वारा सुरक्षित' : 'Safe & Fast via OTP'}</Text>
         </View>
         <Icon name="chevron-right" size={20} color={Colors.textMuted} />
       </TouchableOpacity>
@@ -114,8 +114,8 @@ const RegisterScreen = () => {
           <Icon name="email-outline" size={24} color={Colors.textSecondary} />
         </View>
         <View style={styles.methodTextContent}>
-          <Text style={styles.methodLabel}>{lang === 'te' ? 'ఈమెయిల్' : 'Email Address'}</Text>
-          <Text style={styles.methodDesc}>{lang === 'te' ? 'పాస్‌వర్డ్ ద్వారా నమోదు' : 'Use your email & password'}</Text>
+          <Text style={styles.methodLabel}>{lang === 'te' ? 'ఈమెయిల్' : lang === 'hi' ? 'ईमेल' : 'Email Address'}</Text>
+          <Text style={styles.methodDesc}>{lang === 'te' ? 'పాస్‌వర్డ్ ద్వారా నమోదు' : lang === 'hi' ? 'पासवर्ड के माध्यम से' : 'Use your email & password'}</Text>
         </View>
         <Icon name="chevron-right" size={20} color={Colors.textMuted} />
       </TouchableOpacity>
@@ -139,33 +139,33 @@ const RegisterScreen = () => {
 
           {step === 'select' ? renderSelection() : (
             <View style={styles.formPadding}>
-              <Text style={styles.formTitle}>{step === 'email' ? 'Signup with Email' : 'Quick Signup'}</Text>
+              <Text style={styles.formTitle}>{step === 'email' ? (lang === 'te' ? 'ఈమెయిల్ సైన్అప్' : lang === 'hi' ? 'ईमेल साइनअप' : 'Signup with Email') : (lang === 'te' ? 'త్వరిత సైన్అప్' : lang === 'hi' ? 'त्वरित साइनअप' : 'Quick Signup')}</Text>
               
               <View style={styles.roleContainer}>
                 <TouchableOpacity 
                   style={[styles.roleBtn, formData.role === 'customer' && styles.roleBtnActive]}
                   onPress={() => setFormData({...formData, role: 'customer'})}
                 >
-                   <Text style={[styles.roleBtnText, formData.role === 'customer' && styles.roleBtnTextActive]}>BUYER</Text>
+                   <Text style={[styles.roleBtnText, formData.role === 'customer' && styles.roleBtnTextActive]}>{lang === 'te' ? 'కొనేవారు' : lang === 'hi' ? 'खरीदार' : 'BUYER'}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={[styles.roleBtn, formData.role === 'supplier' && styles.roleBtnActive]}
                   onPress={() => setFormData({...formData, role: 'supplier'})}
                 >
-                   <Text style={[styles.roleBtnText, formData.role === 'supplier' && styles.roleBtnTextActive]}>TRADER</Text>
+                   <Text style={[styles.roleBtnText, formData.role === 'supplier' && styles.roleBtnTextActive]}>{lang === 'te' ? 'అమ్మేవారు' : lang === 'hi' ? 'विक्रेता' : 'TRADER'}</Text>
                 </TouchableOpacity>
               </View>
 
               {step === 'email' ? (
                 <>
-                  <Text style={styles.inputLabel}>FULL NAME</Text>
+                  <Text style={styles.inputLabel}>{lang === 'te' ? 'పూర్తి పేరు' : lang === 'hi' ? 'पूरा नाम' : 'FULL NAME'}</Text>
                   <TextInput 
                     style={styles.input} 
                     placeholder="John Doe" 
                     value={formData.name} 
                     onChangeText={v => setFormData({...formData, name: v})} 
                   />
-                  <Text style={styles.inputLabel}>EMAIL ADDRESS</Text>
+                  <Text style={styles.inputLabel}>{lang === 'te' ? 'ఈమెయిల్ చిరునామా' : lang === 'hi' ? 'ईमेल पता' : 'EMAIL ADDRESS'}</Text>
                   <TextInput 
                     style={styles.input} 
                     placeholder="name@example.com" 
@@ -174,7 +174,7 @@ const RegisterScreen = () => {
                     value={formData.email} 
                     onChangeText={v => setFormData({...formData, email: v})} 
                   />
-                  <Text style={styles.inputLabel}>PASSWORD</Text>
+                  <Text style={styles.inputLabel}>{lang === 'te' ? 'పాస్‌వర్డ్' : lang === 'hi' ? 'पासवर्ड' : 'PASSWORD'}</Text>
                   <TextInput 
                     style={styles.input} 
                     placeholder="••••••••" 
@@ -183,7 +183,7 @@ const RegisterScreen = () => {
                     onChangeText={v => setFormData({...formData, password: v})} 
                   />
                   <TouchableOpacity style={styles.submitBtn} onPress={handleEmailRegister}>
-                    <Text style={styles.submitBtnText}>Create Account</Text>
+                    <Text style={styles.submitBtnText}>{lang === 'te' ? 'ఖాతా సృష్టించండి' : lang === 'hi' ? 'अकाउंट बनाएं' : 'Create Account'}</Text>
                   </TouchableOpacity>
 
                   <View style={styles.dividerRow}>
@@ -197,12 +197,12 @@ const RegisterScreen = () => {
                     onPress={handleGoogleRegister}
                   >
                     <Icon name="google" size={20} color="#DB4437" />
-                    <Text style={styles.googleBtnText}>Continue with Google</Text>
+                    <Text style={styles.googleBtnText}>{lang === 'te' ? 'Google తో కొనసాగండి' : lang === 'hi' ? 'Google से जारी रखें' : 'Continue with Google'}</Text>
                   </TouchableOpacity>
                 </>
               ) : (
                 <>
-                  <Text style={styles.inputLabel}>PHONE NUMBER</Text>
+                  <Text style={styles.inputLabel}>{lang === 'te' ? 'ఫోన్ నంబర్' : lang === 'hi' ? 'फ़ोन नंबर' : 'PHONE NUMBER'}</Text>
                   <View style={styles.phoneRow}>
                     <View style={styles.countryCode}>
                       <Text style={styles.flag}>🇮🇳</Text>
@@ -222,7 +222,7 @@ const RegisterScreen = () => {
                     onPress={handlePhoneRegister}
                     disabled={phone.length < 10}
                   >
-                    <Text style={styles.submitBtnText}>Get OTP Code</Text>
+                    <Text style={styles.submitBtnText}>{lang === 'te' ? 'OTP పొందండి' : lang === 'hi' ? 'OTP प्राप्त करें' : 'Get OTP Code'}</Text>
                   </TouchableOpacity>
                 </>
               )}
@@ -230,9 +230,9 @@ const RegisterScreen = () => {
           )}
 
           <View style={styles.loginFooter}>
-            <Text style={styles.loginLabel}>Already have an account? </Text>
+            <Text style={styles.loginLabel}>{lang === 'te' ? 'ఇప్పటికే ఖాతా ఉందా?' : lang === 'hi' ? 'पहले से ही अकाउंट है?' : 'Already have an account? '} </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Text style={styles.loginLink}>Sign In</Text>
+              <Text style={styles.loginLink}>{lang === 'te' ? 'సైన్ ఇన్' : lang === 'hi' ? 'साइन इन' : 'Sign In'}</Text>
             </TouchableOpacity>
           </View>
           

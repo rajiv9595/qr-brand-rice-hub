@@ -193,7 +193,7 @@ const LoginScreen = () => {
             {lang === 'te' ? 'కొత్త వినియోగదారు?' : lang === 'hi' ? 'नए उपयोगकर्ता?' : 'New User?'}
           </Text>
           <TouchableOpacity onPress={() => navigation.navigate('RoleSelect')}>
-            <Text style={styles.registerLink}> {lang === 'te' ? 'రిజిస్టర్ చేయండి' : lang === 'hi' ? 'రజిస్టర్ करें' : 'Register here'}</Text>
+            <Text style={styles.registerLink}> {lang === 'te' ? 'రిజిస్టర్ చేయండి' : lang === 'hi' ? 'रजिस्टर करें' : 'Register here'}</Text>
           </TouchableOpacity>
         </View>
 

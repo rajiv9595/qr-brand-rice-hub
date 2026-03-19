@@ -24,6 +24,11 @@ const T = {
     titleEn: 'Verify Number',
     sentTo: 'కు పంపబడింది',
   },
+  hi: {
+    title: 'OTP दर्ज करें',
+    titleEn: 'Verify Number',
+    sentTo: 'पर भेजा गया',
+  },
   en: {
     title: 'Enter Code',
     titleEn: 'Verify Phone Number',

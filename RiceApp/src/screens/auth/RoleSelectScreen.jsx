@@ -32,16 +32,18 @@ const RoleSelectScreen = () => {
       key: 'customer',
       icon: 'basket-outline',
       labelTe: 'కొనేవారు (Buyer)',
+      labelHi: 'खरीदार (Buyer)',
       labelEn: 'I want to buy rice',
-      desc: 'బియ్యం కొనాలనుకుంటున్నారు\nBrowse listings and place orders',
+      desc: lang === 'te' ? 'బియ్యం కొనాలనుకుంటున్నారు\nBrowse listings and place orders' : lang === 'hi' ? 'चावल खरीदना चाहते हैं\nBrowse listings and place orders' : 'Browse listings and place orders',
       color: '#3B82F6',
     },
     {
       key: 'supplier',
       icon: 'store-outline',
       labelTe: 'అమ్మేవారు (Trader)',
+      labelHi: 'विक्रेता (Trader)',
       labelEn: 'I want to sell rice',
-      desc: 'బియ్యం అమ్మాలనుకుంటున్నారు\nList your products and manage sales',
+      desc: lang === 'te' ? 'బియ్యం అమ్మాలనుకుంటున్నారు\nList your products and manage sales' : lang === 'hi' ? 'चावल बेचना चाहते हैं\nList your products and manage sales' : 'List your products and manage sales',
       color: Colors.primary,
     },
   ];
@@ -81,8 +83,8 @@ const RoleSelectScreen = () => {
 
       <View style={[styles.header, { paddingTop: insets.top + 30 }]}>
          <Image source={require('../../assets/logo.png')} style={styles.logoImage} />
-         <Text style={styles.title}>{lang === 'te' ? 'మీరు ఎవరు?' : 'Who are you?'}</Text>
-         <Text style={styles.subtitle}>{lang === 'te' ? 'మీ పాత్రను ఎంచుకోండి' : 'Select your primary role'}</Text>
+         <Text style={styles.title}>{lang === 'te' ? 'మీరు ఎవరు?' : lang === 'hi' ? 'आप कौन हैं?' : 'Who are you?'}</Text>
+         <Text style={styles.subtitle}>{lang === 'te' ? 'మీ పాత్రను ఎంచుకోండి' : lang === 'hi' ? 'अपनी भूमिका चुनें' : 'Select your primary role'}</Text>
       </View>
 
       <View style={styles.bottomCard}>
@@ -98,8 +100,7 @@ const RoleSelectScreen = () => {
                    <Icon name={role.icon} size={32} color={role.color} />
                 </View>
                 <View style={styles.cardContent}>
-                  <Text style={[styles.roleTe, selected === role.key && { color: role.color }]}>{role.labelTe}</Text>
-                  <Text style={styles.roleEn}>{role.labelEn}</Text>
+                  <Text style={[styles.roleTe, selected === role.key && { color: role.color }]}>{lang === 'te' ? role.labelTe : lang === 'hi' ? role.labelHi : role.labelEn}</Text>
                   <Text style={styles.roleDesc}>{role.desc}</Text>
                 </View>
                 {selected === role.key && (
@@ -115,7 +116,7 @@ const RoleSelectScreen = () => {
               onPress={handleContinue}
               disabled={!selected || loading}
             >
-              <Text style={styles.btnText}>{lang === 'te' ? 'ముందుకు కొనసాగండి' : 'Continue'}</Text>
+              <Text style={styles.btnText}>{lang === 'te' ? 'ముందుకు కొనసాగండి' : lang === 'hi' ? 'जारी रखें' : 'Continue'}</Text>
               <Icon name="arrow-right" size={20} color="#FFF" />
             </TouchableOpacity>
         </ScrollView>
