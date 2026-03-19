@@ -81,23 +81,6 @@ const OTPScreen = () => {
   const verifyOTP = async (code) => {
     setLoading(true);
     try {
-      if (confirmation.dev) {
-        if (code === '123456') {
-          try {
-            const res = await client.post('/auth/phone-login', { phone });
-            if (res.data.success && res.data.data?.token) {
-                await login(res.data.data, res.data.data.token);
-                return;
-            }
-          } catch (devErr) {
-            navigation.navigate('RoleSelect', { phone, idToken: 'DEV_TOKEN' });
-            return;
-          }
-        } else {
-          throw new Error('Invalid OTP');
-        }
-      }
-
       const result = await confirmation.confirm(code);
       const idToken = await result.user.getIdToken();
 

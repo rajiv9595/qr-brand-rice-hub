@@ -69,21 +69,11 @@ const LoginScreen = () => {
     try {
       const fullNumber = `+91${cleaned}`;
 
-      // Bypass for test number
-      if (cleaned === '9614346666') {
-        navigation.navigate('OTP', { phone: fullNumber, confirmation: { dev: true } });
-        return;
-      }
-
       const confirmation = await auth().signInWithPhoneNumber(fullNumber);
       navigation.navigate('OTP', { phone: fullNumber, confirmation });
     } catch (error) {
       console.warn('OTP send error:', error);
-      if (error.code === 'auth/billing-not-enabled') {
-        Alert.alert('Billing Needed', 'Firebase requires Blaze plan for SMS. Use test number 9614346666 for now.');
-      } else {
-        Alert.alert(t('Error'), lang === 'te' ? 'OTP పంపడం విఫలమైంది' : 'OTP sending failed');
-      }
+      Alert.alert(t('Error'), error.message || (lang === 'te' ? 'OTP పంపడం విఫలమైంది' : 'OTP sending failed'));
     } finally {
       setLoading(false);
     }

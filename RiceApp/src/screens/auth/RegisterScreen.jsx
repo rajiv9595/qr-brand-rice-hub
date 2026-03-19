@@ -83,7 +83,7 @@ const RegisterScreen = () => {
       navigation.navigate('OTP', { phone: fullPhone, confirmation, role: formData.role });
     } catch (e) {
       setLoading(false);
-      Alert.alert('Error', 'Failed to send OTP. Try again.');
+      Alert.alert('Error', e.message || 'Failed to send OTP. Try again.');
     }
   };
 
