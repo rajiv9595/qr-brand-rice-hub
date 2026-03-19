@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "399015994778",
+    "project_id": "qr-brand-rice-hub-2e5b3",
+    "storage_bucket": "qr-brand-rice-hub-2e5b3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:399015994778:android:9f5c4ac1b2806e6c570623",
+        "android_client_info": {
+          "package_name": "com.qrbrand.ricehub"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7wvXmz5C6PsMg0l9yiF9WRkGDVSXwmg8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
