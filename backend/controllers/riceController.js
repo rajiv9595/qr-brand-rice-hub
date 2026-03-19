@@ -168,11 +168,7 @@ exports.getPublicListings = asyncHandler(async (req, res) => {
     const listings = await RiceListing.find({
         approvalStatus: APPROVAL_STATUS.APPROVED,
         isActive: true,
-    }).populate({
-        path: 'supplierId',
-        select: 'millName district state badges trustScore metrics',
-        populate: { path: 'userId', select: 'isVerified' }
-    });
+    }).populate('supplierId', 'millName district state badges trustScore metrics');
 
     res.json({ success: true, data: listings });
 });
@@ -259,11 +255,7 @@ exports.searchListings = asyncHandler(async (req, res) => {
     const skip = (Number(page) - 1) * Number(limit);
     const totalResults = await RiceListing.countDocuments(query);
     const results = await RiceListing.find(query)
-        .populate({
-            path: 'supplierId',
-            select: 'millName district state badges trustScore metrics',
-            populate: { path: 'userId', select: 'isVerified' }
-        })
+        .populate('supplierId', 'millName district state badges trustScore metrics')
         .sort(sort)
         .skip(skip)
         .limit(Number(limit))
@@ -287,11 +279,7 @@ exports.getBestDeals = asyncHandler(async (req, res) => {
         approvalStatus: APPROVAL_STATUS.APPROVED,
         isActive: true,
     })
-    .populate({
-        path: 'supplierId',
-        select: 'millName district state badges trustScore metrics',
-        populate: { path: 'userId', select: 'isVerified' }
-    })
+    .populate('supplierId', 'millName district state badges trustScore metrics location')
     .sort({ averageRating: -1, createdAt: -1 })
     .limit(20);
 
@@ -354,7 +342,7 @@ exports.getListingById = asyncHandler(async (req, res) => {
     const listing = await RiceListing.findById(req.params.id)
         .populate({
             path: 'supplierId',
-            select: 'millName district state badges trustScore metrics',
+            select: 'millName district state badges trustScore metrics location userId',
             populate: { path: 'userId', select: 'isVerified' }
         });
 

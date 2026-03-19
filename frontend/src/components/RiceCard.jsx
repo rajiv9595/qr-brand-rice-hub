@@ -6,7 +6,7 @@ import StarRating from './StarRating';
 import { useAppStore } from '../context/AppContext';
 import { optimizeImage } from '../utils/imageOptimizer';
 
-function RiceCard({ rice }) {
+function RiceCard({ rice, isDeal }) {
     const { toggleCompare } = useAppStore();
     const compareIds = useAppStore().compareIds || [];
 
@@ -97,7 +97,7 @@ function RiceCard({ rice }) {
                 </div>
 
                 <div className="mt-auto flex items-center gap-2 pt-2">
-                    <Link to={`/rice/${id}`} className="flex-1 text-center btn-primary text-sm !py-2.5">View Details</Link>
+                    <Link to={`/rice/${id}`} state={{ isDeal }} className="flex-1 text-center btn-primary text-sm !py-2.5">View Details</Link>
                     <button
                         onClick={() => toggleCompare(id)}
                         className={`p-2.5 rounded-xl border-2 transition-all ${isComparing ? 'border-field-500 bg-field-50 text-field-600' : 'border-gray-200 text-gray-400 hover:border-field-300 hover:text-field-500'}`}
