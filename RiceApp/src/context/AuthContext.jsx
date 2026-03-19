@@ -14,23 +14,31 @@ export const AuthProvider = ({ children }) => {
       if (!token) return;
 
       const authRes = await client.get('/auth/profile');
-      if (authRes.data.success) {
+      if (authRes && authRes.data && authRes.data.success) {
         let freshUser = authRes.data.data;
 
         if (freshUser.role === 'supplier') {
           try {
-            const supplierRes = await client.get('/suppliers/profile');
-            if (supplierRes.data.success) {
+            const supplierRes = await client.get('/supplier/profile');
+            if (supplierRes && supplierRes.data && supplierRes.data.success) {
               const s = supplierRes.data.data;
+              // FLATTEN DATA IMMEDIATELY 🛡️
               freshUser = { 
                 ...freshUser, 
-                ...s, 
+                millName: s.millName || freshUser.millName,
+                gstNumber: s.gstNumber,
+                traderType: s.traderType,
+                bankDetails: s.bankDetails,
+                upiId: s.upiId,
+                ifscCode: s.bankDetails?.ifscCode || s.ifscCode,
+                district: s.district || freshUser.district,
+                state: s.state || freshUser.state,
                 isVerified: s.userId?.isVerified ?? freshUser.isVerified,
                 autoActivateAt: s.userId?.autoActivateAt ?? null
               };
             }
           } catch (e) {
-            console.warn('Supplier sync error:', e);
+             console.warn('Supplier sync error:', e.message);
           }
         }
 
@@ -39,19 +47,20 @@ export const AuthProvider = ({ children }) => {
         return freshUser;
       }
     } catch (e) {
-      console.warn('syncUser error:', e);
+      console.warn('syncUser error:', e.message);
     }
   };
 
-  // On app start — check if user is already logged in and refresh
   useEffect(() => {
     const init = async () => {
       try {
         const stored = await AsyncStorage.getItem('user');
-        if (stored) setUser(JSON.parse(stored));
-        await syncUser(); // Refresh with latest truth
+        if (stored) {
+          setUser(JSON.parse(stored));
+        }
+        await syncUser();
       } catch (e) {
-        console.warn('Auth init error:', e);
+        console.warn('AuthContext init error:', e);
       } finally {
         setLoading(false);
       }
@@ -67,7 +76,7 @@ export const AuthProvider = ({ children }) => {
       }
       if (token) {
         await AsyncStorage.setItem('token', token);
-        await syncUser(); // Complete business profile sync after login 🛡️
+        await syncUser();
       }
     } catch (e) {
       console.warn('AuthContext login error:', e);

@@ -1,22 +1,18 @@
-// RiceApp/src/screens/trader/TraderDashboard.jsx
-// Premium Business Hub with Strict Profile Enforcement
-// Redesigned to match the professional 100cr company standard
-
+// screens/trader/TraderDashboard.jsx
 import React, { useState, useEffect, useContext } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity, RefreshControl,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors } from '../../theme/colors';
 import { AuthContext } from '../../context/AuthContext';
-import { Typography } from '../../theme/typography';
+import { Typography, TextStyles } from '../../theme/typography';
 import AppHeader from '../../components/common/AppHeader';
 import StatCard from '../../components/trader/StatCard';
 import { riceService } from '../../api/riceService';
 import { orderService } from '../../api/orderService';
 import { formatCurrency } from '../../utils/formatCurrency';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
 
 export default function TraderDashboard() {
   const { user, logout, syncUser } = useContext(AuthContext);
@@ -30,20 +26,54 @@ export default function TraderDashboard() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Unified Backend Logic: 100% match with Website
+  // Status mapping for the welcome box 🛡️
   const isVerified = user?.isVerified === true;
-  const isAutoVerifyTimerActive = user?.autoActivateAt && new Date(user.autoActivateAt) > new Date();
+  const autoActivateAt = user?.autoActivateAt;
+  const isAutoVerifyTimerActive = autoActivateAt && new Date(autoActivateAt) > new Date();
   
-  // Strict Check: Backend requires full entity details for business operations
-  const isProfileComplete = user?.gstNumber && user?.millName && user?.district && user?.upiId && user?.ifscCode;
+  // Strict Profile Check
+  const isProfileIncomplete = !user?.gstNumber || !user?.millName || !user?.upiId;
   
   const getStatusDisplay = () => {
     if (isVerified) return { text: "VERIFIED SELLER", color: "#059669", border: "#10B981", icon: "check-decagram" };
-    if (isAutoVerifyTimerActive) return { text: "VERIFYING BUSINESS...", color: "#2563EB", border: "#60A5FA", icon: "clock-fast" };
+    if (isAutoVerifyTimerActive) return { text: "ACTIVATING AUTOMATICALLY...", color: "#2563EB", border: "#60A5FA", icon: "clock-fast" };
     return { text: "PENDING APPROVAL", color: "#D97706", border: "#F59E0B", icon: "clock-check-outline" };
   };
 
   const status = getStatusDisplay();
+
+  // Smart Banner Logic
+  const getBannerConfig = () => {
+    if (isVerified) return null; // Success - cleaner dashboard
+
+    if (isProfileIncomplete) {
+      return {
+        title: "Profile Incomplete",
+        sub: "Please add your Mill details, GST and Banking info to start selling.",
+        bg: '#FFFBEB',
+        borderColor: '#FEF3C7',
+        icon: 'alert-decagram',
+        iconColor: '#D97706',
+        textColor: '#92400E',
+        subColor: '#B45309',
+        action: 'SETUP'
+      };
+    }
+
+    return {
+      title: "Identity Under Verification",
+      sub: "Your business details are being audited. You'll be ready to sell once approved.",
+      bg: '#E3F2FD',
+      borderColor: '#BBDEFB',
+      icon: 'shield-sync',
+      iconColor: '#1565C0',
+      textColor: '#0D47A1',
+      subColor: '#1976D2',
+      action: 'VIEW'
+    };
+  };
+
+  const banner = getBannerConfig();
 
   const fetchStats = async () => {
     try {
@@ -56,16 +86,16 @@ export default function TraderDashboard() {
       const listings = listingsRes.status === 'fulfilled' ? (listingsRes.value.data?.data || []) : [];
       const orders   = ordersRes.status === 'fulfilled'   ? (ordersRes.value.data?.data || [])   : [];
 
-      const activeProducts = listings.filter(l => l.isActive).length;
-      const pendingOrders  = orders.filter(o => o.status === 'Pending').length;
-      const totalSales     = orders
+      const activeProductCount = listings.filter(l => l.isActive).length;
+      const pendingOrderCount  = orders.filter(o => o.status === 'Pending').length;
+      const totalRevenue     = orders
         .filter(o => o.status === 'Delivered')
         .reduce((sum, o) => sum + (o.totalPrice || 0), 0);
 
       setStats({
-        totalSales,
-        newOrders: pendingOrders,
-        activeProducts,
+        totalSales: totalRevenue,
+        newOrders: pendingOrderCount,
+        activeProducts: activeProductCount,
         pendingNegotiations: 0,
       });
     } catch (err) {
@@ -78,29 +108,28 @@ export default function TraderDashboard() {
 
   useEffect(() => { 
     fetchStats(); 
-    syncUser(); 
+    if (syncUser) syncUser();
   }, []);
 
   const onRefresh = () => {
     setRefreshing(true);
     fetchStats();
+    if (syncUser) syncUser();
   };
 
   return (
     <View style={styles.container}>
       <AppHeader 
         te="వ్యాపార డాష్‌బోర్డ్" 
-        en="Business Hub" 
+        en="Trader Dashboard" 
         showBack={false} 
         rightContent={
           <TouchableOpacity style={styles.profileBtn} onPress={() => navigation.navigate('Profile')}>
-            <Icon name="account-circle" size={32} color="#FFF" />
+            <MaterialIcon name="account-circle" size={32} color="#fff" />
           </TouchableOpacity>
         }
       />
       
-      <LoadingSpinner visible={loading && !refreshing} inline />
-
       <ScrollView 
         contentContainerStyle={styles.scroll}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} color={Colors.primary} />}
@@ -109,142 +138,130 @@ export default function TraderDashboard() {
         <View style={styles.welcomeBox}>
             <Text style={styles.namaste}>నమస్తే, {user?.name || 'Trader'} 🙏</Text>
             <View style={[styles.statusChip, { borderColor: status.border }]}>
-                <Icon name={status.icon} size={14} color={status.color} />
+                <MaterialIcon name={status.icon} size={14} color={status.color} />
                 <Text style={[styles.statusText, { color: status.color }]}>
                     {status.text}
                 </Text>
             </View>
         </View>
 
-        {/* PROFILE GUARD: Mandatory Actions */}
-        {!isProfileComplete && (
+        {/* SMART BANNER */}
+        {banner && (
           <TouchableOpacity 
-            style={styles.mandatoryCard} 
-            onPress={() => navigation.navigate('EditProfile')}
+            style={[styles.alertBanner, { backgroundColor: banner.bg, borderColor: banner.borderColor }]} 
+            onPress={() => navigation.navigate('Profile')}
           >
-            <View style={styles.mandatoryIcon}>
-                <Icon name="shield-alert-outline" size={32} color="#B45309" />
+            <View style={[styles.alertIconBox, { backgroundColor: banner.borderColor }]}>
+                <MaterialIcon name={banner.icon} size={24} color={banner.iconColor} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.mandatoryTitle}>Action Required: Business Identity</Text>
-              <Text style={styles.mandatorySub}>Complete your Mill profile & GST to list rice products for sale.</Text>
+              <Text style={[styles.alertTitle, { color: banner.textColor }]}>{banner.title}</Text>
+              <Text style={[styles.alertSub, { color: banner.subColor }]}>{banner.sub}</Text>
             </View>
-            <Icon name="chevron-right" size={24} color="#D97706" />
+            <Text style={styles.alertLink}>{banner.action}</Text>
           </TouchableOpacity>
         )}
 
-        {/* STATS SECTION */}
+        {/* Statistics Grid */}
         <View style={styles.statsGrid}>
-           <View style={styles.statsRow}>
-              <StatCard labelTe="మొత్తం అమ్మకాలు" labelEn="Total Revenue" value={formatCurrency(stats.totalSales)} icon="currency-inr" color="#0891B2" />
-              <StatCard labelTe="కొత్త ఆర్డర్లు" labelEn="New Orders" value={stats.newOrders} icon="package-variant-closed" color="#7C3AED" />
-           </View>
-           <View style={styles.statsRow}>
-              <StatCard labelTe="ఉత్పత్తులు" labelEn="Active Ads" value={stats.activeProducts} icon="store-outline" color="#059669" />
-              <StatCard labelTe="చర్చలు" labelEn="Chats" value={stats.pendingNegotiations} icon="chat-processing-outline" color="#EA580C" />
-           </View>
+            <View style={styles.statsRow}>
+              <StatCard 
+                labelTe="మొత్తం అమ్మకాలు" 
+                labelEn="Total Sales" 
+                value={formatCurrency(stats.totalSales)} 
+                color="#059669" 
+              />
+              <StatCard 
+                labelTe="కొత్త ఆర్డర్లు" 
+                labelEn="New Orders" 
+                value={stats.newOrders} 
+                color="#F59E0B" 
+              />
+            </View>
+            <View style={styles.statsRow}>
+              <StatCard 
+                labelTe="ఉత్పత్తులు" 
+                labelEn="Products" 
+                value={stats.activeProducts} 
+                color="#2563EB" 
+              />
+              <StatCard 
+                labelTe="చర్చలు (Pending)" 
+                labelEn="Negotiations" 
+                value={stats.pendingNegotiations} 
+                color="#7C3AED" 
+              />
+            </View>
         </View>
 
-        {/* QUICK ACTIONS */}
-        <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitleTe}>త్వరిత చర్యలు</Text>
-            <Text style={styles.sectionTitleEn}>Quick Actions</Text>
-        </View>
-
+        {/* Quick Actions */}
+        <Text style={TextStyles.sectionTitle}>త్వరిత చర్యలు (QUICK ACTIONS)</Text>
         <View style={styles.actionGrid}>
             <TouchableOpacity 
-              style={[styles.actionCard, !isProfileComplete && styles.actionLocked]}
-              onPress={() => isProfileComplete ? navigation.navigate('AddProduct') : Alert.alert("Profile Incomplete", "Please add your GST and Mill details first.")}
-              disabled={!isProfileComplete}
+              style={[styles.actionBtn, { backgroundColor: '#ECFDF5' }]}
+              onPress={() => navigation.navigate('AddProduct')}
             >
-                <View style={[styles.actionIconBox, { backgroundColor: '#F0F9FF' }]}>
-                    <Icon name={isProfileComplete ? "plus-circle" : "lock-outline"} size={32} color={isProfileComplete ? "#0284C7" : "#94A3B8"} />
-                </View>
-                <Text style={styles.actionLabel}>Add Rice</Text>
-                <Text style={styles.actionSub}>Create Listing</Text>
+              <View style={[styles.iconCircle, { backgroundColor: '#059669' }]}>
+                <MaterialIcon name="plus" size={24} color="#fff" />
+              </View>
+              <Text style={styles.actionTe}>బియ్యం చేర్చండి</Text>
+              <Text style={styles.actionEn}>Add Product</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
-              style={styles.actionCard}
+              style={[styles.actionBtn, { backgroundColor: '#FFF7ED' }]}
               onPress={() => navigation.navigate('Orders')}
             >
-                <View style={[styles.actionIconBox, { backgroundColor: '#F5F3FF' }]}>
-                    <Icon name="clipboard-text-outline" size={32} color="#7C3AED" />
-                </View>
-                <Text style={styles.actionLabel}>Orders</Text>
-                <Text style={styles.actionSub}>Manage Sales</Text>
+              <View style={[styles.iconCircle, { backgroundColor: '#F59E0B' }]}>
+                <MaterialIcon name="package-variant" size={24} color="#fff" />
+              </View>
+              <Text style={styles.actionTe}>ఆర్డర్లు చూడండి</Text>
+              <Text style={styles.actionEn}>View Orders</Text>
             </TouchableOpacity>
         </View>
 
-        {/* ANALYTICS PREVIEW */}
-        <View style={styles.insightCard}>
-            <View style={styles.insightHeader}>
-                <Icon name="trending-up" size={24} color={Colors.primary} />
-                <Text style={styles.insightTitle}>Market Performance</Text>
+        {/* Business Tips */}
+        <View style={styles.tipsCard}>
+            <View style={styles.tipsHeader}>
+                <MaterialIcon name="lightbulb-on" size={20} color={Colors.primary} />
+                <Text style={styles.tipsTitleTe}>వ్యాపార చిట్కా (Business Tip)</Text>
             </View>
-            <Text style={styles.insightDesc}>Your listings have been viewed 42 times this week. Add clear photos to improve engagement!</Text>
+            <Text style={styles.tipsTextTe}>మీ బియ్యం ఫోటోలు స్పష్టంగా ఉంటే ఎక్కువ మంది కొంటారు.</Text>
+            <Text style={styles.tipsTextEn}>Clear photos of your rice help attract more customers.</Text>
         </View>
 
-        <View style={{ height: 40 }} />
+        <View style={{ height: 100 }} />
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F9FAFB' },
+  container: { flex: 1, backgroundColor: Colors.bg },
   scroll: { padding: 20 },
-  
-  welcomeBox: { marginBottom: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  namaste: { fontSize: 22, fontWeight: '900', color: Colors.textPrimary },
-  statusChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12, gap: 5, elevation: 1 },
-  statusText: { fontSize: 10, fontWeight: '900' },
-  
-  mandatoryCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFBEB',
-    padding: 20,
-    borderRadius: 24,
-    marginBottom: 30,
-    borderWidth: 1.5,
-    borderColor: '#FEF3C7',
-    gap: 16,
-    elevation: 4,
-    shadowColor: '#D97706',
-    shadowOpacity: 0.1,
+  welcomeBox: { marginBottom: 25, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  namaste: { fontSize: 21, fontWeight: '900', color: Colors.textPrimary, letterSpacing: -0.5 },
+  statusChip: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12, borderWidth: 1, gap: 4, backgroundColor: '#fff' },
+  statusText: { fontSize: 9, fontWeight: '900' },
+  alertBanner: { 
+    flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 20, marginBottom: 25, 
+    borderWidth: 1, gap: 12, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 8
   },
-  mandatoryIcon: { width: 56, height: 56, borderRadius: 16, backgroundColor: '#FEF3C7', alignItems: 'center', justifyContent: 'center' },
-  mandatoryTitle: { fontSize: 15, fontWeight: '900', color: '#92400E' },
-  mandatorySub: { fontSize: 11, color: '#B45309', marginTop: 4, lineHeight: 16 },
-  
-  statsGrid: { gap: 12, marginBottom: 32 },
-  statsRow: { flexDirection: 'row', gap: 12 },
-  
-  sectionHeader: { marginBottom: 16 },
-  sectionTitleTe: { fontSize: 16, fontWeight: '900', color: Colors.textPrimary },
-  sectionTitleEn: { fontSize: 10, color: Colors.textMuted, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 },
-  
-  actionGrid: { flexDirection: 'row', gap: 16, marginBottom: 24 },
-  actionCard: {
-    flex: 1,
-    backgroundColor: '#FFF',
-    padding: 20,
-    borderRadius: 24,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
-    elevation: 2,
-  },
-  actionLocked: { opacity: 0.6, backgroundColor: '#F1F5F9' },
-  actionIconBox: { width: 64, height: 64, borderRadius: 20, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
-  actionLabel: { fontSize: 15, fontWeight: '900', color: Colors.textPrimary },
-  actionSub: { fontSize: 11, color: Colors.textSecondary, marginTop: 2, fontWeight: '600' },
-  
-  insightCard: { backgroundColor: '#FFF', padding: 20, borderRadius: 24, borderWidth: 1, borderColor: '#F3F4F6' },
-  insightHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
-  insightTitle: { fontSize: 15, fontWeight: '900', color: Colors.textPrimary },
-  insightDesc: { fontSize: 13, color: Colors.textSecondary, lineHeight: 20 },
-  
+  alertIconBox: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  alertTitle: { fontSize: 14, fontWeight: 'bold' },
+  alertSub: { fontSize: 11, marginTop: 2, lineHeight: 16 },
+  alertLink: { fontSize: 12, fontWeight: '900', color: Colors.primary, marginLeft: 10 },
   profileBtn: { padding: 4 },
+  statsGrid: { gap: 12, marginBottom: 35 },
+  statsRow: { flexDirection: 'row', gap: 12 },
+  actionGrid: { flexDirection: 'row', gap: 16, marginBottom: 35 },
+  actionBtn: { flex: 1, padding: 20, borderRadius: 24, alignItems: 'center', justifyContent: 'center', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 5 },
+  iconCircle: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
+  actionTe: { fontSize: 15, fontWeight: 'bold', color: Colors.textPrimary },
+  actionEn: { fontSize: 10, color: Colors.textSecondary, fontWeight: 'bold', textTransform: 'uppercase', marginTop: 2 },
+  tipsCard: { backgroundColor: Colors.white, padding: 22, borderRadius: 24, borderLeftWidth: 6, borderLeftColor: Colors.primary, shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.08, shadowRadius: 15, elevation: 3 },
+  tipsHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
+  tipsTitleTe: { fontSize: 14, fontWeight: '900', color: Colors.primary },
+  tipsTextTe: { fontSize: 16, fontWeight: 'bold', color: Colors.textPrimary, marginBottom: 6 },
+  tipsTextEn: { fontSize: 12, color: Colors.textSecondary, lineHeight: 18 },
 });
