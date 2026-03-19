@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "401036516298",
+    "project_id": "ricehub-d082e",
+    "storage_bucket": "ricehub-d082e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:401036516298:android:7fd87e35aa89cc589d8d33",
+        "android_client_info": {
+          "package_name": "com.qrbrand.ricehub"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "401036516298-6tq45uat7r8een71nrsr90sgiqqgb3gc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.qrbrand.ricehub",
+            "certificate_hash": "e123d820a69f569848a2b218047432de85ee4c0f"
+          }
+        },
+        {
+          "client_id": "401036516298-ts9ga4efrd42ts57hfvi56voeqk2ehh6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.qrbrand.ricehub",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "401036516298-9rqe5n5bc7nlaqtst6ums9h4ght5qrar.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmjY2Jkl8psC5_3ZJ9KZFM9F7Aiw2W4YM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "401036516298-9rqe5n5bc7nlaqtst6ums9h4ght5qrar.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
